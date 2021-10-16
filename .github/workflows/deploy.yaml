@@ -1,0 +1,78 @@
+name: Deploy to web host
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  # pre-deploy:
+  #   name: 🚧 Pre deploy
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     should_skip: ${{ steps.skip_check.outputs.should_skip }}
+  #   steps:
+  #     - id: skip_check
+  #       name: 🛑 Make sure only a single deployment is running
+  #       uses: fkirc/skip-duplicate-actions@master
+  #       with:
+  #         concurrent_skipping: "always"
+  #         cancel_others: "true"
+  #         # paths_ignore: '["**/*.md"]'
+
+  web-deploy:
+    # needs: pre-deploy
+    # if: ${{ needs.pre-deploy.outputs.should_skip != 'true' }}
+    name: 🚀 Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🚚 Get latest code
+        uses: actions/checkout@v2
+
+      - name: ✏️ Replace secret (BASE_URL)
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: "$config['base_url'] = '';"
+          replace: "$config['base_url'] = '${{ secrets.BASE_URL }}';"
+          include: "application/config/config.php"
+          regex: false
+
+      - name: ✏️ Replace secret (DB_USERNAME)
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: "'username' => 'root',"
+          replace: "'username' => '${{ secrets.DB_USERNAME }}',"
+          include: "application/config/database.php"
+          regex: false
+
+      - name: ✏️ Replace secret (DB_PASSWORD)
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: "'password' => '',"
+          replace: "'password' => '${{ secrets.DB_PASSWORD }}',"
+          include: "application/config/database.php"
+          regex: false
+
+      - name: ✏️ Replace secret (DB_DATABASE)
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: "'database' => 'fnfstats',"
+          replace: "'database' => '${{ secrets.DB_DATABASE }}',"
+          include: "application/config/database.php"
+          regex: false
+
+      # - name: ✏️ Replace secret (ADMIN_KEY)
+      #   uses: jacobtomlinson/gha-find-replace@v2
+      #   with:
+      #     find: "$config['admin_key'] = 'team';"
+      #     replace: "$config['admin_key'] = '${{ secrets.ADMIN_KEY }}';"
+      #     include: "application/config/fnf.php"
+      #     regex: false
+
+      - name: 📂 Sync files
+        uses: SamKirkland/FTP-Deploy-Action@4.1.0
+        with:
+          server: "${{ secrets.FTP_HOSTNAME }}"
+          username: "${{ secrets.FTP_USERNAME }}"
+          password: "${{ secrets.FTP_PASSWORD }}"
+          # dry-run: true

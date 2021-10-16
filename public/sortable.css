@@ -1,0 +1,79 @@
+.sortable {
+  border-spacing: 0;
+}
+.sortable tbody tr:nth-child(odd) {
+}
+
+.sortable th {
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.sortable th > sup {
+  cursor: auto;
+}
+
+.sortable th:hover::after {
+  font-size: 1.2em;
+  color: inherit;
+  content: ' \025B8';
+}
+
+.sortable th::after {
+  font-size: 1.2em;
+  color: transparent;
+  content: ' \025B8';
+}
+
+.sortable th.dir-d::after {
+  color: inherit;
+  content: ' \025BE';
+}
+
+.sortable th.dir-u::after {
+  color: inherit;
+  content: ' \025B4';
+}
+
+.sortable th.mdc-data-table__header-cell--numeric:hover::after, 
+.sortable th.mdc-data-table__header-cell--numeric::after, 
+.sortable th.dir-d.mdc-data-table__header-cell--numeric::after, 
+.sortable th.dir-u.mdc-data-table__header-cell--numeric::after {
+  display: none;
+}
+
+.sortable th.mdc-data-table__header-cell--numeric:hover::before {
+  font-size: 1.2em;
+  color: inherit;
+  content: ' \025B8';
+}
+
+.sortable th.mdc-data-table__header-cell--numeric::before {
+  font-size: 1.2em;
+  color: transparent;
+  content: ' \025B8';
+}
+
+.sortable th.dir-d.mdc-data-table__header-cell--numeric::before {
+  color: inherit;
+  content: ' \025BE';
+}
+
+.sortable th.dir-u.mdc-data-table__header-cell--numeric::before {
+  color: inherit;
+  content: ' \025B4';
+}
+
+table.sortable thead tr th {
+  position: relative;
+}
+
+table.sortable thead tr th sup {
+  position: absolute;
+  right: 0;
+  pointer-events: none;
+}
+
+table.sortable thead tr th:hover {
+  color: var(--mdc-theme-secondary);
+}
