@@ -166,6 +166,10 @@ a:hover {
     .markdown-body h2 {
         border-bottom: 1px solid #555555;
     }
+
+    footer a.github {
+        fill: #c6cbd1;
+    }
 }
 
 .side__, .side__ a:link, .mdc-data-table td.side__ a:visited {

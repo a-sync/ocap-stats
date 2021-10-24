@@ -1,13 +1,15 @@
-<?php defined('BASEPATH') OR exit('*');
+<?php defined('BASEPATH') or exit('*');
 
-class Players extends CI_Model {
+class Players extends CI_Model
+{
 
     public function __construct()
     {
         $this->load->database();
     }
 
-    public function get_players($event_types, $id = false) {
+    public function get_players($event_types, $id = false)
+    {
         if ($id) {
             $this->db->where('players.id', $id);
         }
@@ -35,12 +37,6 @@ class Players extends CI_Model {
 
         $this->db->order_by('attendance DESC, kills DESC, deaths ASC, hits DESC, vkills DESC, shots ASC');
 
-        // $q = $this->db->get_compiled_select();//debug
-        // return array($q);//debug
-        /*
-SELECT `players`.`name`, `players`.`id`, SUM(`shots`) AS `shots`, SUM(`hits`) AS `hits`, SUM(`fhits`) AS `fhits`, SUM(`kills`) AS `kills`, SUM(`fkills`) AS `fkills`, SUM(`vkills`) AS `vkills`, COUNT(DISTINCT `entities`.`operation_id`) AS `attendance` FROM `players` JOIN `entities` ON `entities`.`player_id` = `players`.`id` JOIN `operations` ON `operations`.`id` = `entities`.`operation_id` WHERE `players`.`alias_of` = 0 AND `operations`.`event` IN('eu', 'na') GROUP BY `players`.`id` ORDER BY `attendance` DESC, `kills` DESC, `hits` DESC, `vkills` DESC, `shots` ASC
-        */
-
         $players = $this->db->get()->result_array();
 
         // Get adjusted hit stats for players
@@ -53,7 +49,7 @@ SELECT `players`.`name`, `players`.`id`, SUM(`shots`) AS `shots`, SUM(`hits`) AS
             ->select_sum('entities.hits')
             ->select_sum('entities.fhits')
             ->from('players')
-            ->join('entities', 'entities.player_id = players.id AND entities.operation_id >= '.FIRST_OP_WITH_HIT_EVENTS)
+            ->join('entities', 'entities.player_id = players.id AND entities.operation_id >= ' . FIRST_OP_WITH_HIT_EVENTS)
             ->join('operations', 'operations.id = entities.operation_id')
             ->where('players.alias_of', 0)
             ->group_by('players.id');
@@ -63,10 +59,6 @@ SELECT `players`.`name`, `players`.`id`, SUM(`shots`) AS `shots`, SUM(`hits`) AS
         } else {
             $this->db->where('operations.event !=', '');
         }
-
-/*
-SELECT `players`.`id`, SUM(`entities`.`shots`) AS `shots`, SUM(`entities`.`hits`) AS `hits`, SUM(`entities`.`fhits`) AS `fhits` FROM `players` JOIN `entities` ON `entities`.`player_id` = `players`.`id` AND `entities`.`operation_id` >= 335 JOIN `operations` ON `operations`.`id` = `entities`.`operation_id` WHERE `players`.`alias_of` = 0 AND `operations`.`event` IN('eu', 'na') GROUP BY `players`.`id`
-*/
 
         $players_adjusted_stats = $this->db->get()->result_array();
         $players_adjusted_stats = array_column($players_adjusted_stats, null, 'id');
@@ -87,7 +79,8 @@ SELECT `players`.`id`, SUM(`entities`.`shots`) AS `shots`, SUM(`entities`.`hits`
         return $players;
     }
 
-    public function get_by_id ($id) {
+    public function get_by_id($id)
+    {
         $re = $this->get_players(false, $id);
 
         if (count($re) === 0) {
@@ -97,10 +90,11 @@ SELECT `players`.`id`, SUM(`entities`.`shots`) AS `shots`, SUM(`entities`.`hits`
         }
     }
 
-    public function get_ops_by_id ($id) {
+    public function get_ops_by_id($id)
+    {
         $this->db
             ->select([
-                'entities.operation_id', 
+                'entities.operation_id',
                 'entities.id',
                 'entities.player_id',
                 'entities.group_name',
@@ -128,45 +122,49 @@ SELECT `players`.`id`, SUM(`entities`.`shots`) AS `shots`, SUM(`entities`.`hits`
             ->join('operations', 'operations.id = entities.operation_id')
             ->group_by('entities.id, entities.operation_id')
             ->order_by('entities.operation_id DESC, entities.id ASC');
-        
-        // $q = $this->db->get_compiled_select();//debug
-        // return array($q);//debug
-        /*
-SELECT `entities`.`operation_id`, `entities`.`id`, `entities`.`player_id`, `entities`.`group_name`, `entities`.`name`, `entities`.`role`, `entities`.`side`, `operations`.`mission_name`, `operations`.`mission_duration`, `operations`.`world_name`, `operations`.`filename`, `operations`.`event`, `operations`.`start_time`, `operations`.`end_winner`, SUM(`shots`) AS `shots`, SUM(`hits`) AS `hits`, SUM(`fhits`) AS `fhits`, SUM(`kills`) AS `kills`, SUM(`fkills`) AS `fkills`, SUM(`vkills`) AS `vkills`
-FROM `entities`
-JOIN `players` ON `players`.`id` = `entities`.`player_id`
-JOIN `operations` ON `operations`.`id` = `entities`.`operation_id`
-WHERE `entities`.`player_id` = '66'
-GROUP BY `entities`.`id`, `entities`.`operation_id`
-ORDER BY `entities`.`operation_id` DESC, `entities`.`id` ASC
-        */
 
         return $this->db
             ->get()
             ->result_array();
     }
 
-    public function get_commanders ($event_types) {
+    public function get_commanders($event_types, $return_unsolvable = false)
+    {
+        $hq_group_names = $this->config->item('hq_group_names');
+        $hq_role_names = $this->config->item('hq_role_names');
+
+        $order_by_role_name = 'CASE `role_name` ';
+        foreach ($hq_role_names as $i => $rn) {
+            $order_by_role_name .= "WHEN " . $this->db->escape($rn) . " THEN " . strval($i + 1) . " ";
+        }
+        $order_by_role_name .= 'ELSE ' . strval(count($hq_role_names) + 1) . ' END';
+
         $this->db->select([
-                'players.name', 
-                'entities.player_id',
-                'entities.side',
-                'entities.group_name',
-                'entities.role',
-                'operations.id AS operation_id',
-                'operations.end_winner'
-            ])
+            'players.name',
+            'entities.player_id',
+            'entities.side',
+            'entities.group_name',
+            'entities.role',
+            'operations.id AS operation_id',
+            'operations.end_winner',
+            "SUBSTRING_INDEX(entities.role, '@', 1) as role_name"
+        ])
             ->from('players')
-            ->where('alias_of', 0)
-            ->where_in('entities.group_name', $this->config->item('hq_group_names'))
             ->join('entities', 'entities.player_id = players.id')
-            ->join('operations', 'operations.id = entities.operation_id');
-            //->group_by('players.id');
-        
+            ->join('operations', 'operations.id = entities.operation_id')
+            ->where('players.alias_of', 0)
+            ->where_in('entities.group_name', $hq_group_names)
+            // ->where('operations.end_winner !=', '')
+            ->order_by("FIELD(entities.group_name, '" . implode("', '", $hq_group_names) . "')")
+            ->order_by("FIELD(entities.role, '" . implode("', '", $hq_role_names) . "')")
+            ->order_by($order_by_role_name, 'ASC', false)
+            ->order_by('entities.id ASC');
+
         $this->db->group_start();
-        foreach ($this->config->item('hq_role_names') as $i => $role_name) {
+        foreach ($hq_role_names as $role_name) {
             $this->db->or_like('entities.role', $role_name, 'after');
         }
+        $this->db->or_where('entities.role', '');
         $this->db->group_end();
 
         if ($event_types && count($event_types) > 0) {
@@ -175,50 +173,53 @@ ORDER BY `entities`.`operation_id` DESC, `entities`.`id` ASC
             $this->db->where('operations.event !=', '');
         }
 
-        //$q = $this->db->get_compiled_select();//debug
-        //return array($q);//debug
-        /*
-SELECT `players`.`name`, `entities`.`player_id`, `entities`.`side`, `entities`.`group_name`, `entities`.`role`, `operations`.`id` AS `operation_id`, `operations`.`end_winner`
-FROM `players`
-JOIN `entities` ON `entities`.`player_id` = `players`.`id`
-JOIN `operations` ON `operations`.`id` = `entities`.`operation_id`
-WHERE `alias_of` = 0
-AND `entities`.`group_name` IN('CMD', 'PLTHQ', 'OPF PLT HQ', 'IND PLT HQ', 'P1HQ', 'P2HQ')
-AND   (
-`entities`.`role` LIKE 'Company Commander%' ESCAPE '!'
-OR  `entities`.`role` LIKE 'Platoon Leader%' ESCAPE '!'
-OR  `entities`.`role` LIKE 'Platoon Leader (HVT)%' ESCAPE '!'
-OR  `entities`.`role` LIKE 'Osamba Bind Layden%' ESCAPE '!'
- )
-AND `operations`.`event` IN('eu', 'na')
-        */
+        $leads = $this->db->get()->result_array();
 
         $op_leads = [];
-        $leads = $this->db->get()->result_array();
         $matching_sides = [];
+        $ops_teams_with_unsolvable_hq = [];
         foreach ($leads as $l) {
             $op_id = $l['operation_id'];
             $side = $l['side'];
 
-            if ( ! isset($matching_sides[$side])) {
+            if (!isset($matching_sides[$side])) {
                 $matching_sides[$side] = true;
             }
 
-            if ( ! isset($op_leads[$op_id])) {
+            if (!isset($op_leads[$op_id])) {
                 $op_leads[$op_id] = [];
             }
-            if ( ! isset($op_leads[$op_id][$side])) {
-                $op_leads[$op_id][$side] = $l;
+
+            if (!isset($ops_teams_with_unsolvable_hq[$op_id][$side])) {
+                if (!isset($op_leads[$op_id][$side])) {
+                    $op_leads[$op_id][$side] = $l;
+                } else {
+                    if (
+                        $op_leads[$op_id][$side]['group_name'] === $l['group_name'] &&
+                        $op_leads[$op_id][$side]['role'] === '' &&
+                        $l['role'] === ''
+                    ) {
+                        $ops_teams_with_unsolvable_hq[$op_id][$side] = [$op_leads[$op_id][$side], $l];
+                        unset($op_leads[$op_id][$side]);
+                    } else {
+                        $op_leads[$op_id][$side] = $this->_return_commander($l, $op_leads[$op_id][$side]);
+                    }
+                }
             } else {
-                $op_leads[$op_id][$side] = $this->_return_commander ($l, $op_leads[$op_id][$side]);
+                $ops_teams_with_unsolvable_hq[$op_id][$side][] = $l;
             }
         }
+
+        if ($return_unsolvable) {
+            return $ops_teams_with_unsolvable_hq;
+        }
+        $ops_teams_with_unsolvable_hq = null;
 
         $commanders = [];
         foreach ($op_leads as $ol) {
             foreach ($ol as $l) {
                 $id = $l['player_id'];
-                if ( ! isset($commanders[$id])) {
+                if (!isset($commanders[$id])) {
                     $commanders[$id] = [
                         'name' => $l['name'],
                         'player_id' => $id,
@@ -242,19 +243,19 @@ AND `operations`.`event` IN('eu', 'na')
                         $commanders[$id]['loss_total']++;
                     }
                 }
-
             }
         }
 
         $wins = array_column($commanders, 'win_total');
         $losses = array_column($commanders, 'loss_total');
 
-        array_multisort($wins, SORT_DESC, SORT_NUMERIC , $losses, SORT_ASC, SORT_NUMERIC, $commanders);
+        array_multisort($wins, SORT_DESC, SORT_NUMERIC, $losses, SORT_ASC, SORT_NUMERIC, $commanders);
 
         return $commanders;
     }
 
-    private function _return_commander ($entity_1, $entity_2) {
+    private function _return_commander($entity_1, $entity_2)
+    {
         $e1_group_index = array_search($entity_1['group_name'], $this->config->item('hq_group_names'));
         $e2_group_index = array_search($entity_2['group_name'], $this->config->item('hq_group_names'));
 
@@ -268,13 +269,10 @@ AND `operations`.`event` IN('eu', 'na')
             }
         }
 
-        $e1_role = explode('@', $entity_1['role'])[0];
-        $e2_role = explode('@', $entity_2['role'])[0];
+        $e1_role_index = array_search($entity_1['role_name'], $this->config->item('hq_role_names'));
+        $e2_role_index = array_search($entity_2['role_name'], $this->config->item('hq_role_names'));
 
-        $e1_role_index = array_search($e1_role, $this->config->item('hq_role_names'));
-        $e2_role_index = array_search($e2_role, $this->config->item('hq_role_names'));
-
-        if ($e2_role_index === $e2_role_index) return $entity_1;
+        if ($e1_role_index === $e2_role_index) return $entity_1;
 
         if ($e2_role_index === false) return $entity_1;
         else if ($e1_role_index === false) return $entity_2;
@@ -285,7 +283,8 @@ AND `operations`.`event` IN('eu', 'na')
         }
     }
 
-    public function get_aliases_by_id($id = false) {
+    public function get_aliases_by_id($id = false)
+    {
         $this->db->select(['players.name', 'players.id', 'players.alias_of'])
             ->from('players')
             ->where('players.alias_of', $id);
@@ -295,14 +294,74 @@ AND `operations`.`event` IN('eu', 'na')
             ->result_array();
     }
 
-    public function get_players_names($aliases = false) {
+    public function get_players_names($aliases = false)
+    {
         $this->db->select(['players.name', 'players.id', 'players.alias_of'])
             ->from('players')
-            ->where('players.alias_of'.($aliases?' !=':''), 0)
+            ->where('players.alias_of' . ($aliases ? ' !=' : ''), 0)
             ->order_by('players.name', 'ASC');
 
         return $this->db
             ->get()
             ->result_array();
+    }
+
+    public function get_roles_by_id($id)
+    {
+        $this->db
+            ->select([
+                "SUBSTRING_INDEX(entities.role, '@', 1) AS role_name",
+                'COUNT(entities.role) AS total_count',
+            ])
+            ->select_sum("CASE WHEN side = 'WEST' THEN 1 ELSE 0 END", 'west_count')
+            ->select_sum("CASE WHEN side = 'EAST' THEN 1 ELSE 0 END", 'east_count')
+            ->select_sum("CASE WHEN side = 'GUER' THEN 1 ELSE 0 END", 'guer_count')
+            ->select_sum('shots')
+            ->select_sum('hits')
+            ->select_sum('fhits')
+            ->select_sum('kills')
+            ->select_sum('fkills')
+            ->select_sum('vkills')
+            ->select_sum('deaths')
+            ->from('entities')
+            ->where('entities.player_id', $id)
+            ->where('entities.role !=', '')
+            ->group_by('role_name')
+            ->order_by('total_count DESC, kills DESC, deaths ASC');
+
+        $roles = $this->db->get()->result_array();
+
+        // Get adjusted hit stats for roles
+        $this->db
+            ->select([
+                "SUBSTRING_INDEX(entities.role, '@', 1) AS role_name",
+                'COUNT(entities.role) AS total_count',
+            ])
+            ->select_sum('shots')
+            ->select_sum('hits')
+            ->select_sum('fhits')
+            ->from('entities')
+            ->where('entities.player_id', $id)
+            ->where('entities.role !=', '')
+            ->where('entities.operation_id >=', FIRST_OP_WITH_HIT_EVENTS)
+            ->group_by('role_name');
+
+        $roles_adjusted_stats = $this->db->get()->result_array();
+        $roles_adjusted_stats = array_column($roles_adjusted_stats, null, 'role_name');
+
+        foreach ($roles as $i => $r) {
+            if (isset($roles_adjusted_stats[$r['role_name']])) {
+                $roles[$i]['adj_shots'] = $roles_adjusted_stats[$r['role_name']]['shots'];
+                $roles[$i]['adj_hits'] = $roles_adjusted_stats[$r['role_name']]['hits'];
+                $roles[$i]['adj_fhits'] = $roles_adjusted_stats[$r['role_name']]['fhits'];
+            } else {
+                // player only attended before FIRST_OP_WITH_HIT_EVENTS
+                $roles[$i]['adj_shots'] = false;
+                $roles[$i]['adj_hits'] = false;
+                $roles[$i]['adj_fhits'] = false;
+            }
+        }
+
+        return $roles;
     }
 }

@@ -1,18 +1,21 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
-class App extends CI_Controller {
+class App extends CI_Controller
+{
     public function __construct()
     {
         parent::__construct();
         $this->output->set_header('X-Powered-By: 💖');
     }
 
-    public function login () {
+    public function login()
+    {
         return $this->load->view('admin/login');
     }
 
-    public function zerosec ($my_name = '', $my_hash = '') {
+    public function zerosec($my_name = '', $my_hash = '')
+    {
         $name = preg_replace("/[^A-Za-z0-9]/", '', $my_name);
         $this->load->library('session');
 
@@ -20,14 +23,15 @@ class App extends CI_Controller {
             return redirect(base_url('login'));
         }
 
-        $secret_hash = hash('sha256', 
+        $secret_hash = hash(
+            'sha256',
             $this->config->item('admin_key')
-            .'*-#<_§!?:)¤.-€@&,%/=(>\\|~ß$Ł'.
-            $name
+                . '*-#<_§!?:)¤.-€@&,%/=(>\\|~ß$Ł' .
+                $name
         );
 
         if ($my_hash === $this->config->item('admin_key')) {
-            exit(base_url('login/'.$name.'/'.$secret_hash));
+            exit(base_url('login/' . $name . '/' . $secret_hash));
         }
 
         if ($my_hash !== $secret_hash) {
@@ -38,25 +42,28 @@ class App extends CI_Controller {
             'name' => $name
         ];
         session_write_close();
-        log_message('error', 'EVENT --> Admin ['.$name.'] logging in @ '.$this->input->ip_address());
+        log_message('error', 'EVENT --> Admin [' . $name . '] logging in @ ' . $this->input->ip_address());
 
         return redirect(base_url('manage'));
     }
 
-    private function _head($active = 'players', $prefix = '', $postfix = '') {
+    private function _head($active = 'players', $prefix = '', $postfix = '')
+    {
         return $this->load->view('head', [
-            'title' => ($prefix?$prefix.' - ':'').'FNF Stats'.($postfix?' - '.$postfix:''),
+            'title' => ($prefix ? $prefix . ' - ' : '') . 'FNF Stats' . ($postfix ? ' - ' . $postfix : ''),
             'main_menu' => $this->load->view('menu', ['active' => $active], true)
         ]);
     }
 
-    private function _foot($active = 'user') {
+    private function _foot($active = 'user')
+    {
         return $this->load->view('foot', [
             'active' => $active
         ]);
     }
 
-    private function _cache() {
+    private function _cache()
+    {
         $this->load->helper('cache');
 
         $cache_expiration = 0;
@@ -74,10 +81,11 @@ class App extends CI_Controller {
         }
     }
 
-    private function _filters_redirect() {
+    private function _filters_redirect()
+    {
         $re = false;
         $events = $this->input->get('events');
-        if ( ! is_null($events) && is_array($events)) {
+        if (!is_null($events) && is_array($events)) {
             $re = current_url();
             if (count($events) > 0) {
                 $event_type_ids = array_keys($this->config->item('event_types'));
@@ -87,7 +95,7 @@ class App extends CI_Controller {
 
                 if (count($events) > 0) {
                     $events_list = implode(',', $events);
-                    $re .= '?events='.$events_list;
+                    $re .= '?events=' . $events_list;
                 }
             }
         }
@@ -150,7 +158,7 @@ class App extends CI_Controller {
         }
 
         $this->load->model('operations');
-        
+
         $event_type_ids = array_keys($this->config->item('event_types'));
         $default_events = ['eu', 'na'];
         $event_types = $this->input->get('events');
@@ -183,7 +191,8 @@ class App extends CI_Controller {
         $this->_foot();
     }
 
-    public function player ($id) {
+    public function player($id, $tab = 'ops')
+    {
         $this->_cache();
 
         $this->load->model('players');
@@ -191,13 +200,19 @@ class App extends CI_Controller {
         $errors = [];
         $player = null;
         $player_ops = [];
+        $player_roles = [];
         $player_aliases = [];
         if (filter_var($id, FILTER_VALIDATE_INT)) {
             $player = $this->players->get_by_id($id);
 
             if ($player) {
-                $player_ops = $this->players->get_ops_by_id($id);
                 $player_aliases = $this->players->get_aliases_by_id($id);
+
+                if ($tab === 'roles') {
+                    $player_roles = $this->players->get_roles_by_id($id);
+                } else { //ops
+                    $player_ops = $this->players->get_ops_by_id($id);
+                }
             } else {
                 $errors[] = 'Unknown player ID given.';
             }
@@ -205,7 +220,7 @@ class App extends CI_Controller {
             $errors[] = 'Invalid ID given.';
         }
 
-        $this->_head('players', $player?$player['name']:'');
+        $this->_head('players', $player ? $player['name'] : '');
 
         $this->load->view('player', [
             'player' => $player,
@@ -213,14 +228,31 @@ class App extends CI_Controller {
             'aliases' => $player_aliases
         ]);
 
-        $this->load->view('player-ops', [
-            'items' => $player_ops
-        ]);
+        if ($player) {
+            if ($tab === 'roles') {
+                $this->load->view('player-roles', [
+                    'items' => $player_roles,
+                    'player_menu' => $this->load->view('player-menu', [
+                        'active' => 'roles',
+                        'player_url' => base_url('player/' . $player['id'])
+                    ], true)
+                ]);
+            } else { // ops
+                $this->load->view('player-ops', [
+                    'items' => $player_ops,
+                    'player_menu' => $this->load->view('player-menu', [
+                        'active' => 'ops',
+                        'player_url' => base_url('player/' . $player['id'])
+                    ], true)
+                ]);
+            }
+        }
 
         $this->_foot();
     }
 
-    public function op ($id, $tab = 'entities') {
+    public function op($id, $tab = 'entities')
+    {
         $this->_cache();
 
         $this->load->model('operations');
@@ -245,29 +277,31 @@ class App extends CI_Controller {
             $errors[] = 'Invalid ID given.';
         }
 
-        $this->_head('ops', $op?str_replace('_',' ',$op['mission_name']):'');
+        $this->_head('ops', $op ? str_replace('_', ' ', $op['mission_name']) : '');
 
         $this->load->view('op', [
             'op' => $op,
             'errors' => $errors
         ]);
 
-        if ($tab === 'events') {
-            $this->load->view('op-events', [
-                'items' => $op_events,
-                'op_menu' => $this->load->view('op-menu', [
-                    'active' => 'events',
-                    'op_url' => base_url('op/'.$op['id'])
-                ], true)
-            ]);
-        } else { // entities
-            $this->load->view('op-entities', [
-                'items' => $op_entities,
-                'op_menu' => $this->load->view('op-menu', [
-                    'active' => 'entities',
-                    'op_url' => base_url('op/'.$op['id'])
-                ], true)
-            ]);
+        if ($op) {
+            if ($tab === 'events') {
+                $this->load->view('op-events', [
+                    'items' => $op_events,
+                    'op_menu' => $this->load->view('op-menu', [
+                        'active' => 'events',
+                        'op_url' => base_url('op/' . $op['id'])
+                    ], true)
+                ]);
+            } else { // entities
+                $this->load->view('op-entities', [
+                    'items' => $op_entities,
+                    'op_menu' => $this->load->view('op-menu', [
+                        'active' => 'entities',
+                        'op_url' => base_url('op/' . $op['id'])
+                    ], true)
+                ]);
+            }
         }
 
         $this->_foot();
@@ -316,7 +350,8 @@ class App extends CI_Controller {
         $this->_foot();
     }
 
-    public function readme_md () {
+    public function readme_md()
+    {
         $this->_cache();
 
         $this->_head('', 'About');
@@ -330,8 +365,9 @@ class App extends CI_Controller {
         $this->_foot();
     }
 
-    private function _ajax ($data) {
-        if ( ! $this->input->is_ajax_request()) {
+    private function _ajax($data)
+    {
+        if (!$this->input->is_ajax_request()) {
             return show_error(400);
         }
 

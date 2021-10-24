@@ -1,13 +1,15 @@
-<?php defined('BASEPATH') OR exit('*');
+<?php defined('BASEPATH') or exit('*');
 
-class Operations extends CI_Model {
+class Operations extends CI_Model
+{
 
     public function __construct()
     {
         $this->load->database();
     }
 
-    public function exists ($id) {
+    public function exists($id)
+    {
         $re = $this->db
             ->select('id')
             ->from('operations')
@@ -22,7 +24,8 @@ class Operations extends CI_Model {
         }
     }
 
-    public function get_all_ids_and_events () {
+    public function get_all_ids_and_events()
+    {
         $re = $this->db
             ->select(['id', 'event', 'updated', 'start_time'])
             ->from('operations')
@@ -36,11 +39,13 @@ class Operations extends CI_Model {
         return array_column($re, null, 'id');
     }
 
-    public function insert ($data) {
+    public function insert($data)
+    {
         return $this->db->insert('operations', $data);
     }
 
-    public function parse_entities ($data) {
+    public function parse_entities($data)
+    {
         $entities = [];
         $events = [];
 
@@ -77,16 +82,17 @@ class Operations extends CI_Model {
             ],
             */
 
-            if ($e['type'] === 'unit' && in_array($e['side'], ['WEST','EAST','GUER'])) {
+            if ($e['type'] === 'unit' && in_array($e['side'], ['WEST', 'EAST', 'GUER'])) {
                 $last_state = 1; // starting state is awake, skip this one
                 foreach ($e['positions'] as $f => $p) {
                     // not a player, not a vehicle, is a player, name field is empty and position name field is not empty
-                    if ($entities[$e['id']]['is_player'] === 0 
-                        && $p[3] === 0 
-                        && $p[5] === 1 
-                        && $e['name'] === '' 
-                        && $p[4] !== '')
-                    {
+                    if (
+                        $entities[$e['id']]['is_player'] === 0
+                        && $p[3] === 0
+                        && $p[5] === 1
+                        && $e['name'] === ''
+                        && $p[4] !== ''
+                    ) {
                         // note: this attempts to fix missing names and player flag for actual player units
                         $entities[$e['id']]['is_player'] = 1;
                         $entities[$e['id']]['name'] = $p[4];
@@ -131,7 +137,8 @@ class Operations extends CI_Model {
         ];
     }
 
-    public function parse_events ($data) {
+    public function parse_events($data)
+    {
         $re = [
             'events' => [],
             'end_winner' => '',
@@ -172,7 +179,8 @@ class Operations extends CI_Model {
         return $re;
     }
 
-    public function parse_markers ($data) {
+    public function parse_markers($data)
+    {
         $re = [];
 
         /** marker: projectile
@@ -190,7 +198,7 @@ class Operations extends CI_Model {
          */
         foreach ($data as $m) {
             if ($m[0] && substr($m[0], 0, 9) === 'magIcons/') {
-                if ( ! isset($re[$m[4]])) {
+                if (!isset($re[$m[4]])) {
                     $re[$m[4]] = 1;
                 } else {
                     $re[$m[4]]++;
@@ -201,8 +209,25 @@ class Operations extends CI_Model {
         return $re;
     }
 
-    public function process_op_data ($details, $entities, $events, $markers) {
+    public function process_op_data($details, $entities, $events, $markers)
+    {
         $errors = [];
+
+        if (!$details['start_time']) {
+            try {
+                $date_time = str_replace('__', ' ', substr($details['filename'], 0, 17));
+                $date_time_arr = explode(' ', $date_time);
+                $start_date = str_replace('_', '-', $date_time_arr[0]);
+                $start_time = str_replace('_', ':', $date_time_arr[1]);
+
+                // Adjust/guess server local time based on tag/event
+                $tz = $details['event'] === 'eu' ? 'Europe/London' : 'America/Goose_Bay'; // na ops time zone in json file name is most likely AST/ADT
+                $adj_date_time = new \DateTime($start_date . ' ' . $start_time, new \DateTimeZone($tz));
+                $details['start_time'] = $adj_date_time->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d H:i:s');
+            } catch (exception $e) {
+                $details['start_time'] = gmdate('Y-m-d H:i:s', strtotime($details['date']));
+            }
+        }
 
         if ($this->insert($details)) {
 
@@ -220,7 +245,7 @@ class Operations extends CI_Model {
                     $_dead_events[$vid] = true;
                 }
 
-                if ( ! is_null($aid) &&  ! is_null($vid) && $aid !== $vid) {
+                if (!is_null($aid) &&  !is_null($vid) && $aid !== $vid) {
                     $ff = ($entities[$aid]['side'] === $entities[$vid]['side']) ? true : false;
 
                     if ($e['event'] === 'hit') {
@@ -249,56 +274,57 @@ class Operations extends CI_Model {
 
             if ($this->db->insert_batch('events', $events) === false) {
                 $errors[] = 'Failed to save events.';
-            }
-            $events = NULL;
+            } else {
+                $events = null;
 
-            $players = $this->get_all_players();
-            $player_names = array_column($players, 'name');
+                $players = $this->get_all_players();
+                $player_names = array_column($players, 'name');
 
-            $new_players = [];
-            foreach ($entities as $i => $e) {
-                $entities[$i]['operation_id'] = $details['id'];
+                $new_players = [];
+                foreach ($entities as $i => $e) {
+                    $entities[$i]['operation_id'] = $details['id'];
 
-                if ($e['is_player']) {
-                    $pi = array_search($e['name'], $player_names);
-                    if ($pi === false) {
-                        $new_player_names = array_column($new_players, 'name');
-                        $npi = array_search($e['name'], $new_player_names);
+                    if ($e['is_player']) {
+                        $pi = array_search($e['name'], $player_names);
+                        if ($pi === false) {
+                            $new_player_names = array_column($new_players, 'name');
+                            $npi = array_search($e['name'], $new_player_names);
 
-                        if ($npi === false) {
-                            $new_players[] = [
-                                'entity_ids' => [$i],
-                                'name' => $e['name']
-                            ];
+                            if ($npi === false) {
+                                $new_players[] = [
+                                    'entity_ids' => [$i],
+                                    'name' => $e['name']
+                                ];
+                            } else {
+                                $new_players[$npi]['entity_ids'][] = $i;
+                            }
                         } else {
-                            $new_players[$npi]['entity_ids'][] = $i;
+                            $p = $players[$pi];
+                            $entities[$i]['player_id'] = $p['alias_of'] ? $p['alias_of'] : $p['id'];
                         }
+                    }
+                }
+
+                if (count($new_players) > 0) {
+                    $added_players = $this->add_players($new_players);
+                    if ($added_players === false) {
+                        $errors[] = 'Failed to save players.';
                     } else {
-                        $p = $players[$pi];
-                        $entities[$i]['player_id'] = $p['alias_of'] ? $p['alias_of'] : $p['id'];
+                        foreach ($added_players as $p) {
+                            foreach ($p['entity_ids'] as $eid) {
+                                $entities[$eid]['player_id'] = $p['player_id'];
+                            }
+                        }
                     }
                 }
-            }
 
-            if (count($new_players) > 0) {
-                $added_players = $this->add_players($new_players);
-                if ($added_players === false) {
-                    $errors[] = 'Failed to save players.';
-                }
-
-                foreach ($added_players as $p) {
-                    foreach ($p['entity_ids'] as $eid) {
-                        $entities[$eid]['player_id'] = $p['player_id'];
+                if (count($errors) === 0) {
+                    if ($this->db->insert_batch('entities', $entities) === false) {
+                        $errors[] = 'Failed to save entities.';
                     }
                 }
+                $entities = null;
             }
-
-            if ($this->db->insert_batch('entities', $entities) === false) {
-                $errors[] = 'Failed to save entities.';
-            }
-            $entities = NULL;
-
-            return $errors;
         } else {
             $errors[] = 'Failed to save operation.';
         }
@@ -306,7 +332,8 @@ class Operations extends CI_Model {
         return $errors;
     }
 
-    private function get_all_players () {
+    private function get_all_players()
+    {
         return $this->db
             ->select(['id', 'name', 'alias_of'])
             ->from('players')
@@ -314,7 +341,8 @@ class Operations extends CI_Model {
             ->result_array();
     }
 
-    private function add_players($new_players) {
+    private function add_players($new_players)
+    {
         $batch = [];
         foreach ($new_players as $p) {
             $batch[] = ['name' => $p['name']];
@@ -333,7 +361,8 @@ class Operations extends CI_Model {
         return $new_players;
     }
 
-    public function get_ops ($event_types, $id = false) {
+    public function get_ops($event_types, $id = false, $empty_end_winner_only = false)
+    {
         if ($event_types && count($event_types) > 0) {
             $this->db->where_in('operations.event', $event_types);
         } else {
@@ -341,37 +370,46 @@ class Operations extends CI_Model {
         }
 
         if ($id) {
-            $this->db->where('operations.id', $id);
+            if (!is_array($id)) {
+                $id = [$id];
+            }
+
+            $this->db->where_in('operations.id', $id);
         }
 
         $this->db
             ->select([
-                'operations.id', 
-                'operations.world_name', 
-                'operations.mission_name', 
-                'operations.mission_duration', 
-                'operations.filename', 
-                'operations.date', 
-                'operations.tag', 
-                'operations.event', 
-                'operations.updated', 
-                'operations.mission_author', 
-                'operations.start_time', 
-                'operations.end_winner', 
+                'operations.id',
+                'operations.world_name',
+                'operations.mission_name',
+                'operations.mission_duration',
+                'operations.filename',
+                'operations.date',
+                'operations.tag',
+                'operations.event',
+                'operations.updated',
+                'operations.mission_author',
+                'operations.start_time',
+                'operations.end_winner',
                 'operations.end_message'
             ])
-            ->join('entities', 'entities.operation_id = operations.id AND entities.player_id != 0')
             ->select('COUNT(DISTINCT entities.player_id) AS players')
             ->from('operations')
+            ->join('entities', 'entities.operation_id = operations.id AND entities.player_id != 0')
             ->group_by('operations.id')
             ->order_by('operations.id', 'DESC');
+
+        if ($empty_end_winner_only) {
+            $this->db->where('operations.end_winner', '');
+        }
 
         return $this->db
             ->get()
             ->result_array();
     }
 
-    public function get_by_id ($id) {
+    public function get_by_id($id)
+    {
         $re = $this->get_ops(false, $id);
 
         if (count($re) === 0) {
@@ -381,7 +419,8 @@ class Operations extends CI_Model {
         }
     }
 
-    public function get_entities_by_op_id ($id) {
+    public function get_entities_by_op_id($id)
+    {
         $this->db
             ->select([
                 'entities.operation_id',
@@ -405,19 +444,17 @@ class Operations extends CI_Model {
             ->select_sum('vkills')
             ->select_sum('deaths')
             ->from('entities')
-            ->where('entities.operation_id', $id)
             ->join('players', 'players.id = entities.player_id', 'LEFT')
             ->join('operations', 'operations.id = entities.operation_id')
+            ->where('entities.operation_id', $id)
             ->group_by('entities.id')
             ->order_by('is_player DESC, kills DESC, deaths ASC, hits DESC, vkills DESC, shots ASC, id ASC');
-        
-        // $q = $this->db->get_compiled_select();//debug
-        // return array($q);//debug
 
         return $this->db->get()->result_array();
     }
 
-    public function purge ($id) {
+    public function purge($id)
+    {
         $del_events = $this->db->delete('events', ['operation_id' => $id]);
         $del_entities = $this->db->delete('entities', ['operation_id' => $id]);
         $del_operation = $this->db->delete('operations', ['id' => $id]);
@@ -440,7 +477,8 @@ class Operations extends CI_Model {
         }
     }
 
-    public function get_events_by_op_id ($id) {
+    public function get_events_by_op_id($id)
+    {
         $this->db
             ->select([
                 'events.frame',
@@ -459,15 +497,12 @@ class Operations extends CI_Model {
                 'attacker_player.id AS attacker_player_id'
             ])
             ->from('events')
-            ->where('events.operation_id', $id)
-            ->join('entities AS victim', 'victim.id = events.victim_id AND victim.operation_id = '.$id)
-            ->join('entities AS attacker', 'attacker.id = events.attacker_id AND attacker.operation_id = '.$id, 'LEFT')
+            ->join('entities AS victim', 'victim.id = events.victim_id AND victim.operation_id = ' . $id)
+            ->join('entities AS attacker', 'attacker.id = events.attacker_id AND attacker.operation_id = ' . $id, 'LEFT')
             ->join('players AS victim_player', 'victim_player.id = victim.player_id')
             ->join('players AS attacker_player', 'attacker_player.id = attacker.player_id', 'LEFT')
+            ->where('events.operation_id', $id)
             ->order_by("events.frame ASC, victim.name ASC, FIELD(events.event, 'hit', 'killed', '_awake', '_uncon', '_dead')");
-
-        // $q = $this->db->get_compiled_select();//debug
-        // return array($q);//debug
 
         return $this->db->get()->result_array();
     }

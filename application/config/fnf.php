@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 $config['admin_key'] = 'team';
 
@@ -31,18 +31,18 @@ $config['sides'] = [
 // Keep these ordered by rank
 $config['hq_group_names'] = [
     'CMD',
-    'PLTHQ', 
-    'OPF PLT HQ', 
-    'IND PLT HQ', 
+    'PLTHQ',
+    'OPF PLT HQ',
+    'IND PLT HQ',
     'P1HQ',
     'P2HQ'
 ];
 
 // Keep these ordered by rank
 $config['hq_role_names'] = [
-    'Company Commander', 
-    'Platoon Leader', 
-    'Platoon Leader (HVT)', 
+    'Company Commander',
+    'Platoon Leader',
+    'Platoon Leader (HVT)',
     'Osamba Bind Layden'
 ];
 

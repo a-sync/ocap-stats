@@ -2,31 +2,40 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 if (count($items) === 0) :
-    echo '<div class="mdc-typography--body1 list__no_items">No players matching the selected filters...</div>';
+    echo '<div class="mdc-typography--body1 list__no_items">No roles found...</div>';
 else :
-    echo '<div class="mdc-typography--caption list__total">' . count($items) . ' players</div>';
+    echo '<div class="mdc-typography--caption list__total">' . count($items) . ' roles</div>';
+
+    $sides = $this->config->item('sides');
 ?>
     <div class="mdc-layout-grid">
         <div class="mdc-layout-grid__inner">
             <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center">
                 <div class="mdc-data-table mdc-elevation--z2">
                     <div class="mdc-data-table__table-container">
+
+                        <?php echo $player_menu; ?>
+
                         <table class="mdc-data-table__table sortable">
                             <thead>
                                 <tr class="mdc-data-table__header-row">
-                                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="name">Name</th>
-                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="shots">Shots</th>
-                                    <?php /* <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="adj_shots">Adjusted shots</th>
-                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="hits">Hits</th>
-                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="adj_hits">Adjusted hits</th> */ ?>
-                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="hits_shots_ratio" title="Hits / Shots (Shots / Hits)">Hit % (S/H)</th>
-                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="descending" data-column-id="kills">Kills</th>
-                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="kills_shots_ratio" title="Kills / Shots (Shots / Kills)">Kill % (S/K)</th>
-                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="ascending" data-column-id="deaths">Deaths</th>
+
+                                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="name" title="Name">Role</th>
+                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="shots" title="Shots">S</th>
+                                    <?php /*<th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="adj_shots" title="Adjusted shots">S*</th>
+                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="hits" title="Hits">H</th>
+                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="adj_hits" title="Adjusted hits">H*</th> */ ?>
+                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="hits_shots_ratio" title="Hits / Shots (Shots / Hits)">H% (S/H)</th>
+                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="kills" title="Kills">K</th>
+                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="kills_shots_ratio" title="Kills / Shots (Shots / Kills)">K% (S/K)</th>
+                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="deaths" title="Deaths">D</th>
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="fhits" title="Friendly fire">FF</th>
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="fkills" title="Teamkills">Tk</th>
-                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="vkills" title="Destroyed asse<?php echo (mt_rand(0, 99) ? 't' : '') ?>s">DA</th>
-                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="attendance" title="Attendance (Kills / Attendance)">A (K/A)</th>
+                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="vkills" title="Destroyed assets">DA</th>
+                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="west_count"><?php echo $sides['WEST']; ?></th>
+                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="east_count"><?php echo $sides['EAST']; ?></th>
+                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="guer_count"><?php echo $sides['GUER']; ?></th>
+                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="descending" data-column-id="total_count" title="Attendance (Kills / Attendance)">A (K/A)</th>
                                 </tr>
                             </thead>
                             <tbody class="mdc-data-table__content">
@@ -60,14 +69,12 @@ else :
                                         $shots_kills_ratio = number_format($i['shots'] / $i['kills'], 1);
                                     }
 
-                                    if ($i['attendance'] > 0) {
-                                        $kills_attendance_ratio = number_format($i['kills'] / $i['attendance'], 1);
+                                    if ($i['total_count'] > 0) {
+                                        $kills_attendance_ratio = number_format($i['kills'] / $i['total_count'], 1);
                                     }
-
-                                    $name = '<a href="' . base_url('player/') . $i['id'] . '">' . html_escape($i['name']) . '</a>';
                                 ?>
                                     <tr class="mdc-data-table__row">
-                                        <td class="mdc-data-table__cell cell__title"><?php echo $name; ?></td>
+                                        <td class="mdc-data-table__cell"><?php echo html_escape($i['role_name']); ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['shots']; ?></td>
                                         <?php /* <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['adj_shots']; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['hits']; ?></td>
@@ -79,7 +86,10 @@ else :
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['fhits']; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['fkills']; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['vkills']; ?></td>
-                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo $kills_attendance_ratio; ?>"><?php echo $i['attendance']; ?> (<?php echo $kills_attendance_ratio; ?>)</td>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['west_count']; ?></td>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['east_count']; ?></td>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['guer_count']; ?></td>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo $kills_attendance_ratio; ?>"><?php echo $i['total_count']; ?> (<?php echo $kills_attendance_ratio; ?>)</td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>

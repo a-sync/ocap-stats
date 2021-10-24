@@ -1,7 +1,9 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed');
+<?php defined('BASEPATH') or exit('No direct script access allowed');
 
-?><!DOCTYPE html>
+?>
+<!DOCTYPE html>
 <html>
+
 <head>
     <title><?php echo $title; ?></title>
 
@@ -16,7 +18,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/4.0.0/github-markdown.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/slim-select/1.27.0/slimselect.min.js"></script>
-    <link rel="stylesheet"  href="https://cdnjs.cloudflare.com/ajax/libs/slim-select/1.27.0/slimselect.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slim-select/1.27.0/slimselect.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
 
     <script src="<?php echo base_url('public/sortable.min.js'); ?>"></script>
     <link rel="stylesheet" href="<?php echo base_url('public/sortable.css'); ?>">
@@ -25,6 +27,7 @@
     <link rel="stylesheet" href="<?php echo base_url('public/app.css'); ?>">
 
 </head>
+
 <body class="mdc-typography">
 
     <?php echo $main_menu; ?>

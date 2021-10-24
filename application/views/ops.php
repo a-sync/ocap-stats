@@ -34,7 +34,7 @@ else :
                                 ?>
                                     <tr class="mdc-data-table__row">
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric">
-                                            <a href="<?php echo base_url('op/').$i['id']; ?>" title="<?php echo html_escape($i['filename']); ?>"><?php echo $i['id']; ?></a>
+                                            <a href="<?php echo base_url('op/') . $i['id']; ?>" title="<?php echo html_escape($i['filename']); ?>"><?php echo $i['id']; ?></a>
                                         </td>
                                         <td class="mdc-data-table__cell cell__title">
                                             <?php echo html_escape($i['mission_name']); ?>&nbsp;<sup class="mdc-typography--caption"><a target="_blank" href="<?php echo FNF_AAR_URL_PREFIX . urlencode($i['filename']); ?>">AAR</a>

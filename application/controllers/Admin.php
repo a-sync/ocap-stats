@@ -1,7 +1,8 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
-class Admin extends CI_Controller {
+class Admin extends CI_Controller
+{
     private $adminUser = false;
 
     public function __construct()
@@ -11,7 +12,7 @@ class Admin extends CI_Controller {
 
         $this->load->library('session');
 
-        if ( ! $this->session->admin ) {
+        if (!$this->session->admin) {
             return redirect(base_url('login'));
         }
         $this->adminUser = $this->session->admin;
@@ -19,20 +20,21 @@ class Admin extends CI_Controller {
             session_write_close();
         }
     }
-    
-    public function logout () {
+
+    public function logout()
+    {
         $this->load->library('session');
 
         $this->session->sess_destroy();
         session_write_close();
 
-        log_message('error', 'EVENT --> Admin ['.$this->adminUser['name'].'] logging out @ '.$this->input->ip_address());
+        log_message('error', 'EVENT --> Admin [' . $this->adminUser['name'] . '] logging out @ ' . $this->input->ip_address());
         $this->adminUser = false;
 
         return redirect(base_url(''));
     }
 
-    public function clear_cache()
+    public function clearcache()
     {
         $this->load->helper(['file', 'cache']);
 
@@ -40,7 +42,7 @@ class Admin extends CI_Controller {
         if ($clear) {
             delete_all_cache();
 
-            log_message('error', 'EVENT --> ['.$this->adminUser['name'].'] cleared site cache');
+            log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] cleared site cache');
         }
 
         return redirect(base_url('manage'));
@@ -53,20 +55,20 @@ class Admin extends CI_Controller {
         $update = $this->input->post('update_operations');
 
         if ($update) {
-            log_message('error', 'EVENT --> ['.$this->adminUser['name'].'] updated operations.json');
+            log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] updated operations.json');
             $status = download_file(FNF_OPERATIONS_JSON_URL, './json/operations.json');
             if ($status !== 200) {
-                log_message('error', 'Update operations.json returned status code: '.$status);
+                log_message('error', 'Update operations.json returned status code: ' . $status);
             }
         }
 
         return redirect(base_url('manage'));
     }
 
+    // operations
     public function index()
     {
-        //  $this->output->enable_profiler(TRUE);//DEBUG
-        require_once( APPPATH . 'third_party/json-machine/load.php' );
+        require_once(APPPATH . 'third_party/json-machine/load.php');
 
         $this->load->helper(['cache', 'date']);
         $this->load->model('operations');
@@ -108,7 +110,7 @@ class Admin extends CI_Controller {
 
     public function manage($op_id = null)
     {
-        require_once( APPPATH . 'third_party/json-machine/load.php' );
+        require_once(APPPATH . 'third_party/json-machine/load.php');
 
         $this->load->helper(['curl', 'array']);
         $this->load->model('operations');
@@ -137,22 +139,22 @@ class Admin extends CI_Controller {
                 if ($operation['id'] === intval($this->input->post('id'))) {
                     $action = $this->input->post('action');
 
-                    log_message('error', 'EVENT --> ['.$this->adminUser['name'].'] operation ('.$operation['id'].') action: '.$action);
+                    log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] operation (' . $operation['id'] . ') action: ' . $action);
                     // Note: these actions require a file lock
                     if (in_array($action, ['ignore', 'parse', 'update', 'del'])) {
-                        $_lock = fopen('./json/op_'.$operation['id'].'.lock', 'w');
-                        if(flock($_lock, LOCK_EX|LOCK_NB)) { // Lock
+                        $_lock = fopen('./json/op_' . $operation['id'] . '.lock', 'w');
+                        if (flock($_lock, LOCK_EX | LOCK_NB)) { // Lock
                             set_time_limit(0);
                             ignore_user_abort(true);
 
                             try {
                                 if ($op_in_db === false && $action === 'ignore') {
-                                    if ( ! $this->operations->insert($operation)) {
+                                    if (!$this->operations->insert($operation)) {
                                         $errors[] = 'Failed to save operation.';
                                     }
-            
+
                                     if (count($errors) === 0) {
-                                        return redirect(base_url('manage/#id-'.$operation['id']));
+                                        return redirect(base_url('manage/#id-' . $operation['id']));
                                     }
                                     $op_in_db = $this->operations->exists($operation['id']);
                                 } elseif ($op_in_db === false && $action === 'parse') {
@@ -160,14 +162,14 @@ class Admin extends CI_Controller {
                                     if ($event_type_match === $event_type) {
                                         if (in_array($event_type, array_keys($this->config->item('event_types')))) {
                                             $operation['event'] = $event_type;
-            
-                                            if (file_exists('./json/'.$operation['filename'])) {
+
+                                            if (file_exists('./json/' . $operation['filename'])) {
                                                 $opdata = $this->_parse_operation_json($operation);
                                                 $errors = $this->operations->process_op_data($opdata['details'], $opdata['entities'], $opdata['events'], $opdata['markers']);
-                                                $opdata = NULL;
+                                                $opdata = null;
 
                                                 if (count($errors) === 0) {
-                                                    return redirect(base_url('manage/#id-'.$operation['id']));
+                                                    return redirect(base_url('manage/#id-' . $operation['id']));
                                                 }
                                                 $op_in_db = $this->operations->exists($operation['id']);
                                             } else {
@@ -180,13 +182,13 @@ class Admin extends CI_Controller {
                                         $errors[] = 'Unsupported event type for this mission!';
                                     }
                                 } elseif ($action === 'update') {
-                                    $status = download_file(FNF_OPERATION_DATA_JSON_URL_PREFIX.$operation['filename'], './json/'.$operation['filename']);
+                                    $status = download_file(FNF_OPERATION_DATA_JSON_URL_PREFIX . $operation['filename'], './json/' . $operation['filename']);
                                     if ($status !== 200) {
-                                        $errors[] = 'Import operation ('.$operation['id'].') returned status code: '.$status;
+                                        $errors[] = 'Update/download operation (' . $operation['id'] . ') returned status code: ' . $status;
                                     }
                                 } elseif ($action === 'del') {
-                                    if (file_exists('./json/'.$operation['filename'])) {
-                                        unlink('./json/'.$operation['filename']);
+                                    if (file_exists('./json/' . $operation['filename'])) {
+                                        unlink('./json/' . $operation['filename']);
                                     }
                                 } else {
                                     $errors[] = 'Invalid action.';
@@ -215,13 +217,13 @@ class Admin extends CI_Controller {
 
                 $operation['filesize'] = '0 B';
                 $operation['last_update'] = 'none';
-                if (file_exists('./json/'.$operation['filename'])) {
-                    $operation['filesize'] = $this->_convert_filesize(filesize('./json/'.$operation['filename']));
-                    $operation['last_update'] = date('Y-m-d H:i:s', filemtime('./json/'.$operation['filename']));
+                if (file_exists('./json/' . $operation['filename'])) {
+                    $operation['filesize'] = $this->_convert_filesize(filesize('./json/' . $operation['filename']));
+                    $operation['last_update'] = date('Y-m-d H:i:s', filemtime('./json/' . $operation['filename']));
                 }
 
                 if ($op_in_db) {
-                    $op = $this->operations->get_by_id ($operation['id']);
+                    $op = $this->operations->get_by_id($operation['id']);
                 }
             } else {
                 $errors[] = 'Unknown operation ID given.';
@@ -234,9 +236,9 @@ class Admin extends CI_Controller {
             log_message('error', implode('; ', $errors));
         }
 
-        $this->_head('manage', $operation?$operation['mission_name'].' ('.$operation['id'].')':'');
+        $this->_head('manage', $operation ? $operation['mission_name'] . ' (' . $operation['id'] . ')' : '');
 
-        $this->load->view('admin/import', [
+        $this->load->view('admin/process', [
             'operation' => $operation,
             'errors' => $errors,
             'op_in_db' => $op_in_db,
@@ -247,63 +249,55 @@ class Admin extends CI_Controller {
         $this->_foot();
     }
 
-    private function _convert_filesize ($bytes, $decimals = 2)
+    private function _convert_filesize($bytes, $decimals = 2)
     {
-        $size = ['B','kB','MB','GB','TB','PB','EB','ZB','YB'];
+        $size = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
         $factor = floor(log($bytes, 1024));
-        return sprintf('%.'.$decimals.'f', $bytes / pow(1024, $factor)).' '.@$size[$factor];
+        return sprintf('%.' . $decimals . 'f', $bytes / pow(1024, $factor)) . ' ' . @$size[$factor];
     }
 
-    private function _parse_operation_json ($operation)
+    private function _parse_operation_json($operation)
     {
-        $markers = $this->operations->parse_markers(\JsonMachine\JsonMachine::fromFile('./json/'.$operation['filename'], '/Markers'));
+        $markers = $this->operations->parse_markers(\JsonMachine\JsonMachine::fromFile('./json/' . $operation['filename'], '/Markers'));
 
         try {
-            $operation['addon_version'] = iterator_to_array(\JsonMachine\JsonMachine::fromFile('./json/'.$operation['filename'], '/addonVersion'))[0];
+            $operation['addon_version'] = iterator_to_array(\JsonMachine\JsonMachine::fromFile('./json/' . $operation['filename'], '/addonVersion'))[0];
         } catch (exception $e) {
             $operation['addon_version'] = '';
         }
 
         try {
-            $operation['capture_delay'] = iterator_to_array(\JsonMachine\JsonMachine::fromFile('./json/'.$operation['filename'], '/captureDelay'))[0];
+            $operation['capture_delay'] = iterator_to_array(\JsonMachine\JsonMachine::fromFile('./json/' . $operation['filename'], '/captureDelay'))[0];
         } catch (exception $e) {
             $operation['capture_delay'] = '';
         }
 
         try {
-            $operation['extension_build'] = iterator_to_array(\JsonMachine\JsonMachine::fromFile('./json/'.$operation['filename'], '/extensionBuild'))[0];
+            $operation['extension_build'] = iterator_to_array(\JsonMachine\JsonMachine::fromFile('./json/' . $operation['filename'], '/extensionBuild'))[0];
         } catch (exception $e) {
             $operation['extension_build'] = '';
         }
 
         try {
-            $operation['extension_version'] = iterator_to_array(\JsonMachine\JsonMachine::fromFile('./json/'.$operation['filename'], '/extensionVersion'))[0];
+            $operation['extension_version'] = iterator_to_array(\JsonMachine\JsonMachine::fromFile('./json/' . $operation['filename'], '/extensionVersion'))[0];
         } catch (exception $e) {
             $operation['extension_version'] = '';
         }
-        
+
         try {
-            $operation['mission_author'] = iterator_to_array(\JsonMachine\JsonMachine::fromFile('./json/'.$operation['filename'], '/missionAuthor'))[0];
+            $operation['mission_author'] = iterator_to_array(\JsonMachine\JsonMachine::fromFile('./json/' . $operation['filename'], '/missionAuthor'))[0];
         } catch (exception $e) {
             $operation['mission_author'] = explode('_', $operation['mission_name'])[1];
         }
 
         try {
-            $operation['start_time'] = iterator_to_array(\JsonMachine\JsonMachine::fromFile('./json/'.$operation['filename'], '/times'))[0]['systemTimeUTC'];
+            $operation['start_time'] = iterator_to_array(\JsonMachine\JsonMachine::fromFile('./json/' . $operation['filename'], '/times'))[0]['systemTimeUTC'];
         } catch (exception $e) {
-            try {
-                $date_time = str_replace('__',' ', substr($operation['filename'], 0, 17));
-                $date_time_arr = explode(' ', $date_time);
-                $start_date = str_replace('_', '-', $date_time_arr[0]);
-                $start_time = str_replace('_', ':', $date_time_arr[1]);
-                $operation['start_time'] = gmdate('Y-m-d H:i:s', strtotime($start_date.' '.$start_time));
-            } catch (exception $e) {
-                $operation['start_time'] = gmdate('Y-m-d H:i:s', strtotime($operation['date']));
-            }
+            $operation['start_time'] = '';
         }
 
-        $entities = $this->operations->parse_entities(\JsonMachine\JsonMachine::fromFile('./json/'.$operation['filename'], '/entities'));
-        $events = $this->operations->parse_events(\JsonMachine\JsonMachine::fromFile('./json/'.$operation['filename'], '/events'));
+        $entities = $this->operations->parse_entities(\JsonMachine\JsonMachine::fromFile('./json/' . $operation['filename'], '/entities'));
+        $events = $this->operations->parse_events(\JsonMachine\JsonMachine::fromFile('./json/' . $operation['filename'], '/events'));
 
         $operation['end_winner'] = $events['end_winner'];
         $operation['end_message'] = $events['end_message'];
@@ -316,29 +310,30 @@ class Admin extends CI_Controller {
         );
     }
 
-    private function _head($active = 'manage', $prefix = '', $postfix = '') {
+    private function _head($active = 'manage', $prefix = '', $postfix = '')
+    {
         return $this->load->view('head', [
-            'title' => ($prefix?$prefix.' - ':'').'FNF Stats Admin'.($postfix?' - '.$postfix:''),
+            'title' => ($prefix ? $prefix . ' - ' : '') . 'FNF Stats Admin' . ($postfix ? ' - ' . $postfix : ''),
             'main_menu' => $this->load->view('admin/menu', ['active' => $active], true)
         ]);
     }
 
-    private function _foot($active = 'admin') {
+    private function _foot($active = 'admin')
+    {
         return $this->load->view('foot', [
             'active' => $active
         ]);
     }
 
-    public function alias () {
+    public function addalias()
+    {
         $this->load->model('players');
-
-        $errors = ['💩 TODO'];
-
         $players = $this->players->get_players_names();
 
+        $errors = ['💩 TODO'];
         $this->_head('addalias', 'Add player alias');
 
-        $this->load->view('admin/alias', [
+        $this->load->view('admin/addalias', [
             'players' => $players,
             'errors' => $errors
         ]);
@@ -346,12 +341,17 @@ class Admin extends CI_Controller {
         $this->_foot();
     }
 
-    public function commanders () {
+    public function fixopdata()
+    {
+        // $this->load->model('players');
+        // $this->load->model('operations');
+        // $hq_unsolvable = $this->players->get_commanders(false, true);
+        // $no_winner = $this->operations->get_ops(false, false, true);
+
         $errors = ['💩 TODO'];
+        $this->_head('fixopdata', 'Fill in missing op data');
 
-        $this->_head('fixcommanders', 'Fix op commanders');
-
-        $this->load->view('admin/commanders', [
+        $this->load->view('admin/fixopdata', [
             // 'ops' => $ops,
             // 'op_units' => $op_units,
             'errors' => $errors

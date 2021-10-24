@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 /*
 | -------------------------------------------------------------------------
@@ -57,21 +57,23 @@ $route['login'] = 'app/login';
 $route['login/(:any)/(:any)'] = 'app/zerosec/$1/$2';
 $route['logout'] = 'admin/logout';
 
-$route['clear-cache'] = 'admin/clear_cache';
+$route['clearcache'] = 'admin/clearcache';
 $route['update'] = 'admin/update';
 $route['manage'] = 'admin/index';
 $route['manage/(:num)'] = 'admin/manage/$1';
-$route['addalias'] = 'admin/alias';
-$route['addalias/(:num)'] = 'admin/alias/$1';
-$route['fixcommanders'] = 'admin/commanders';
-$route['fixcommanders/(:num)'] = 'admin/commanders/$1';
+$route['addalias'] = 'admin/addalias';
+$route['fixopdata'] = 'admin/fixopdata';
 
 $route['players'] = 'app/index';
 $route['player/(:num)'] = 'app/player/$1';
+$route['player/(:num)/ops'] = 'app/player/$1/ops';
+$route['player/(:num)/roles'] = 'app/player/$1/roles';
+
 $route['ops'] = 'app/ops';
 $route['op/(:num)'] = 'app/op/$1';
-$route['op/(:num)/events'] = 'app/op/$1/events';
 $route['op/(:num)/entities'] = 'app/op/$1/entities';
+$route['op/(:num)/events'] = 'app/op/$1/events';
+
 $route['commanders'] = 'app/commanders';
 
 $route['about'] = 'app/readme_md';

@@ -5,9 +5,7 @@ if (count($items) === 0) :
     echo '<div class="mdc-typography--body1 list__no_items">No entities found...</div>';
 else :
     echo '<div class="mdc-typography--caption list__total">' . count($items) . ' entities</div>';
-    //echo '<pre>'.print_r($items, true).'</pre>';
 
-    $event_types = $this->config->item('event_types');
     $sides = $this->config->item('sides');
 ?>
     <div class="mdc-layout-grid">
@@ -36,7 +34,7 @@ else :
                                 </tr>
                             </thead>
                             <tbody class="mdc-data-table__content">
-                                <?php foreach ($items as $index => $i) : 
+                                <?php foreach ($items as $index => $i) :
 
                                     if ($i['class'] !== '') {
                                         $role = $i['class'];
@@ -57,9 +55,9 @@ else :
                                     $name = html_escape($i['name']);
                                     $name_title = '';
                                     if ($i['player_id']) {
-                                        $name = '<a href="'.base_url('player/').$i['player_id'].'">'.$name.'</a>';
+                                        $name = '<a href="' . base_url('player/') . $i['player_id'] . '">' . $name . '</a>';
                                         if ($player_name !== '' && $i['name'] !== $player_name) {
-                                            $name_title = ' title="'.html_escape($player_name).'"';
+                                            $name_title = ' title="' . html_escape($player_name) . '"';
                                         }
                                     }
                                 ?>
@@ -68,16 +66,20 @@ else :
                                         <td class="mdc-data-table__cell cell__title">
                                             <span<?php echo $name_title; ?>><?php echo $name; ?></span>
                                         </td>
-                                        <td class="mdc-data-table__cell <?php echo 'side__'.html_escape(strtolower($i['side'])); ?>">
-                                            <?php echo $sides[$i['side']]; ?> <?php echo html_escape($group); ?> 
+                                        <td class="mdc-data-table__cell <?php echo 'side__' . html_escape(strtolower($i['side'])); ?>">
+                                            <?php echo $sides[$i['side']]; ?> <?php echo html_escape($group); ?>
                                         </td>
                                         <td class="mdc-data-table__cell"><?php echo html_escape($role); ?></td>
 
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['shots']; ?></td>
-                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php if($i['operation_id'] >= FIRST_OP_WITH_HIT_EVENTS) { echo $i['hits']; } ?></td>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php if ($i['operation_id'] >= FIRST_OP_WITH_HIT_EVENTS) {
+                                                                                                            echo $i['hits'];
+                                                                                                        } ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['kills']; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['deaths']; ?></td>
-                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php if($i['operation_id'] >= FIRST_OP_WITH_HIT_EVENTS) { echo $i['fhits']; } ?></td>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php if ($i['operation_id'] >= FIRST_OP_WITH_HIT_EVENTS) {
+                                                                                                            echo $i['fhits'];
+                                                                                                        } ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['fkills']; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['vkills']; ?></td>
                                     </tr>

@@ -18,7 +18,7 @@ $op_parsed = ($op_in_db  && $op && $op['event'] !== '') ? true : false;
         <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center">
             <div class="mdc-data-table mdc-elevation--z2">
                 <div class="mdc-data-table__table-container">
-                    <?php echo form_open('', ['id' => 'import-form'], ['id' => $operation['id']]); ?>
+                    <?php echo form_open('', ['id' => 'process-form'], ['id' => $operation['id']]); ?>
                     <table class="mdc-data-table__table">
                         <tbody class="mdc-data-table__content">
                             <tr class="mdc-data-table__row">

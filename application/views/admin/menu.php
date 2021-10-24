@@ -7,28 +7,28 @@
         <div class="mdc-tab-scroller">
             <div class="mdc-tab-scroller__scroll-area">
                 <div class="mdc-tab-scroller__scroll-content">
-                    <a href="/manage" class="mdc-tab" role="tab" aria-selected="true" tabindex="1">
+                    <a href="<?php echo base_url('manage'); ?>" class="mdc-tab" role="tab" aria-selected="true" tabindex="1">
                         <span class="mdc-tab__content">
                             <span class="mdc-tab__icon material-icons" aria-hidden="true">checklist_rtl</span>
                             <span class="mdc-tab__text-label">Operations</span>
                         </span>
                         <span class="mdc-tab__ripple"></span>
                     </a>
-                    <a href="/addalias" class="mdc-tab" role="tab" aria-selected="true" tabindex="2">
+                    <a href="<?php echo base_url('addalias'); ?>" class="mdc-tab" role="tab" aria-selected="true" tabindex="2">
                         <span class="mdc-tab__content">
                             <span class="mdc-tab__icon material-icons" aria-hidden="true">reduce_capacity</span>
                             <span class="mdc-tab__text-label">Add player alias</span>
                         </span>
                         <span class="mdc-tab__ripple"></span>
                     </a>
-                    <a href="/fixcommanders" class="mdc-tab" role="tab" aria-selected="true" tabindex="3">
+                    <a href="<?php echo base_url('fixopdata'); ?>" class="mdc-tab" role="tab" aria-selected="true" tabindex="3">
                         <span class="mdc-tab__content">
-                            <span class="mdc-tab__icon material-icons" aria-hidden="true">group_add</span>
-                            <span class="mdc-tab__text-label">Fix op commanders</span>
+                            <span class="mdc-tab__icon material-icons" aria-hidden="true">healing</span>
+                            <span class="mdc-tab__text-label">Fill in missing op data</span>
                         </span>
                         <span class="mdc-tab__ripple"></span>
                     </a>
-                    <a href="/logout" class="mdc-tab mdc-tab--active" role="tab" aria-selected="true" tabindex="4">
+                    <a href="<?php echo base_url('logout'); ?>" class="mdc-tab mdc-tab--active" role="tab" aria-selected="true" tabindex="4">
                         <span class="mdc-tab__content">
                             <span class="mdc-tab__icon material-icons" aria-hidden="true">logout</span>
                             <span class="mdc-tab__text-label">Logout</span>

@@ -15,14 +15,14 @@ $event_types = $this->config->item('event_types');
             </button>
             <br>
             <i class="mdc-typography--caption operations_json_info">
-                <?php echo count($operations); ?> entries (<?php echo $file_size; ?>)  
+                <?php echo count($operations); ?> entries (<?php echo $file_size; ?>)
                 <br>
-                <?php echo $last_update ? 'updated '.strtolower(timespan($last_update, time())).' ago' : 'not downloaded'; ?>
+                <?php echo $last_update ? 'updated ' . strtolower(timespan($last_update, time())) . ' ago' : 'not downloaded'; ?>
             </i>
             <?php echo form_close(); ?>
         </div>
         <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6 flex--center update_field">
-            <?php echo form_open(base_url('clear-cache'), ['id' => 'clear_cache']);?>
+            <?php echo form_open(base_url('clearcache'), ['id' => 'clear_cache']); ?>
             <button type="submit" name="clear_cache" value="1" class="mdc-button mdc-button--outlined">
                 <span class="mdc-button__ripple"></span>
                 <i class="material-icons mdc-button__icon" aria-hidden="true">auto_delete</i>
@@ -30,7 +30,7 @@ $event_types = $this->config->item('event_types');
             </button>
             <br>
             <i class="mdc-typography--caption operations_json_info">
-                index <?php echo $last_cache_update ? 'cached '.strtolower(timespan($last_cache_update, time())).' ago' : 'not cached'; ?>
+                index <?php echo $last_cache_update ? 'cached ' . strtolower(timespan($last_cache_update, time())) . ' ago' : 'not cached'; ?>
             </i>
             <?php echo form_close(); ?>
         </div>
@@ -60,10 +60,10 @@ $event_types = $this->config->item('event_types');
                                 if ($op_in_db) {
                                     if ($op_db_ids[$op['id']]['event'] === '') {
                                         $append_class .= ' ignored_operation';
-                                        $label = '<i title="'.html_escape($op_db_ids[$op['id']]['updated']).'">ignored</i>';
+                                        $label = '<i title="' . html_escape($op_db_ids[$op['id']]['updated']) . '">ignored</i>';
                                     } else {
-                                        $label = '<span title="'.$op_db_ids[$op['id']]['updated'].'">'.$event_types[$op_db_ids[$op['id']]['event']].'</span>';
-                                        $start_time_title = ' title="'.html_escape($op_db_ids[$op['id']]['start_time']).'"';
+                                        $label = '<span title="' . $op_db_ids[$op['id']]['updated'] . '">' . $event_types[$op_db_ids[$op['id']]['event']] . '</span>';
+                                        $start_time_title = ' title="' . html_escape($op_db_ids[$op['id']]['start_time']) . '"';
                                     }
                                 }
                             ?>
@@ -77,7 +77,7 @@ $event_types = $this->config->item('event_types');
                                             <?php echo intval($op['id']); ?>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="mdc-data-table__cell"<?php echo $start_time_title; ?>><?php echo html_escape($op['date']); ?></td>
+                                    <td class="mdc-data-table__cell" <?php echo $start_time_title; ?>><?php echo html_escape($op['date']); ?></td>
                                     <td class="mdc-data-table__cell cell__title">
                                         <?php echo html_escape($op['mission_name']); ?> (<span class="mdc-typography--subtitle2"><?php echo html_escape($op['world_name']); ?></span>)
                                         <br>

@@ -9,14 +9,12 @@ $shots_hits_ratio = '0.0';
 
 if ($player['adj_shots'] === false) {
     $hits_shots_ratio = '';
-}
-elseif ($player['adj_shots'] > 0) {
+} elseif ($player['adj_shots'] > 0) {
     $hits_shots_ratio = number_format(intval($player['adj_hits']) / $player['adj_shots'] * 100, 2) . '%';
 }
 if ($player['adj_hits'] === false) {
     $shots_hits_ratio = '';
-}
-elseif ($player['adj_hits'] > 0) {
+} elseif ($player['adj_hits'] > 0) {
     $shots_hits_ratio = number_format(intval($player['adj_shots']) / $player['adj_hits'], 1);
 }
 
@@ -71,12 +69,20 @@ $aliases_names = array_map('html_escape', array_column($aliases, 'name'));
                                     <td class="mdc-data-table__cell"><?php echo $player['shots']; ?></td>
                                 </tr>
                                 <!-- <tr class="mdc-data-table__row">
+                                    <td class="mdc-data-table__cell">Adjusted shots</td>
+                                    <td class="mdc-data-table__cell"><?php echo $player['adj_shots']; ?></td>
+                                </tr>
+                                <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Hits</td>
                                     <td class="mdc-data-table__cell"><?php echo $player['hits']; ?></td>
+                                </tr>
+                                <tr class="mdc-data-table__row">
+                                    <td class="mdc-data-table__cell">Adjusted hits</td>
+                                    <td class="mdc-data-table__cell"><?php echo $player['adj_hits']; ?></td>
                                 </tr> -->
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Hits / Shots (Shots / Hits)</td>
-                                    <td class="mdc-data-table__cell"><?php echo $hits_shots_ratio; ?><?php echo $shots_hits_ratio ? ' ('.$shots_hits_ratio.')' : ''; ?></td>
+                                    <td class="mdc-data-table__cell"><?php echo $hits_shots_ratio; ?><?php echo $shots_hits_ratio ? ' (' . $shots_hits_ratio . ')' : ''; ?></td>
                                 </tr>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Kills</td>
@@ -93,7 +99,7 @@ $aliases_names = array_map('html_escape', array_column($aliases, 'name'));
 
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Friendly fire</td>
-                                    <td class="mdc-data-table__cell"><?php echo $player['adj_fhits'] !== false ? $player['fhits'] : ''; ?></td>
+                                    <td class="mdc-data-table__cell"><?php echo $player['fhits']; ?></td>
                                 </tr>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Teamkills</td>

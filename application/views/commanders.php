@@ -5,9 +5,7 @@ if (count($items) === 0) :
     echo '<div class="mdc-typography--body1 list__no_items">No commanders matching the selected filters...</div>';
 else :
     echo '<div class="mdc-typography--caption list__total">' . count($items) . ' commanders</div>';
-    // echo '<pre>'.print_r($items, true).'</pre>';//debug
 
-    $event_types = $this->config->item('event_types');
     $sides = $this->config->item('sides');
 ?>
     <div class="mdc-layout-grid">
@@ -27,11 +25,9 @@ else :
                                 </tr>
                             </thead>
                             <tbody class="mdc-data-table__content">
-                                <?php 
-                                $pos = 0;
+                                <?php
                                 foreach ($items as $i) :
-                                    $pos++;
-                                    $name = '<a href="'.base_url('player/').$i['player_id'].'">'.html_escape($i['name']).'</a>';
+                                    $name = '<a href="' . base_url('player/') . $i['player_id'] . '">' . html_escape($i['name']) . '</a>';
 
                                     $blufor_wl_ratio = 0;
                                     if ($i['WEST']['win'] === 0) {

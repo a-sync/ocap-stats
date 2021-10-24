@@ -6,7 +6,6 @@ if (count($items) === 0) :
 else :
     $unique_count = count(array_unique(array_column($items, 'operation_id')));
     echo '<div class="mdc-typography--caption list__total">' . $unique_count . ' ops</div>';
-    // echo '<pre>'.print_r($items, true).'</pre>';
 
     $event_types = $this->config->item('event_types');
     $sides = $this->config->item('sides');
@@ -17,70 +16,7 @@ else :
                 <div class="mdc-data-table mdc-elevation--z2">
                     <div class="mdc-data-table__table-container">
 
-                        <div class="mdc-tab-bar">
-                            <div class="mdc-tab-scroller">
-                                <div class="mdc-tab-scroller__scroll-area">
-                                    <div class="mdc-tab-scroller__scroll-content">
-                                        <a class="mdc-tab mdc-tab--active" role="tab" aria-selected="true" tabindex="0">
-                                            <span class="mdc-tab__content">
-                                                <span class="mdc-tab__text-label">Ops</span>
-                                            </span>
-                                            <span class="mdc-tab-indicator mdc-tab-indicator--active">
-                                                <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
-                                            </span>
-                                            <span class="mdc-tab__ripple"></span>
-                                        </a>
-                                        <!--
-                                        <a class="mdc-tab" role="tab" aria-selected="false" tabindex="1">
-                                            <span class="mdc-tab__content">
-                                                <span class="mdc-tab__text-label">Roles</span>
-                                            </span>
-                                            <span class="mdc-tab-indicator">
-                                                <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
-                                            </span>
-                                            <span class="mdc-tab__ripple"></span>
-                                        </a>
-                                        <a class="mdc-tab" role="tab" aria-selected="false" tabindex="1">
-                                            <span class="mdc-tab__content">
-                                                <span class="mdc-tab__text-label">Weapons</span>
-                                            </span>
-                                            <span class="mdc-tab-indicator">
-                                                <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
-                                            </span>
-                                            <span class="mdc-tab__ripple"></span>
-                                        </a>
-                                        <a class="mdc-tab" role="tab" aria-selected="false" tabindex="1">
-                                            <span class="mdc-tab__content">
-                                                <span class="mdc-tab__text-label">Attackers</span>
-                                            </span>
-                                            <span class="mdc-tab-indicator">
-                                                <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
-                                            </span>
-                                            <span class="mdc-tab__ripple"></span>
-                                        </a>
-                                        <a class="mdc-tab" role="tab" aria-selected="false" tabindex="1">
-                                            <span class="mdc-tab__content">
-                                                <span class="mdc-tab__text-label">Victims</span>
-                                            </span>
-                                            <span class="mdc-tab-indicator">
-                                                <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
-                                            </span>
-                                            <span class="mdc-tab__ripple"></span>
-                                        </a>
-                                        <a class="mdc-tab" role="tab" aria-selected="false" tabindex="1">
-                                            <span class="mdc-tab__content">
-                                                <span class="mdc-tab__text-label">Rivals</span>
-                                            </span>
-                                            <span class="mdc-tab-indicator">
-                                                <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
-                                            </span>
-                                            <span class="mdc-tab__ripple"></span>
-                                        </a>
-                                        -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <?php echo $player_menu; ?>
 
                         <table class="mdc-data-table__table sortable">
                             <thead>
@@ -143,30 +79,34 @@ else :
                                         $group = str_replace('Reconnaissance', 'Recon', $group);
                                     }
 
-                                    $new_op_row = ($prev_op_id !== $i['operation_id']); 
+                                    $new_op_row = ($prev_op_id !== $i['operation_id']);
                                 ?>
                                     <tr class="mdc-data-table__row">
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric">
-                                                <a href="<?php echo base_url('op/') . $i['operation_id']; ?>"><?php echo $i['operation_id']; ?></a>
-                                            </td>
-                                            <td class="mdc-data-table__cell">
-                                                <span title="<?php echo $event_types[$i['event']]; ?> @ <?php echo $i['start_time']; ?> (<?php echo $duration_min ?>m)">
+                                            <a href="<?php echo base_url('op/') . $i['operation_id']; ?>"><?php echo $i['operation_id']; ?></a>
+                                        </td>
+                                        <td class="mdc-data-table__cell">
+                                            <span title="<?php echo $event_types[$i['event']]; ?> @ <?php echo $i['start_time']; ?> (<?php echo $duration_min ?>m)">
                                                 <?php echo html_escape($i['mission_name']); ?>&nbsp;<sup class="mdc-typography--caption"><a target="_blank" title="AAR" href="<?php echo FNF_AAR_URL_PREFIX . urlencode($i['filename']); ?>">AAR</a>
                                                     (<?php echo html_escape($i['world_name']); ?>) <?php echo $sides[$i['end_winner']]; ?>
-                                                    </sup>
-                                                </span>
-                                            </td>
-                                        <td class="mdc-data-table__cell <?php echo 'side__'.html_escape(strtolower($i['side'])); ?>">
+                                                </sup>
+                                            </span>
+                                        </td>
+                                        <td class="mdc-data-table__cell <?php echo 'side__' . html_escape(strtolower($i['side'])); ?>">
                                             <?php echo $sides[$i['side']]; ?> <?php echo html_escape($group); ?>
                                         </td>
                                         <td class="mdc-data-table__cell">
                                             <span title="<?php echo html_escape($i['name']); ?>"><?php echo html_escape($role); ?></span>
                                         </td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['shots']; ?></td>
-                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php if($i['operation_id'] >= FIRST_OP_WITH_HIT_EVENTS) { echo $i['hits']; } ?></td>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php if ($i['operation_id'] >= FIRST_OP_WITH_HIT_EVENTS) {
+                                                                                                            echo $i['hits'];
+                                                                                                        } ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['kills']; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['deaths']; ?></td>
-                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php if($i['operation_id'] >= FIRST_OP_WITH_HIT_EVENTS) { echo $i['fhits']; } ?></td>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php if ($i['operation_id'] >= FIRST_OP_WITH_HIT_EVENTS) {
+                                                                                                            echo $i['fhits'];
+                                                                                                        } ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['fkills']; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['vkills']; ?></td>
                                     </tr>
