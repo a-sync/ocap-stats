@@ -1,4 +1,4 @@
-name: Deploy to 3cb-stats.devs.space
+name: Deploy demo sites
 
 on:
   push:
@@ -16,15 +16,35 @@ jobs:
   #       name: 🛑 Make sure only a single deployment is running
   #       uses: fkirc/skip-duplicate-actions@master
   #       with:
-  #         concurrent_skipping: "always"
-  #         cancel_others: "true"
+  #         concurrent_skipping: always
+  #         cancel_others: true
   #         # paths_ignore: '["**/*.md"]'
 
-  web-deploy:
+  deploy:
     # needs: pre-deploy
     # if: ${{ needs.pre-deploy.outputs.should_skip != 'true' }}
-    name: 🚀 Deploy
+    name: 🚀 Deploy demo sites
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        config: [fnf, ofcra, 3cb, 242ns]
+        include:
+          - config: fnf
+            uname_secret: DB_USERNAME_FNF
+            pword_secret: DB_PASSWORD_FNF
+          - config: ofcra
+            uname_secret: DB_USERNAME_OFCRA
+            pword_secret: DB_PASSWORD_OFCRA
+          - config: 3cb
+            uname_secret: DB_USERNAME_3CB
+            pword_secret: DB_PASSWORD_3CB
+          - config: 242ns
+            uname_secret: DB_USERNAME_242NS
+            pword_secret: DB_PASSWORD_242NS
+
     steps:
       - name: 🚚 Get latest code
         uses: actions/checkout@v2
@@ -33,7 +53,7 @@ jobs:
         uses: jacobtomlinson/gha-find-replace@v2
         with:
           find: "$config['base_url'] = '';"
-          replace: "$config['base_url'] = 'https://3cb-stats.devs.space/';"
+          replace: "$config['base_url'] = 'https://${{ matrix.config }}-stats.devs.space/';"
           include: "application/config/config.php"
           regex: false
 
@@ -41,23 +61,15 @@ jobs:
         uses: jacobtomlinson/gha-find-replace@v2
         with:
           find: "$autoload['config'] = array('localhost');"
-          replace: "$autoload['config'] = array('3cb');"
+          replace: "$autoload['config'] = array('${{ matrix.config }}');"
           include: "application/config/autoload.php"
           regex: false
-
-      # - name: ✏️ Replace config[admin_key]
-      #   uses: jacobtomlinson/gha-find-replace@v2
-      #   with:
-      #     find: "$config['admin_key'] = 'team';"
-      #     replace: "$config['admin_key'] = '${{ secrets.ADMIN_KEY }}';"
-      #     include: "application/config/3cb.php"
-      #     regex: false
 
       - name: ✏️ Replace db[default][username]
         uses: jacobtomlinson/gha-find-replace@v2
         with:
           find: "'username' => 'root',"
-          replace: "'username' => '${{ secrets.DB_USERNAME_3CB }}',"
+          replace: "'username' => '${{ secrets[matrix.uname_secret] }}',"
           include: "application/config/database.php"
           regex: false
 
@@ -65,7 +77,7 @@ jobs:
         uses: jacobtomlinson/gha-find-replace@v2
         with:
           find: "'password' => '',"
-          replace: "'password' => '${{ secrets.DB_PASSWORD_3CB }}',"
+          replace: "'password' => '${{ secrets[matrix.pword_secret] }}',"
           include: "application/config/database.php"
           regex: false
 
@@ -73,7 +85,7 @@ jobs:
         uses: jacobtomlinson/gha-find-replace@v2
         with:
           find: "'database' => 'ocapstats',"
-          replace: "'database' => '${{ secrets.DB_USERNAME_3CB }}',"
+          replace: "'database' => '${{ secrets[matrix.uname_secret] }}',"
           include: "application/config/database.php"
           regex: false
 
@@ -83,5 +95,6 @@ jobs:
           server: "${{ secrets.FTP_HOSTNAME }}"
           username: "${{ secrets.FTP_USERNAME }}"
           password: "${{ secrets.FTP_PASSWORD }}"
-          server-dir: "3cb-stats/"
+          server-dir: "${{ matrix.config }}-stats/"
+          exclude: "[**/.git*, **/.git*/**, .sql/**, .dev/**, docker-compose.yml]"
           # dry-run: true
