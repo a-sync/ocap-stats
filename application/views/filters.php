@@ -10,7 +10,7 @@ echo form_open('', [
 
 foreach ($event_types as $id => $name) :
     $extra_attr = '';
-    if (in_array($id, $events)) {
+    if (is_array($events_filter) && in_array($id, $events_filter)) {
         $extra_attr = ' checked';
     }
 ?>
@@ -18,10 +18,10 @@ foreach ($event_types as $id => $name) :
     <div class="mdc-form-field filters_checkbox">
         <div class="mdc-touch-target-wrapper">
             <div class="mdc-checkbox mdc-checkbox--touch">
-                <input type="checkbox" class="mdc-checkbox__native-control" id="<?php echo 'event-' . $id; ?>" name="events[]" value="<?php echo $id; ?>" <?php echo $extra_attr; ?> />
+                <input type="checkbox" class="mdc-checkbox__native-control" id="<?php echo 'event-' . $id; ?>" name="events[]" value="<?php echo $id; ?>" <?php echo $extra_attr; ?>>
                 <div class="mdc-checkbox__background">
                     <svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24">
-                        <path class="mdc-checkbox__checkmark-path" fill="none" d="M1.73,12.91 8.1,19.28 22.79,4.59" />
+                        <path class="mdc-checkbox__checkmark-path" fill="none" d="M1.73,12.91 8.1,19.28 22.79,4.59">
                     </svg>
                     <div class="mdc-checkbox__mixedmark"></div>
                 </div>

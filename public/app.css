@@ -119,6 +119,10 @@ a:hover {
     display: none;
 }
 
+img.ocap-link {
+    width: 14px;
+}
+
 /* Dark mode */
 @media (prefers-color-scheme: dark) {
     html, body {
@@ -170,11 +174,20 @@ a:hover {
     footer a.github {
         fill: #c6cbd1;
     }
+
+    .markdown-body table tr, .markdown-body table tr:nth-child(2n) {
+        background-color: var(--mdc-theme-surface);
+        border-color: var(--mdc-theme-text-hint-on-light);
+    }
+    .markdown-body table td, .markdown-body table th {
+        border-color: var(--mdc-theme-text-hint-on-light);
+    }
 }
 
 .side__, .side__ a:link, .mdc-data-table td.side__ a:visited {
 }
 .side__unknown, .side__unknown a:link, .mdc-data-table td.side__unknown a:visited {
+    color: #b29900 !important;
 }
 .side__west, .side__west a:link, .mdc-data-table td.side__west a:visited {
     color: #00a8ff !important;

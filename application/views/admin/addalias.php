@@ -16,7 +16,7 @@
             <?php echo form_open('', ['id' => 'alias-form']); ?>
 
             <div class="mdc-text-field mdc-text-field--outlined">
-                <input type="text" name="alias_name" value="" class="mdc-text-field__input" tabindex="0" />
+                <input type="text" name="alias_name" value="" class="mdc-text-field__input" tabindex="0">
 
                 <div class="mdc-notched-outline mdc-notched-outline--upgraded">
                     <div class="mdc-notched-outline__leading"></div>

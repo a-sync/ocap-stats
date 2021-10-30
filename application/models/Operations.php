@@ -27,7 +27,7 @@ class Operations extends CI_Model
     public function get_all_ids_and_events()
     {
         $re = $this->db
-            ->select(['id', 'event', 'updated', 'start_time'])
+            ->select(['id', 'event', 'UNIX_TIMESTAMP(updated) AS updated', 'start_time'])
             ->from('operations')
             ->get()
             ->result_array();
@@ -41,7 +41,24 @@ class Operations extends CI_Model
 
     public function insert($data)
     {
-        return $this->db->insert('operations', $data);
+        return $this->db->insert('operations', [
+            'id' => $data['id'],
+            'world_name' => $data['world_name'],
+            'mission_name' => $data['mission_name'],
+            'mission_duration' => $data['mission_duration'],
+            'filename' => $data['filename'],
+            'date' => $data['date'],
+            'tag' => element('tag', $data, ''),
+            'event' => element('event', $data, ''),
+            'addon_version' => element('addon_version', $data, ''),
+            'capture_delay' => element('capture_delay', $data, 0),
+            'extension_build' => element('extension_build', $data, ''),
+            'extension_version' => element('extension_version', $data, ''),
+            'mission_author' => element('mission_author', $data, ''),
+            'start_time' => element('start_time', $data, ''),
+            'end_winner' => element('end_winner', $data, ''),
+            'end_message' => element('end_message', $data, '')
+        ]);
     }
 
     public function parse_entities($data)
@@ -61,7 +78,7 @@ class Operations extends CI_Model
                 'start_frame_num' => $e['startFrameNum'],
                 'type' => $e['type'],
                 'class' => element('class', $e, ''),
-                'shots' => count($e['framesFired']),
+                'shots' => isset($e['framesFired']) ? count($e['framesFired']) : 0,
                 'hits' => 0,
                 'fhits' => 0,
                 'kills' => 0,
@@ -82,20 +99,22 @@ class Operations extends CI_Model
             ],
             */
 
-            if ($e['type'] === 'unit' && in_array($e['side'], ['WEST', 'EAST', 'GUER'])) {
+            if ($e['type'] === 'unit' && in_array($e['side'], ['WEST', 'EAST', 'GUER', 'CIV'])) {
                 $last_state = 1; // starting state is awake, skip this one
                 foreach ($e['positions'] as $f => $p) {
-                    // not a player, not a vehicle, is a player, name field is empty and position name field is not empty
-                    if (
-                        $entities[$e['id']]['is_player'] === 0
-                        && $p[3] === 0
-                        && $p[5] === 1
-                        && $e['name'] === ''
-                        && $p[4] !== ''
-                    ) {
-                        // note: this attempts to fix missing names and player flag for actual player units
-                        $entities[$e['id']]['is_player'] = 1;
-                        $entities[$e['id']]['name'] = $p[4];
+                    if (isset($p[5])) {
+                        // not a player, not a vehicle, is a player, name field is empty and position name field is not empty
+                        if (
+                            $entities[$e['id']]['is_player'] === 0
+                            && $p[3] === 0
+                            && $p[5] === 1
+                            && $e['name'] === ''
+                            && $p[4] !== ''
+                        ) {
+                            // Note: this attempts to fix missing name and player flag for actual player units
+                            $entities[$e['id']]['is_player'] = 1;
+                            $entities[$e['id']]['name'] = $p[4];
+                        }
                     }
 
                     if ($last_state !== $p[2]) {
@@ -149,7 +168,7 @@ class Operations extends CI_Model
          * [0] frame nr.
          * [1] event
          * [2] victim id
-         * [3][0] attacker id / "null"
+         * [3][0] attacker id / "null" / -1
          * [3][1] weapon (if attacker is not null)
          * [4] distance (m)
          */
@@ -157,7 +176,7 @@ class Operations extends CI_Model
             if ($e[1] === 'hit' || $e[1] === 'killed') {
                 $attacker = null;
                 $weapon = '';
-                if ($e[3][0] !== 'null') {
+                if ($e[3][0] !== 'null' && intval($e[3][0]) !== -1) {
                     $attacker = $e[3][0];
                     $weapon = element(1, $e[3], '');
                 }
@@ -168,7 +187,7 @@ class Operations extends CI_Model
                     'victim_id' => $e[2],
                     'attacker_id' => $attacker,
                     'weapon' => $weapon,
-                    'distance' => $e[4]
+                    'distance' => intval($e[4])
                 ];
             } elseif ($e[1] === 'endMission') {
                 $re['end_winner'] = element(0, $e[2], '');
@@ -185,16 +204,16 @@ class Operations extends CI_Model
 
         /** marker: projectile
          * [0] icon magIcons/*
-         * [1] name
+         * [1] text
          * [2] start_frame
          * [3] end_frame
          * [4] entity_id
          * [5] color
-         * [6] ?
+         * [6] side
          * [7][] positions
-         * [8][] ?
-         * [9] marker_type1 (RECTANGLE, ICON, POLYLINE)
-         * [10] marker_type2 (SolidBorder, SolidFull, solid, Solid, border)
+         * [8][] marker_size
+         * [9] marker_shape (RECTANGLE, ICON, POLYLINE)
+         * [10] marker_brush (SolidBorder, SolidFull, solid, Solid, border)
          */
         foreach ($data as $m) {
             if ($m[0] && substr($m[0], 0, 9) === 'magIcons/') {
@@ -213,20 +232,12 @@ class Operations extends CI_Model
     {
         $errors = [];
 
-        if (!$details['start_time']) {
-            try {
-                $date_time = str_replace('__', ' ', substr($details['filename'], 0, 17));
-                $date_time_arr = explode(' ', $date_time);
-                $start_date = str_replace('_', '-', $date_time_arr[0]);
-                $start_time = str_replace('_', ':', $date_time_arr[1]);
+        if (function_exists('preprocess_op_data')) {
+            $errors = preprocess_op_data($details);
+        }
 
-                // Adjust/guess server local time based on tag/event
-                $tz = $details['event'] === 'eu' ? 'Europe/London' : 'America/Goose_Bay'; // na ops time zone in json file name is most likely AST/ADT
-                $adj_date_time = new \DateTime($start_date . ' ' . $start_time, new \DateTimeZone($tz));
-                $details['start_time'] = $adj_date_time->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d H:i:s');
-            } catch (exception $e) {
-                $details['start_time'] = gmdate('Y-m-d H:i:s', strtotime($details['date']));
-            }
+        if (!$details['start_time']) {
+            $details['start_time'] = gmdate('Y-m-d H:i:s', strtotime($details['date']));
         }
 
         if ($this->insert($details)) {
@@ -245,7 +256,7 @@ class Operations extends CI_Model
                     $_dead_events[$vid] = true;
                 }
 
-                if (!is_null($aid) &&  !is_null($vid) && $aid !== $vid) {
+                if (!is_null($aid) && !is_null($vid) && $aid !== $vid && isset($entities[$aid])) {
                     $ff = ($entities[$aid]['side'] === $entities[$vid]['side']) ? true : false;
 
                     if ($e['event'] === 'hit') {
@@ -254,7 +265,7 @@ class Operations extends CI_Model
                             $entities[$aid]['fhits']++;
                         }
                     } elseif ($e['event'] === 'killed') {
-                        if ($entities[$vid]['is_player']) {
+                        if ($entities[$vid]['type'] === 'unit') {
                             $entities[$aid]['kills']++;
                             if ($ff) {
                                 $entities[$aid]['fkills']++;
@@ -361,15 +372,15 @@ class Operations extends CI_Model
         return $new_players;
     }
 
-    public function get_ops($event_types, $id = false, $empty_end_winner_only = false)
+    public function get_ops($events_filter, $id = false, $empty_end_winner_only = false)
     {
-        if ($event_types && count($event_types) > 0) {
-            $this->db->where_in('operations.event', $event_types);
-        } else {
+        if (is_array($events_filter) && count($events_filter) > 0) {
+            $this->db->where_in('operations.event', $events_filter);
+        } elseif ($events_filter !== false) {
             $this->db->where('operations.event !=', '');
         }
 
-        if ($id) {
+        if ($id !== false) {
             if (!is_array($id)) {
                 $id = [$id];
             }
@@ -387,7 +398,7 @@ class Operations extends CI_Model
                 'operations.date',
                 'operations.tag',
                 'operations.event',
-                'operations.updated',
+                'UNIX_TIMESTAMP(operations.updated) AS updated',
                 'operations.mission_author',
                 'operations.start_time',
                 'operations.end_winner',
@@ -395,7 +406,7 @@ class Operations extends CI_Model
             ])
             ->select('COUNT(DISTINCT entities.player_id) AS players')
             ->from('operations')
-            ->join('entities', 'entities.operation_id = operations.id AND entities.player_id != 0')
+            ->join('entities', 'entities.operation_id = operations.id AND entities.player_id != 0', 'LEFT')
             ->group_by('operations.id')
             ->order_by('operations.id', 'DESC');
 
@@ -408,9 +419,9 @@ class Operations extends CI_Model
             ->result_array();
     }
 
-    public function get_by_id($id)
+    public function get_by_id($id, $only_parsed = true)
     {
-        $re = $this->get_ops(false, $id);
+        $re = $this->get_ops($only_parsed, $id);
 
         if (count($re) === 0) {
             return false;
@@ -499,7 +510,7 @@ class Operations extends CI_Model
             ->from('events')
             ->join('entities AS victim', 'victim.id = events.victim_id AND victim.operation_id = ' . $id)
             ->join('entities AS attacker', 'attacker.id = events.attacker_id AND attacker.operation_id = ' . $id, 'LEFT')
-            ->join('players AS victim_player', 'victim_player.id = victim.player_id')
+            ->join('players AS victim_player', 'victim_player.id = victim.player_id', 'LEFT')
             ->join('players AS attacker_player', 'attacker_player.id = attacker.player_id', 'LEFT')
             ->where('events.operation_id', $id)
             ->order_by("events.frame ASC, victim.name ASC, FIELD(events.event, 'hit', 'killed', '_awake', '_uncon', '_dead')");

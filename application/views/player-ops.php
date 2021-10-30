@@ -87,7 +87,7 @@ else :
                                         </td>
                                         <td class="mdc-data-table__cell">
                                             <span title="<?php echo $event_types[$i['event']]; ?> @ <?php echo $i['start_time']; ?> (<?php echo $duration_min ?>m)">
-                                                <?php echo html_escape($i['mission_name']); ?>&nbsp;<sup class="mdc-typography--caption"><a target="_blank" title="AAR" href="<?php echo FNF_AAR_URL_PREFIX . urlencode($i['filename']); ?>">AAR</a>
+                                                <?php echo html_escape($i['mission_name']); ?>&nbsp;<sup class="mdc-typography--caption"><a target="_blank" title="OCAP" href="<?php echo OCAP_URL_PREFIX . urlencode($i['filename']); ?>"><img src="<?php echo base_url('public/ocap_logo.png'); ?>" alt="OCAP" class="ocap-link"></a>
                                                     (<?php echo html_escape($i['world_name']); ?>) <?php echo $sides[$i['end_winner']]; ?>
                                                 </sup>
                                             </span>
@@ -99,14 +99,10 @@ else :
                                             <span title="<?php echo html_escape($i['name']); ?>"><?php echo html_escape($role); ?></span>
                                         </td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['shots']; ?></td>
-                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php if ($i['operation_id'] >= FIRST_OP_WITH_HIT_EVENTS) {
-                                                                                                            echo $i['hits'];
-                                                                                                        } ?></td>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['operation_id'] >= FIRST_PVP_OP_WITH_HIT_EVENTS ? $i['hits'] : ''; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['kills']; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['deaths']; ?></td>
-                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php if ($i['operation_id'] >= FIRST_OP_WITH_HIT_EVENTS) {
-                                                                                                            echo $i['fhits'];
-                                                                                                        } ?></td>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['operation_id'] >= FIRST_PVP_OP_WITH_HIT_EVENTS ? $i['fhits'] : ''; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['fkills']; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['vkills']; ?></td>
                                     </tr>

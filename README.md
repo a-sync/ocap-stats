@@ -1,23 +1,35 @@
-# fnf-stats
+# ocap-stats
 
 ## What is this?
-[AAR](http://aar.fridaynightfight.org) data from [FNF](https://www.fridaynightfight.org) spread out on tables  
- &nbsp; &rdca; based on [OCAP2](https://github.com/OCAP2/OCAP) data  
+[OCAP](https://github.com/OCAP2/OCAP) data spread out on tables.  
+
+
+## Demo sites 
+[fnf-stats.devs.space](https://fnf-stats.devs.space)  
+ &nbsp; &rdca; based on [OCAP2](http://aar.fridaynightfight.org) data from [FNF](https://www.fridaynightfight.org)  
+[ofcra-stats.devs.space](https://ofcra-stats.devs.space)  
+ &nbsp; &rdca; based on [OCAP](https://game.ofcra.org/ocap) data from [OFCRA](https://ofcrav2.org)  
+[3cb-stats.devs.space](https://3cb-stats.devs.space)  
+ &nbsp; &rdca; based on [OCAP2](https://ocap.3commandobrigade.com) data from [3CB](https://www.3commandobrigade.com)  
+[242ns-stats.devs.space](https://242ns-stats.devs.space)  
+ &nbsp; &rdca; based on [OCAP2](http://server.242nightstalkers.com:5000) data from [242NS](https://steamcommunity.com/groups/242NS)  
 
 
 ## Known issues
   1. player stats are collected based on name only (aliases must be set manually to mitigate this)  
-  1. ops before 2021-08-05 had no proper hit event tracking  
+  1. ops before 2021-08 had no proper tracking for hit events where the victim is a player  
      * Hits / Shots percent and Shots / Hits are adjusted accordingly
   1. some units have less shots then hits  
-     * some weapons produce multiple hit events (eg. MAAWS)  
-  1. a few players have two entities in the same op with `killed` events (rejoin bug?)  
-     * this affects role stats since there is no explicit way to tell which entity is actually playing
+     * some weapons produce multiple hit events (eg. MAAWS)
+  1. players can have multiple entities in the same op (rejoins/role switch)  
+     * this affects role data since there is no explicit way to tell which entity was actually playing
+     * in a few cases two entities of the same player have `killed` events in a single op (dc/spectator bug/_something_?)
   1. vehicle kills are not always registered (not sure why)  
   1. ops before 2021-07-09, and some later ones have no winner announced (endMission[1]: Mission ended automatically)  
-     * nobody wins or loses the op (maybe the ending can be assumed or it's just omitted, not sure...)  
+     * nobody wins or loses the op (maybe the ending can be assumed or it's just omitted, not sure...)
   1. ops before 2021-07-16 have no role info  
-     * commanders can not always be determined automatically and must be fixed manually   
+  1. commanders can not always be determined automatically and must be fixed manually  
+  1. timestamps are all UTC (or should be) and depend on the server  
 
 
 ## Stats collected  
@@ -37,9 +49,7 @@
  * **Destroyed assets**  
    nr. of `killed` events as attacker, where victim is a _vehicle_ (asset)  
 
-Self inflicted and environmental hits / kills (_something_) are not counted!  
-
-Timestamps are all UTC.  
+Self inflicted and environmental hits / kills (_something_) are omitted!  
 
 
 ## Search

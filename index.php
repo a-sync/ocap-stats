@@ -35,9 +35,6 @@
  * @since	Version 1.0.0
  * @filesource
  */
-date_default_timezone_set('UTC');
-ini_set('date.timezone', 'Etc/UTC');
-@ini_set('expose_php', 'off');
 
 /*
  *---------------------------------------------------------------

@@ -49,7 +49,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 | Examples:	my-controller/index	-> my_controller/index
 |		my-controller/my-method	-> my_controller/my_method
 */
-$route['default_controller'] = 'app';
+$route['default_controller'] = 'app/ops';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
@@ -59,12 +59,12 @@ $route['logout'] = 'admin/logout';
 
 $route['clearcache'] = 'admin/clearcache';
 $route['update'] = 'admin/update';
-$route['manage'] = 'admin/index';
+$route['manage'] = 'admin/operations';
 $route['manage/(:num)'] = 'admin/manage/$1';
 $route['addalias'] = 'admin/addalias';
 $route['fixopdata'] = 'admin/fixopdata';
 
-$route['players'] = 'app/index';
+$route['players'] = 'app/players';
 $route['player/(:num)'] = 'app/player/$1';
 $route['player/(:num)/ops'] = 'app/player/$1/ops';
 $route['player/(:num)/roles'] = 'app/player/$1/roles';
@@ -76,4 +76,5 @@ $route['op/(:num)/events'] = 'app/op/$1/events';
 
 $route['commanders'] = 'app/commanders';
 
+$route['assorted-data'] = 'app/assorted_data';
 $route['about'] = 'app/readme_md';

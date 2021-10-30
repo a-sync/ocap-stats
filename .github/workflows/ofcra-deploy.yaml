@@ -1,0 +1,87 @@
+name: Deploy to ofcra-stats.devs.space
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  # pre-deploy:
+  #   name: 🚧 Pre deploy
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     should_skip: ${{ steps.skip_check.outputs.should_skip }}
+  #   steps:
+  #     - id: skip_check
+  #       name: 🛑 Make sure only a single deployment is running
+  #       uses: fkirc/skip-duplicate-actions@master
+  #       with:
+  #         concurrent_skipping: "always"
+  #         cancel_others: "true"
+  #         # paths_ignore: '["**/*.md"]'
+
+  web-deploy:
+    # needs: pre-deploy
+    # if: ${{ needs.pre-deploy.outputs.should_skip != 'true' }}
+    name: 🚀 Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🚚 Get latest code
+        uses: actions/checkout@v2
+
+      - name: ✏️ Replace config[base_url]
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: "$config['base_url'] = '';"
+          replace: "$config['base_url'] = 'https://ofcra-stats.devs.space/';"
+          include: "application/config/config.php"
+          regex: false
+
+      - name: ✏️ Replace autoload[config]
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: "$autoload['config'] = array('localhost');"
+          replace: "$autoload['config'] = array('ofcra');"
+          include: "application/config/autoload.php"
+          regex: false
+
+      # - name: ✏️ Replace config[admin_key]
+      #   uses: jacobtomlinson/gha-find-replace@v2
+      #   with:
+      #     find: "$config['admin_key'] = 'team';"
+      #     replace: "$config['admin_key'] = '${{ secrets.ADMIN_KEY }}';"
+      #     include: "application/config/ofcra.php"
+      #     regex: false
+
+      - name: ✏️ Replace db[default][username]
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: "'username' => 'root',"
+          replace: "'username' => '${{ secrets.DB_USERNAME_OFCRA }}',"
+          include: "application/config/database.php"
+          regex: false
+
+      - name: ✏️ Replace db[default][password]
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: "'password' => '',"
+          replace: "'password' => '${{ secrets.DB_PASSWORD_OFCRA }}',"
+          include: "application/config/database.php"
+          regex: false
+
+      - name: ✏️ Replace db[default][database]
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: "'database' => 'ocapstats',"
+          replace: "'database' => '${{ secrets.DB_USERNAME_OFCRA }}',"
+          include: "application/config/database.php"
+          regex: false
+
+      - name: 📂 Sync files
+        uses: SamKirkland/FTP-Deploy-Action@4.1.0
+        with:
+          server: "${{ secrets.FTP_HOSTNAME }}"
+          username: "${{ secrets.FTP_USERNAME }}"
+          password: "${{ secrets.FTP_PASSWORD }}"
+          server-dir: "ofcra-stats/"
+          # dry-run: true

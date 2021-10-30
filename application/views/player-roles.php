@@ -35,6 +35,7 @@ else :
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="west_count"><?php echo $sides['WEST']; ?></th>
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="east_count"><?php echo $sides['EAST']; ?></th>
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="guer_count"><?php echo $sides['GUER']; ?></th>
+                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="civ_count"><?php echo $sides['CIV']; ?></th>
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="descending" data-column-id="total_count" title="Attendance (Kills / Attendance)">A (K/A)</th>
                                 </tr>
                             </thead>
@@ -89,6 +90,7 @@ else :
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['west_count']; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['east_count']; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['guer_count']; ?></td>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['civ_count']; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo $kills_attendance_ratio; ?>"><?php echo $i['total_count']; ?> (<?php echo $kills_attendance_ratio; ?>)</td>
                                     </tr>
                                 <?php endforeach; ?>

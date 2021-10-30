@@ -47,10 +47,10 @@ class App extends CI_Controller
         return redirect(base_url('manage'));
     }
 
-    private function _head($active = 'players', $prefix = '', $postfix = '')
+    private function _head($active = 'ops', $prefix = '', $postfix = '')
     {
         return $this->load->view('head', [
-            'title' => ($prefix ? $prefix . ' - ' : '') . 'FNF Stats' . ($postfix ? ' - ' . $postfix : ''),
+            'title' => ($prefix ? $prefix . ' - ' : '') . $this->config->item('site_title') . ($postfix ? ' - ' . $postfix : ''),
             'main_menu' => $this->load->view('menu', ['active' => $active], true)
         ]);
     }
@@ -81,64 +81,62 @@ class App extends CI_Controller
         }
     }
 
-    private function _filters_redirect()
+    private function _filters()
     {
-        $re = false;
         $events = $this->input->get('events');
+        $event_type_ids = array_keys($this->config->item('event_types'));
+
         if (!is_null($events) && is_array($events)) {
             $re = current_url();
             if (count($events) > 0) {
-                $event_type_ids = array_keys($this->config->item('event_types'));
                 $events = array_filter($events, function ($v) use ($event_type_ids) {
                     return in_array($v, $event_type_ids);
                 });
 
                 if (count($events) > 0) {
-                    $events_list = implode(',', $events);
-                    $re .= '?events=' . $events_list;
+                    $re .= '?events=' . implode(',', $events);
                 }
             }
-        }
 
-        return $re;
+            return redirect($re);
+        } else {
+            if (!is_null($events)) {
+                $events = explode(',', $events);
+
+                if (count($events) > 0) {
+                    $events = array_filter($events, function ($v) use ($event_type_ids) {
+                        return in_array($v, $event_type_ids);
+                    });
+                }
+            }
+
+            if (!$events || count($events) === 0) {
+                return $this->config->item('default_selected_event_types');
+            } else {
+                return $events;
+            }
+        }
     }
 
-    // players
     public function index()
+    {
+        $this->ops();
+    }
+
+    public function players()
     {
         $this->_cache();
 
-        $re = $this->_filters_redirect();
-        if ($re !== false) {
-            return redirect($re);
-        }
+        $events_filter = $this->_filters();
 
         $this->load->model('players');
 
-        $event_type_ids = array_keys($this->config->item('event_types'));
-        $default_events = ['eu', 'na'];
-        $events = $this->input->get('events');
+        $players = $this->players->get_players($events_filter);
 
-        if ($events !== null) {
-            $events = explode(',', $events);
-
-            if (count($events) > 0) {
-                $events = array_filter($events, function ($v) use ($event_type_ids) {
-                    return in_array($v, $event_type_ids);
-                });
-            }
-        }
-
-        if (!$events || count($events) === 0) {
-            $events = $default_events;
-        }
-
-        $players = $this->players->get_players($events);
-
-        $this->_head();
+        $this->_head('players');
 
         $this->load->view('filters', [
-            'events' => $events
+            'events_filter' => $events_filter
         ]);
 
         $this->load->view('players', [
@@ -152,37 +150,16 @@ class App extends CI_Controller
     {
         $this->_cache();
 
-        $re = $this->_filters_redirect();
-        if ($re !== false) {
-            return redirect($re);
-        }
+        $events_filter = $this->_filters();
 
         $this->load->model('operations');
 
-        $event_type_ids = array_keys($this->config->item('event_types'));
-        $default_events = ['eu', 'na'];
-        $event_types = $this->input->get('events');
-
-        if ($event_types !== null) {
-            $event_types = explode(',', $event_types);
-
-            if (count($event_types) > 0) {
-                $event_types = array_filter($event_types, function ($v) use ($event_type_ids) {
-                    return in_array($v, $event_type_ids);
-                });
-            }
-        }
-
-        if (!$event_types || count($event_types) === 0) {
-            $event_types = $default_events;
-        }
-
-        $ops = $this->operations->get_ops($event_types);
+        $ops = $this->operations->get_ops($events_filter);
 
         $this->_head('ops');
 
         $this->load->view('filters', [
-            'events' => $event_types
+            'events_filter' => $events_filter
         ]);
         $this->load->view('ops', [
             'items' => $ops
@@ -261,7 +238,7 @@ class App extends CI_Controller
         $op = null;
         $op_events = [];
         $op_entities = [];
-        if (filter_var($id, FILTER_VALIDATE_INT)) {
+        if (filter_var($id, FILTER_VALIDATE_INT) || filter_var($id, FILTER_VALIDATE_INT) === 0) {
             $op = $this->operations->get_by_id($id);
 
             if ($op) {
@@ -311,43 +288,86 @@ class App extends CI_Controller
     {
         $this->_cache();
 
-        $re = $this->_filters_redirect();
-        if ($re !== false) {
-            return redirect($re);
-        }
+        $events_filter = $this->_filters();
 
         $this->load->model('players');
 
-        $event_type_ids = array_keys($this->config->item('event_types'));
-        $default_events = ['eu', 'na'];
-        $event_types = $this->input->get('events');
-
-        if ($event_types !== null) {
-            $event_types = explode(',', $event_types);
-
-            if (count($event_types) > 0) {
-                $event_types = array_filter($event_types, function ($v) use ($event_type_ids) {
-                    return in_array($v, $event_type_ids);
-                });
-            }
-        }
-
-        if (!$event_types || count($event_types) === 0) {
-            $event_types = $default_events;
-        }
-
-        $commanders = $this->players->get_commanders($event_types);
+        $commanders = $this->players->get_commanders($events_filter);
 
         $this->_head('commanders');
 
         $this->load->view('filters', [
-            'events' => $event_types
+            'events_filter' => $events_filter
         ]);
         $this->load->view('commanders', [
             'items' => $commanders
         ]);
 
         $this->_foot();
+    }
+
+    public function assorted_data()
+    {
+        $this->_cache();
+
+        $this->load->model('assorted');
+
+        $this->_head('', 'Assorted data');
+
+        $this->load->library('markdown');
+
+        $data_md = '';
+
+        $data_md .= $this->_md_table('Mission authors', $this->assorted->get_mission_authors());
+        $data_md .= $this->_md_table('Maps', $this->assorted->get_maps());
+        $data_md .= $this->_md_table('Winners', $this->assorted->get_winners());
+        $data_md .= $this->_md_table('End messages', $this->assorted->get_end_messages());
+        $data_md .= $this->_md_table('Groups', $this->assorted->get_groups());
+        $data_md .= $this->_md_table('Roles', $this->assorted->get_roles());
+        $data_md .= $this->_md_table('Weapons', $this->assorted->get_weapons());
+        $data_md .= $this->_md_table('Assets', $this->assorted->get_vehicles());
+
+        $this->load->view('md', [
+            'markdown' => $this->markdown->parse($data_md)
+        ]);
+
+        $this->_foot();
+    }
+
+    private function _md_table($title = '', $arr = [])
+    {
+        $head = '';
+        if ($title) {
+            $head .= '### ' . $title . "  \n";
+        }
+
+        $body = '';
+        if (count($arr) > 0) {
+            $keys = array_keys($arr[0]);
+            $head .= '| # |';
+            $neck = '| --: |';
+            foreach ($keys as $i => $k) {
+                $head .= ' ' . $k . ' |';
+                if ($i === 0) {
+                    $neck .= ' :-- |';
+                } elseif(is_numeric($arr[0][$k])) {
+                    $neck .= ' --: |';
+                } else {
+                    $neck .= ' :-: |';
+                }
+            }
+            $head .= "\n" . $neck . "\n";
+
+            foreach ($arr as $i => $a) {
+                $body .= '| ' . ($i + 1) . '. |';
+                foreach ($a as $val) {
+                    $body .= ' ' . html_escape($val) . ' |';
+                }
+                $body .= "\n";
+            }
+        }
+
+        return $head . $body . "\n";
     }
 
     public function readme_md()

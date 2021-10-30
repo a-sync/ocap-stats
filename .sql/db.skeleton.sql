@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS `entities` (
 --       `players` -> `id`
 --
 
+
 DROP TABLE IF EXISTS `events`;
 CREATE TABLE IF NOT EXISTS `events` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -51,7 +52,7 @@ CREATE TABLE IF NOT EXISTS `events` (
   `distance` int(10) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `operation_id` (`operation_id`,`attacker_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=110602 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=1 ;
 --
 -- RELATIONS FOR TABLE `events`:
 --   `operation_id`
@@ -61,6 +62,7 @@ CREATE TABLE IF NOT EXISTS `events` (
 --   `attacker_id`
 --       `entities` -> `id`
 --
+
 
 DROP TABLE IF EXISTS `operations`;
 CREATE TABLE IF NOT EXISTS `operations` (
@@ -92,12 +94,13 @@ CREATE TABLE IF NOT EXISTS `players` (
   `alias_of` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `alias_of` (`alias_of`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=1077 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=11 ;
 --
 -- RELATIONS FOR TABLE `players`:
 --   `alias_of`
 --       `players` -> `id`
 --
+
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

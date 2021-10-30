@@ -1,7 +1,6 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
 
 $event_types = $this->config->item('event_types');
-
 ?>
 
 <div class="mdc-layout-grid">
@@ -17,7 +16,7 @@ $event_types = $this->config->item('event_types');
             <i class="mdc-typography--caption operations_json_info">
                 <?php echo count($operations); ?> entries (<?php echo $file_size; ?>)
                 <br>
-                <?php echo $last_update ? 'updated ' . strtolower(timespan($last_update, time())) . ' ago' : 'not downloaded'; ?>
+                <?php echo $last_update ? 'updated ' . strtolower(timespan($last_update, '', 2)) . ' ago' : 'not downloaded'; ?>
             </i>
             <?php echo form_close(); ?>
         </div>
@@ -30,79 +29,103 @@ $event_types = $this->config->item('event_types');
             </button>
             <br>
             <i class="mdc-typography--caption operations_json_info">
-                index <?php echo $last_cache_update ? 'cached ' . strtolower(timespan($last_cache_update, time())) . ' ago' : 'not cached'; ?>
+                index <?php echo $last_cache_update ? 'cached ' . strtolower(timespan($last_cache_update, '', 2)) . ' ago' : 'not cached'; ?>
             </i>
             <?php echo form_close(); ?>
         </div>
-
-        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-            <div class="mdc-data-table mdc-elevation--z2 list__table">
-                <div class="mdc-data-table__table-container">
-                    <table class="mdc-data-table__table">
-                        <thead>
-                            <tr class="mdc-data-table__header-row">
-                                <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col">ID</th>
-                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col" title="Start time">Date</th>
-                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Mission (map)</th>
-                                <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col">Duration</th>
-                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Tag</th>
-                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col" title="Updated">Event</th>
-                            </tr>
-                        </thead>
-                        <tbody class="mdc-data-table__content">
-                            <?php foreach ($operations as $op) :
-                                $duration_min = floor(intval($op['mission_duration']) / 60);
-
-                                $op_in_db = isset($op_db_ids[$op['id']]);
-                                $append_class = '';
-                                $label = '';
-                                $start_time_title = '';
-                                if ($op_in_db) {
-                                    if ($op_db_ids[$op['id']]['event'] === '') {
-                                        $append_class .= ' ignored_operation';
-                                        $label = '<i title="' . html_escape($op_db_ids[$op['id']]['updated']) . '">ignored</i>';
-                                    } else {
-                                        $label = '<span title="' . $op_db_ids[$op['id']]['updated'] . '">' . $event_types[$op_db_ids[$op['id']]['event']] . '</span>';
-                                        $start_time_title = ' title="' . html_escape($op_db_ids[$op['id']]['start_time']) . '"';
-                                    }
-                                }
-                            ?>
-                                <tr class="mdc-data-table__row<?php echo $append_class; ?>" id="id-<?php echo intval($op['id']); ?>">
-                                    <td class="mdc-data-table__cell mdc-data-table__cell--numeric mdc-typography--caption">
-                                        <?php if ($op_in_db) : ?>
-                                            <a href="<?php echo base_url('manage/' . intval($op['id'])); ?>">
-                                                <?php echo intval($op['id']); ?>
-                                            </a>
-                                        <?php else : ?>
-                                            <?php echo intval($op['id']); ?>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td class="mdc-data-table__cell" <?php echo $start_time_title; ?>><?php echo html_escape($op['date']); ?></td>
-                                    <td class="mdc-data-table__cell cell__title">
-                                        <?php echo html_escape($op['mission_name']); ?> (<span class="mdc-typography--subtitle2"><?php echo html_escape($op['world_name']); ?></span>)
-                                        <br>
-                                        <span class="mdc-typography--caption">
-                                            <a title="AAR" target="_blank" href="<?php echo FNF_AAR_URL_PREFIX . urlencode($op['filename']); ?>"><?php echo html_escape($op['filename']); ?></a>
-                                        </span>
-                                    </td>
-                                    <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $duration_min; ?>m</td>
-                                    <td class="mdc-data-table__cell"><?php echo html_escape($op['tag']); ?></td>
-                                    <td class="mdc-data-table__cell">
-                                        <?php if ($op_in_db) : ?>
-                                            <?php echo $label; ?>
-                                        <?php else : ?>
-                                            <a href="<?php echo base_url('manage/' . intval($op['id'])); ?>" class="mdc-button mdc-button--outlined">
-                                                <span class="mdc-button__ripple"></span>
-                                                <span class="mdc-button__label">Process</span>
-                                            </a>
-                                        <?php endif; ?>
-                                    </td>
+        <?php
+        if (count($operations) === 0) :
+            echo '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-typography--body1 list__no_items">operations.json is empty...</div>';
+        else :
+            $op0 = $operations[0];
+        ?>
+            <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+                <div class="mdc-data-table mdc-elevation--z2 list__table">
+                    <div class="mdc-data-table__table-container">
+                        <table class="mdc-data-table__table">
+                            <thead>
+                                <tr class="mdc-data-table__header-row">
+                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col">ID</th>
+                                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col" title="Start time">Date</th>
+                                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Mission (map)</th>
+                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col">Duration</th>
+                                    <?php if (isset($op0['tag'])) : ?>
+                                        <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Tag</th>
+                                    <?php endif; ?>
+                                    <?php if (isset($op0['can_import'])) : ?>
+                                        <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Can import</th>
+                                    <?php endif; ?>
+                                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Event</th>
+                                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Updated</th>
                                 </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody class="mdc-data-table__content">
+                                <?php foreach ($operations as $op) :
+                                    $duration_min = floor(intval($op['mission_duration']) / 60);
+
+                                    $op_in_db = isset($op_db_ids[$op['id']]);
+                                    $append_class = '';
+                                    $label = '';
+                                    $start_time_title = '';
+                                    if ($op_in_db) {
+                                        if ($op_db_ids[$op['id']]['event'] === '') {
+                                            $append_class .= ' ignored_operation';
+                                            $label = '<i>ignored</i>';
+                                        } else {
+                                            $label = '<span>' . $event_types[$op_db_ids[$op['id']]['event']] . '</span>';
+                                            $start_time_title = ' title="' . html_escape($op_db_ids[$op['id']]['start_time']) . '"';
+                                        }
+                                    }
+                                ?>
+                                    <tr class="mdc-data-table__row<?php echo $append_class; ?>" id="id-<?php echo $op['id']; ?>">
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric mdc-typography--caption">
+                                            <?php if ($op_in_db) : ?>
+                                                <a href="<?php echo base_url('manage/' . $op['id']); ?>">
+                                                    <?php echo $op['id']; ?>
+                                                </a>
+                                            <?php else : ?>
+                                                <?php echo $op['id']; ?>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="mdc-data-table__cell" <?php echo $start_time_title; ?>><?php echo html_escape($op['date']); ?></td>
+                                        <td class="mdc-data-table__cell cell__title">
+                                            <?php echo html_escape($op['mission_name']); ?> (<span class="mdc-typography--subtitle2"><?php echo html_escape($op['world_name']); ?></span>)
+                                            <br>
+                                            <span class="mdc-typography--caption">
+                                                <a title="OCAP" target="_blank" href="<?php echo OCAP_URL_PREFIX . urlencode($op['filename']); ?>"><?php echo html_escape($op['filename']); ?></a>
+                                            </span>
+                                        </td>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $duration_min; ?>m</td>
+                                        <?php if (isset($op['tag'])) : ?>
+                                            <td class="mdc-data-table__cell"><?php echo html_escape($op['tag']); ?></td>
+                                        <?php endif; ?>
+                                        <?php if (isset($op['can_import'])) : ?>
+                                            <td class="mdc-data-table__cell"><?php echo $op['can_import'] ? 'Yes' : 'No'; ?></td>
+                                        <?php endif; ?>
+                                        <td class="mdc-data-table__cell">
+                                            <?php if ($op_in_db) : ?>
+                                                <?php echo $label; ?>
+                                            <?php else : ?>
+                                                <a href="<?php echo base_url('manage/' . $op['id']); ?>" class="mdc-button mdc-button--outlined">
+                                                    <span class="mdc-button__ripple"></span>
+                                                    <span class="mdc-button__label">Process</span>
+                                                </a>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="mdc-data-table__cell">
+                                            <?php if($op_in_db) : ?>
+                                                <span title="<?php echo gmdate('Y-m-d H:i:s', $op_db_ids[$op['id']]['updated']); ?>">
+                                                    <?php echo timespan($op_db_ids[$op['id']]['updated'], '', 1); ?> ago
+                                                </span>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
+        <?php endif; ?>
     </div>
 </div>

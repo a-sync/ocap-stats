@@ -27,7 +27,7 @@ else :
                             </thead>
                             <tbody class="mdc-data-table__content">
                                 <?php foreach ($items as $index => $i) :
-                                    $time = date('H:i:s', $i['frame']);
+                                    $time = gmdate('H:i:s', $i['frame']);
 
                                     $victim_player_name = is_null($i['victim_player_name']) ? '' : $i['victim_player_name'];
                                     $victim_name = html_escape($i['victim_name']);

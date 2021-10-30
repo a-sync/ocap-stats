@@ -7,14 +7,14 @@
         <div class="mdc-tab-scroller">
             <div class="mdc-tab-scroller__scroll-area">
                 <div class="mdc-tab-scroller__scroll-content">
-                    <a href="<?php echo base_url(''); ?>" class="mdc-tab<?php if ($active === 'players') echo ' mdc-tab--active';  ?>" role="tab" aria-selected="true" tabindex="1">
+                    <a href="<?php echo base_url('players'); ?>" class="mdc-tab<?php if ($active === 'players') echo ' mdc-tab--active';  ?>" role="tab" aria-selected="true" tabindex="1">
                         <span class="mdc-tab__content">
                             <span class="mdc-tab__icon material-icons" aria-hidden="true">people</span>
                             <span class="mdc-tab__text-label">Players</span>
                         </span>
                         <span class="mdc-tab__ripple"></span>
                     </a>
-                    <a href="<?php echo base_url('ops'); ?>" class="mdc-tab<?php if ($active === 'ops') echo ' mdc-tab--active';  ?>" role="tab" aria-selected="true" tabindex="2">
+                    <a href="<?php echo base_url(''); ?>" class="mdc-tab<?php if ($active === 'ops') echo ' mdc-tab--active';  ?>" role="tab" aria-selected="true" tabindex="2">
                         <span class="mdc-tab__content">
                             <span class="mdc-tab__icon material-icons" aria-hidden="true">list</span>
                             <span class="mdc-tab__text-label">Ops</span>

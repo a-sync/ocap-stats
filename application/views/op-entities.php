@@ -72,14 +72,10 @@ else :
                                         <td class="mdc-data-table__cell"><?php echo html_escape($role); ?></td>
 
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['shots']; ?></td>
-                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php if ($i['operation_id'] >= FIRST_OP_WITH_HIT_EVENTS) {
-                                                                                                            echo $i['hits'];
-                                                                                                        } ?></td>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['operation_id'] >= FIRST_PVP_OP_WITH_HIT_EVENTS ? $i['hits'] : ''; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['kills']; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['deaths']; ?></td>
-                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php if ($i['operation_id'] >= FIRST_OP_WITH_HIT_EVENTS) {
-                                                                                                            echo $i['fhits'];
-                                                                                                        } ?></td>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['operation_id'] >= FIRST_PVP_OP_WITH_HIT_EVENTS ? $i['fhits'] : ''; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['fkills']; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['vkills']; ?></td>
                                     </tr>

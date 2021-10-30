@@ -1,5 +1,6 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
 
+$icon_url = base_url($this->config->item('site_logo'));
 ?>
 <!DOCTYPE html>
 <html>
@@ -9,8 +10,8 @@
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="<?php echo base_url('public/logo_100_100.png'); ?>" type="image/x-icon">
-    <link rel="shortcut icon" href="<?php echo base_url('public/logo_100_100.png'); ?>" type="image/x-icon">
+    <link rel="icon" href="<?php echo $icon_url; ?>" type="image/x-icon">
+    <link rel="shortcut icon" href="<?php echo $icon_url; ?>" type="image/x-icon">
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" crossorigin="anonymous" referrerpolicy="no-referrer">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" crossorigin="anonymous" referrerpolicy="no-referrer">

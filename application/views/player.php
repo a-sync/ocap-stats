@@ -1,7 +1,5 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
 
-$event_types = $this->config->item('event_types');
-
 $hits_shots_ratio = '0.00%';
 $kills_shots_ratio = '0.00%';
 $shots_kills_ratio = '0.0';
