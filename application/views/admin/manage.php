@@ -46,10 +46,30 @@ $op_parsed = ($op_in_db && $op && $op['event'] !== '') ? true : false;
                                     <td class="mdc-data-table__cell">Author</td>
                                     <td class="mdc-data-table__cell"><?php echo html_escape($op['mission_author']); ?></td>
                                 </tr>
+                            <?php endif; ?>
+                            <?php if (isset($operation['tag'])) : ?>
+                                <tr class="mdc-data-table__row">
+                                    <td class="mdc-data-table__cell">Tag</td>
+                                    <td class="mdc-data-table__cell"><?php echo html_escape($operation['tag']); ?></td>
+                                </tr>
+                            <?php endif; ?>
+                            <?php if (isset($operation['can_import'])) : ?>
+                                <tr class="mdc-data-table__row">
+                                    <td class="mdc-data-table__cell">Can import</td>
+                                    <td class="mdc-data-table__cell"><?php echo $operation['can_import'] ? 'Yes' : 'No'; ?></td>
+                                </tr>
+                            <?php endif; ?>
+                            <?php if ($op_parsed) : ?>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Event</td>
                                     <td class="mdc-data-table__cell"><?php echo $event_types[$op['event']]; ?></td>
                                 </tr>
+                            <?php endif; ?>
+                            <tr class="mdc-data-table__row">
+                                <td class="mdc-data-table__cell">Date</td>
+                                <td class="mdc-data-table__cell"><?php echo html_escape($operation['date']); ?></td>
+                            </tr>
+                            <?php if ($op_parsed) : ?>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">
                                         Start time (UTC)
@@ -75,22 +95,6 @@ $op_parsed = ($op_in_db && $op && $op['event'] !== '') ? true : false;
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Players</td>
                                     <td class="mdc-data-table__cell"><?php echo html_escape($op['players']); ?></td>
-                                </tr>
-                            <?php endif; ?>
-                            <tr class="mdc-data-table__row">
-                                <td class="mdc-data-table__cell">Date</td>
-                                <td class="mdc-data-table__cell"><?php echo html_escape($operation['date']); ?></td>
-                            </tr>
-                            <?php if (isset($operation['tag'])) : ?>
-                                <tr class="mdc-data-table__row">
-                                    <td class="mdc-data-table__cell">Tag</td>
-                                    <td class="mdc-data-table__cell"><?php echo html_escape($operation['tag']); ?></td>
-                                </tr>
-                            <?php endif; ?>
-                            <?php if (isset($operation['can_import'])) : ?>
-                                <tr class="mdc-data-table__row">
-                                    <td class="mdc-data-table__cell">Can import</td>
-                                    <td class="mdc-data-table__cell"><?php echo $operation['can_import'] ? 'Yes' : 'No'; ?></td>
                                 </tr>
                             <?php endif; ?>
                             <tr class="mdc-data-table__row">

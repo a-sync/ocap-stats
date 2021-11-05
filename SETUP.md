@@ -4,7 +4,7 @@ Copy all files to the host and configure the [`base_url`](application/config/con
 
 If the site is running under a path the [.htaccess](.htaccess#L10) file `RewriteBase /` line needs to be updated to reflect that path.  
 
-Configure the [`autoload[config]`](application/config/autoload.php#L106) value to match an existing config file (_fnf, ofcra, 3cb, 242ns, localhost_), or create a new one.  
+Configure the [`autoload[config]`](application/config/autoload.php#L106) value to match an existing config file (_fnf, ofcra, 3cb, 242ns, rb, localhost_), or create a new one.  
 
 
 ## Database

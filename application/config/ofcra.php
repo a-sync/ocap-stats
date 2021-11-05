@@ -42,4 +42,4 @@ define('OPERATIONS_JSON_URL', 'https://game.ofcra.org/ocap/index.php');
 define('OPERATIONS_JSON_URL_CONTENT_REGEX', '/let opList = (\[.*\]);\s*\n/');
 define('OPERATION_DATA_JSON_URL_PATH', 'https://game.ofcra.org/ocap/data/');
 define('OCAP_URL_PREFIX', 'https://game.ofcra.org/ocap/#');
-define('FIRST_PVP_OP_WITH_HIT_EVENTS', 999999);
+define('ADJUST_HIT_DATA', -1);

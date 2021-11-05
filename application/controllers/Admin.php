@@ -108,11 +108,14 @@ class Admin extends CI_Controller
 
             if ($file_size_bytes > 0) {
                 $file_size = $this->_convert_filesize($file_size_bytes);
-                
+
                 $operations = \JsonMachine\JsonMachine::fromFile('./json/operations.json');
 
                 foreach ($operations as $op) {
                     $op['id'] = intval($op['id']);
+                    if (!isset($op['tag']) && isset($op['type'])) {
+                        $op['tag'] = $op['type'];
+                    }
                     array_unshift($operations_rev, $op);
                 }
             }
@@ -154,6 +157,9 @@ class Admin extends CI_Controller
                 $operations = \JsonMachine\JsonMachine::fromFile('./json/operations.json');
                 foreach ($operations as $o) {
                     $o['id'] = intval($o['id']);
+                    if (!isset($o['tag']) && isset($o['type'])) {
+                        $o['tag'] = $o['type'];
+                    }
                     if (intval($op_id) === $o['id']) {
                         $operation = $o;
                         break;
@@ -291,6 +297,9 @@ class Admin extends CI_Controller
 
     private function _convert_filesize($bytes, $decimals = 2)
     {
+        if (intval($bytes) === 0) {
+            return '0 B';
+        }
         $size = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
         $factor = floor(log($bytes, 1024));
         return sprintf('%.' . $decimals . 'f', $bytes / pow(1024, $factor)) . ' ' . @$size[$factor];

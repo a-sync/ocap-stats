@@ -46,16 +46,15 @@ $config['sides'] = [
 define('OPERATIONS_JSON_URL', 'http://server.242nightstalkers.com:5000/api/v1/operations?tag=&name=&newer=2017-06-01&older=2099-12-12');
 define('OPERATION_DATA_JSON_URL_PATH', 'http://server.242nightstalkers.com:5000/data/');
 define('OCAP_URL_PREFIX', 'http://server.242nightstalkers.com:5000/?zoom=1.4&x=-150&y=120&file=');
-define('FIRST_PVP_OP_WITH_HIT_EVENTS', 0);
 
 if (!function_exists('preprocess_op_data')) {
     function preprocess_op_data(&$op)
     {
         $errors = [];
 
-        // Some early OCAP2 ops are missing the start_time but have a timestamp in the filename
+        // Some ops are missing the start_time but have a timestamp in the filename
         if (!$op['start_time']) {
-            // Detect OCAP2 style timestamp in filename prefix
+            // Detect timestamp in filename prefix
             if (preg_match('/^20[0-9]{2}_[0-9]{2}_[0-9]{2}__[0-9]{2}_[0-9]{2}_/', $op['filename'])) {
                 try {
                     $date_time = str_replace('__', ' ', substr($op['filename'], 0, 17));

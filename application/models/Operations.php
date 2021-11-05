@@ -190,8 +190,13 @@ class Operations extends CI_Model
                     'distance' => intval($e[4])
                 ];
             } elseif ($e[1] === 'endMission') {
-                $re['end_winner'] = element(0, $e[2], '');
-                $re['end_message'] = element(1, $e[2], '');
+                if (is_array($e[2])) {
+                    $re['end_winner'] = element(0, $e[2], '');
+                    $re['end_message'] = element(1, $e[2], '');
+                } else {
+                    $re['end_winner'] = element(2, $e, '');
+                    $re['end_message'] = element(3, $e, '');
+                }
             }
         }
 

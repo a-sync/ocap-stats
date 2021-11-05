@@ -6,6 +6,7 @@ if (count($items) === 0) :
 else :
     echo '<div class="mdc-typography--caption list__total">' . count($items) . ' entities</div>';
 
+    $show_hit_data = (!defined('ADJUST_HIT_DATA') || ADJUST_HIT_DATA >= 0) ? true : false;
     $sides = $this->config->item('sides');
 ?>
     <div class="mdc-layout-grid">
@@ -25,10 +26,14 @@ else :
                                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="role">Role</th>
 
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="shots" title="Shots">S</th>
-                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="hits" title="Hits">H</th>
+                                    <?php if ($show_hit_data) : ?>
+                                        <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="hits" title="Hits">H</th>
+                                    <?php endif; ?>
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="descending" data-column-id="kills" title="Kills">K</th>
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="ascending" data-column-id="deaths" title="Deaths">D</th>
-                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="fhits" title="Friendly fire">FF</th>
+                                    <?php if ($show_hit_data) : ?>
+                                        <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="fhits" title="Friendly fire">FF</th>
+                                    <?php endif; ?>
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="fkills" title="Teamkills">Tk</th>
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="vkills" title="Destroyed assets">DA</th>
                                 </tr>
@@ -36,18 +41,19 @@ else :
                             <tbody class="mdc-data-table__content">
                                 <?php foreach ($items as $index => $i) :
 
+                                    $role = $i['role'];
+                                    $group = $i['group_name'];
                                     if ($i['class'] !== '') {
                                         $role = $i['class'];
-                                        $group = '';
                                     } else {
-                                        if ($i['role'] === '') {
-                                            $role = '';
-                                            $group = $i['group_name'];
-                                        } else {
+                                        if (strpos($role, '@') !== false) {
                                             $role_group_arr = explode('@', $i['role']);
-                                            $role = $role_group_arr[0];
-                                            $group = isset($role_group_arr[1]) ? $role_group_arr[1] : '';
-                                            $group = str_replace('Reconnaissance', 'Recon', $group);
+                                            if (isset($role_group_arr[0]) && $role_group_arr[0] !== '') {
+                                                $role = $role_group_arr[0];
+                                            }
+                                            if (isset($role_group_arr[1]) && $role_group_arr[1] !== '') {
+                                                $group = $role_group_arr[1];
+                                            }
                                         }
                                     }
 
@@ -59,6 +65,16 @@ else :
                                         if ($player_name !== '' && $i['name'] !== $player_name) {
                                             $name_title = ' title="' . html_escape($player_name) . '"';
                                         }
+                                    }
+
+                                    $hits = $i['hits'];
+                                    if (defined('ADJUST_HIT_DATA') && $i['operation_id'] < ADJUST_HIT_DATA) {
+                                        $hits = '';
+                                    }
+
+                                    $fhits = $i['fhits'];
+                                    if (defined('ADJUST_HIT_DATA') && $i['operation_id'] < ADJUST_HIT_DATA) {
+                                        $fhits = '';
                                     }
                                 ?>
                                     <tr class="mdc-data-table__row">
@@ -72,10 +88,14 @@ else :
                                         <td class="mdc-data-table__cell"><?php echo html_escape($role); ?></td>
 
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['shots']; ?></td>
-                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['operation_id'] >= FIRST_PVP_OP_WITH_HIT_EVENTS ? $i['hits'] : ''; ?></td>
+                                        <?php if ($show_hit_data) : ?>
+                                            <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $hits; ?></td>
+                                        <?php endif; ?>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['kills']; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['deaths']; ?></td>
-                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['operation_id'] >= FIRST_PVP_OP_WITH_HIT_EVENTS ? $i['fhits'] : ''; ?></td>
+                                        <?php if ($show_hit_data) : ?>
+                                            <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $fhits; ?></td>
+                                        <?php endif; ?>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['fkills']; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['vkills']; ?></td>
                                     </tr>

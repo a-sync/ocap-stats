@@ -42,7 +42,7 @@ class Players extends CI_Model
 
         $players = $this->db->get()->result_array();
 
-        if (FIRST_PVP_OP_WITH_HIT_EVENTS > 0) {
+        if (defined('ADJUST_HIT_DATA') && ADJUST_HIT_DATA >= 0) {
             // Get adjusted hit stats for players
             if (is_array($events_filter) && count($events_filter) > 0) {
                 $this->db->where_in('operations.event', $events_filter);
@@ -63,7 +63,7 @@ class Players extends CI_Model
                 ->select_sum('entities.hits')
                 ->select_sum('entities.fhits')
                 ->from('players')
-                ->join('entities', 'entities.player_id = players.id AND entities.operation_id >= ' . FIRST_PVP_OP_WITH_HIT_EVENTS)
+                ->join('entities', 'entities.player_id = players.id AND entities.operation_id >= ' . ADJUST_HIT_DATA)
                 ->join('operations', 'operations.id = entities.operation_id')
                 ->where('players.alias_of', 0)
                 ->group_by('players.id');
@@ -270,6 +270,10 @@ class Players extends CI_Model
         return $commanders;
     }
 
+    /**
+     * Compare entities by group_name first, by role_name second and by ID 
+     * as a last resort and return the highest ranking one.
+     */
     private function _return_commander($entity_1, $entity_2)
     {
         if ($entity_1['group_name'] !== $entity_2['group_name']) {
@@ -278,12 +282,14 @@ class Players extends CI_Model
                 $e1_group_index = array_search($entity_1['group_name'], $hq_group_names);
                 $e2_group_index = array_search($entity_2['group_name'], $hq_group_names);
 
-                if ($e2_group_index === false) return $entity_1;
-                else if ($e1_group_index === false) return $entity_2;
-                else if ($e2_group_index > $e1_group_index) {
-                    return $entity_1;
-                } else if ($e1_group_index > $e2_group_index) {
-                    return $entity_2;
+                if ($e1_group_index !== $e2_group_index) {
+                    if ($e2_group_index === false) return $entity_1;
+                    else if ($e1_group_index === false) return $entity_2;
+                    else if ($e2_group_index > $e1_group_index) {
+                        return $entity_1;
+                    } else if ($e1_group_index > $e2_group_index) {
+                        return $entity_2;
+                    }
                 }
             }
         }
@@ -294,12 +300,14 @@ class Players extends CI_Model
                 $e1_role_index = $this->_array_search_prefix($entity_1['role_name'], $hq_role_names);
                 $e2_role_index = $this->_array_search_prefix($entity_2['role_name'], $hq_role_names);
 
-                if ($e2_role_index === false) return $entity_1;
-                else if ($e1_role_index === false) return $entity_2;
-                else if ($e2_role_index > $e1_role_index) {
-                    return $entity_1;
-                } else {
-                    return $entity_2;
+                if ($e1_role_index !== $e2_role_index) {
+                    if ($e2_role_index === false) return $entity_1;
+                    else if ($e1_role_index === false) return $entity_2;
+                    else if ($e2_role_index > $e1_role_index) {
+                        return $entity_1;
+                    } else {
+                        return $entity_2;
+                    }
                 }
             }
         }
@@ -350,7 +358,7 @@ class Players extends CI_Model
         $this->db
             ->select([
                 "SUBSTRING_INDEX(entities.role, '@', 1) AS role_name",
-                'COUNT(entities.role) AS total_count',
+                'COUNT(entities.role) AS total_count'
             ])
             ->select_sum("CASE WHEN side = 'WEST' THEN 1 ELSE 0 END", 'west_count')
             ->select_sum("CASE WHEN side = 'EAST' THEN 1 ELSE 0 END", 'east_count')
@@ -371,7 +379,7 @@ class Players extends CI_Model
 
         $roles = $this->db->get()->result_array();
 
-        if (FIRST_PVP_OP_WITH_HIT_EVENTS > 0) {
+        if (defined('ADJUST_HIT_DATA') && ADJUST_HIT_DATA >= 0) {
             // Get adjusted hit stats for roles
             $this->db
                 ->select([
@@ -384,7 +392,7 @@ class Players extends CI_Model
                 ->from('entities')
                 ->where('entities.player_id', $id)
                 ->where('entities.role !=', '')
-                ->where('entities.operation_id >=', FIRST_PVP_OP_WITH_HIT_EVENTS)
+                ->where('entities.operation_id >=', ADJUST_HIT_DATA)
                 ->group_by('role_name');
 
             $roles_adjusted_stats = $this->db->get()->result_array();
@@ -411,5 +419,44 @@ class Players extends CI_Model
         }
 
         return $roles;
+    }
+
+    private function get_opponents_by_id($id, $type)
+    {
+        $this->db
+            ->select(['players.id', 'players.name'])
+            ->select_sum("CASE WHEN events.event = 'hit' THEN 1 ELSE 0 END", 'hits')
+            ->select_sum("CASE WHEN events.event = 'hit' AND attacker.side = victim.side THEN 1 ELSE 0 END", 'fhits')
+            ->select_avg("CASE WHEN events.event = 'hit' THEN events.distance ELSE NULL END", 'hit_dist_avg')
+            ->select_sum("CASE WHEN events.event = 'killed' THEN 1 ELSE 0 END", 'kills')
+            ->select_sum("CASE WHEN events.event = 'killed' AND attacker.side = victim.side THEN 1 ELSE 0 END", 'fkills')
+            ->select_avg("CASE WHEN events.event = 'killed' THEN events.distance ELSE NULL END", 'kill_dist_avg')
+            ->from('events')
+            ->join('entities AS attacker', 'attacker.id = events.attacker_id AND attacker.operation_id = events.operation_id')
+            ->join('entities AS victim', 'victim.id = events.victim_id AND victim.operation_id = events.operation_id')
+            ->group_by('players.id')
+            ->order_by('kills DESC, hits DESC, fkills ASC, fhits ASC, players.name ASC');
+
+        if ($type === 'attackers') {
+            $this->db
+                ->join('players', 'players.id = attacker.player_id')
+                ->where('victim.player_id', $id);
+        } elseif ($type === 'victims') {
+            $this->db
+                ->join('players', 'players.id = victim.player_id')
+                ->where('attacker.player_id', $id);
+        }
+
+        return $this->db->get()->result_array();
+    }
+
+    public function get_attackers_by_id($id)
+    {
+        return $this->get_opponents_by_id($id, 'attackers');
+    }
+
+    public function get_victims_by_id($id)
+    {
+        return $this->get_opponents_by_id($id, 'victims');
     }
 }

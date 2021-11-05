@@ -176,9 +176,11 @@ class App extends CI_Controller
 
         $errors = [];
         $player = null;
+        $player_aliases = [];
         $player_ops = [];
         $player_roles = [];
-        $player_aliases = [];
+        $player_attackers = [];
+        $player_victims = [];
         if (filter_var($id, FILTER_VALIDATE_INT)) {
             $player = $this->players->get_by_id($id);
 
@@ -187,6 +189,10 @@ class App extends CI_Controller
 
                 if ($tab === 'roles') {
                     $player_roles = $this->players->get_roles_by_id($id);
+                } elseif ($tab === 'attackers') {
+                    $player_attackers = $this->players->get_attackers_by_id($id);
+                } elseif ($tab === 'victims') {
+                    $player_victims = $this->players->get_victims_by_id($id);
                 } else { //ops
                     $player_ops = $this->players->get_ops_by_id($id);
                 }
@@ -213,6 +219,24 @@ class App extends CI_Controller
                         'active' => 'roles',
                         'player_url' => base_url('player/' . $player['id'])
                     ], true)
+                ]);
+            } elseif ($tab === 'attackers') {
+                $this->load->view('player-attackers-victims', [
+                    'items' => $player_attackers,
+                    'player_menu' => $this->load->view('player-menu', [
+                        'active' => 'attackers',
+                        'player_url' => base_url('player/' . $player['id'])
+                    ], true),
+                    'player' => $player
+                ]);
+            } elseif ($tab === 'victims') {
+                $this->load->view('player-attackers-victims', [
+                    'items' => $player_victims,
+                    'player_menu' => $this->load->view('player-menu', [
+                        'active' => 'victims',
+                        'player_url' => base_url('player/' . $player['id'])
+                    ], true),
+                    'player' => $player
                 ]);
             } else { // ops
                 $this->load->view('player-ops', [
