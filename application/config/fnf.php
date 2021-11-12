@@ -74,17 +74,13 @@ if (!function_exists('preprocess_op_data')) {
 
         // Some ops are missing the start_time but have a timestamp in the filename
         if (!$op['start_time']) {
+            $matches = null;
             // Detect timestamp in filename prefix
-            if (preg_match('/^20[0-9]{2}_[0-9]{2}_[0-9]{2}__[0-9]{2}_[0-9]{2}_/', $op['filename'])) {
+            if (preg_match('/^(20[0-9]{2})_([0-9]{2})_([0-9]{2})__([0-9]{2})_([0-9]{2})_/', $op['filename'], $matches)) {
                 try {
-                    $date_time = str_replace('__', ' ', substr($op['filename'], 0, 17));
-                    $date_time_arr = explode(' ', $date_time);
-                    $start_date = str_replace('_', '-', $date_time_arr[0]);
-                    $start_time = str_replace('_', ':', $date_time_arr[1]);
-
                     // Adjust server local time based on tag/event
                     $tz = $op['event'] === 'eu' ? 'Europe/London' : 'America/Goose_Bay'; // na ops timestamp is most likely AST/ADT
-                    $adj_date_time = new \DateTime($start_date . ' ' . $start_time, new \DateTimeZone($tz));
+                    $adj_date_time = new \DateTime($matches[1] . '-' . $matches[2] . '-' . $matches[3] . ' ' . $matches[4] . ':' . $matches[5], new \DateTimeZone($tz));
                     $op['start_time'] = $adj_date_time->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d H:i:s');
                 } catch (exception $e) {
                 }
@@ -94,7 +90,7 @@ if (!function_exists('preprocess_op_data')) {
         // If mission_author field is empty, we can try to grab it from the mission_name
         if (!$op['mission_author']) {
             try {
-                foreach(['FNF_WWII_', 'NEWORBAT_', 'FNFTitans_', 'FNFWWII_', 'FNFReplay_', 'FNF_', 'TNT2_', 'NO_'] as $prefix) {
+                foreach (['FNF_WWII_', 'NEWORBAT_', 'FNFTitans_', 'FNFWWII_', 'FNFReplay_', 'FNF_', 'TNT2_', 'NO_'] as $prefix) {
                     $mission_name_arr = explode($prefix, $op['mission_name']);
                     if (isset($mission_name_arr[1])) {
                         $op['mission_author'] = explode('_', $mission_name_arr[1], 2)[0];

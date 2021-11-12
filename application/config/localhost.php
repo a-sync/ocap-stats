@@ -13,7 +13,7 @@ $config['site_logo'] = 'public/ocap_logo.png';
 |--------------------------------------------------------------------------
 |
 | The ID and name pairs of available event types to categorize the 
-| missions by.
+| operations by.
 |
 */
 $config['event_types'] = [
@@ -173,6 +173,7 @@ define('OCAP_URL_PREFIX', 'http://localhost:5000/?zoom=1.4&x=-150&y=120&file=');
 */
 /*
 if (!function_exists('preprocess_op_data')) {
+    // @param $op array of operation data fields passed by reference
     // @return string array of non fatal error messages
     function preprocess_op_data(&$op)
     {
@@ -182,3 +183,14 @@ if (!function_exists('preprocess_op_data')) {
     }
 }
 */
+
+/*
+|--------------------------------------------------------------------------
+| Manage the data JSON files manually
+|--------------------------------------------------------------------------
+|
+| Require the admin to download / delete the operation data JSON files.  
+| Useful during development.
+|
+*/
+// define('MANAGE_DATA_JSON_FILES', true);

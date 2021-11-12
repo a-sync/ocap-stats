@@ -37,7 +37,7 @@ else :
                                             <a href="<?php echo base_url('op/') . $i['id']; ?>" title="<?php echo html_escape($i['filename']); ?>"><?php echo $i['id']; ?></a>
                                         </td>
                                         <td class="mdc-data-table__cell cell__title">
-                                            <?php echo html_escape($i['mission_name']); ?>&nbsp;<sup class="mdc-typography--caption"><a target="_blank" href="<?php echo OCAP_URL_PREFIX . urlencode($i['filename']); ?>"><img src="<?php echo base_url('public/ocap_logo.png'); ?>" alt="OCAP" class="ocap-link"></a>
+                                            <?php echo html_escape($i['mission_name']); ?>&nbsp;<sup class="mdc-typography--caption"><a target="_blank" href="<?php echo OCAP_URL_PREFIX . rawurlencode($i['filename']); ?>"><img src="<?php echo base_url('public/ocap_logo.png'); ?>" alt="OCAP" class="ocap-link"></a>
                                             </sup>
                                         </td>
                                         <td class="mdc-data-table__cell"><?php echo html_escape($i['world_name']); ?></td>

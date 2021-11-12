@@ -33,7 +33,7 @@ $sides = $this->config->item('sides');
                                         <?php echo html_escape($op['mission_name']); ?>
                                         <br>
                                         <span class="mdc-typography--caption">
-                                            <a title="OCAP" target="_blank" href="<?php echo OCAP_URL_PREFIX . urlencode($op['filename']); ?>"><?php echo html_escape($op['filename']); ?></a>
+                                            <a title="OCAP" target="_blank" href="<?php echo OCAP_URL_PREFIX . rawurlencode($op['filename']); ?>"><?php echo html_escape($op['filename']); ?></a>
                                         </span>
                                     </td>
                                 </tr>

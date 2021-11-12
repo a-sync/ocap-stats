@@ -55,42 +55,58 @@ jobs:
       - name: ✏️ Replace config[base_url]
         uses: jacobtomlinson/gha-find-replace@v2
         with:
-          find: "$config['base_url'] = '';"
-          replace: "$config['base_url'] = 'https://${{ matrix.config }}-stats.devs.space/';"
           include: "application/config/config.php"
           regex: false
+          find: "$config['base_url'] = 'http://localhost/';"
+          replace: "$config['base_url'] = 'https://${{ matrix.config }}-stats.devs.space/';"
 
       - name: ✏️ Replace autoload[config]
         uses: jacobtomlinson/gha-find-replace@v2
         with:
-          find: "$autoload['config'] = array('localhost');"
-          replace: "$autoload['config'] = array('${{ matrix.config }}');"
           include: "application/config/autoload.php"
           regex: false
+          find: "$autoload['config'] = array('localhost');"
+          replace: "$autoload['config'] = array('${{ matrix.config }}');"
+
+      - name: ✏️ Replace db[default][hostname]
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          include: "application/config/database.php"
+          regex: false
+          find: "'hostname' => 'db',"
+          replace: "'hostname' => 'localhost',"
 
       - name: ✏️ Replace db[default][username]
         uses: jacobtomlinson/gha-find-replace@v2
         with:
-          find: "'username' => 'root',"
-          replace: "'username' => '${{ secrets[matrix.uname_secret] }}',"
           include: "application/config/database.php"
           regex: false
+          find: "'username' => 'root',"
+          replace: "'username' => '${{ secrets[matrix.uname_secret] }}',"
 
       - name: ✏️ Replace db[default][password]
         uses: jacobtomlinson/gha-find-replace@v2
         with:
-          find: "'password' => '',"
-          replace: "'password' => '${{ secrets[matrix.pword_secret] }}',"
           include: "application/config/database.php"
           regex: false
+          find: "'password' => 'rootpass',"
+          replace: "'password' => '${{ secrets[matrix.pword_secret] }}',"
 
       - name: ✏️ Replace db[default][database]
         uses: jacobtomlinson/gha-find-replace@v2
         with:
-          find: "'database' => 'ocapstats',"
-          replace: "'database' => '${{ secrets[matrix.uname_secret] }}',"
           include: "application/config/database.php"
           regex: false
+          find: "'database' => 'ocapstats',"
+          replace: "'database' => '${{ secrets[matrix.uname_secret] }}',"
+
+      - name: ✏️ Replace CI_ENV
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          include: ".htaccess"
+          regex: false
+          find: "SetEnv CI_ENV development"
+          replace: "SetEnv CI_ENV production"
 
       - name: 📂 Sync files
         uses: SamKirkland/FTP-Deploy-Action@4.1.0

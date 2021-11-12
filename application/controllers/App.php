@@ -9,11 +9,6 @@ class App extends CI_Controller
         $this->output->set_header('X-Powered-By: 💖');
     }
 
-    public function login()
-    {
-        return $this->load->view('admin/login');
-    }
-
     public function zerosec($my_name = '', $my_hash = '')
     {
         $name = preg_replace("/[^A-Za-z0-9]/", '', $my_name);
@@ -47,6 +42,11 @@ class App extends CI_Controller
         return redirect(base_url('manage'));
     }
 
+    public function login()
+    {
+        return $this->load->view('admin/login');
+    }
+
     private function _head($active = 'ops', $prefix = '', $postfix = '')
     {
         return $this->load->view('head', [
@@ -55,11 +55,9 @@ class App extends CI_Controller
         ]);
     }
 
-    private function _foot($active = 'user')
+    private function _foot()
     {
-        return $this->load->view('foot', [
-            'active' => $active
-        ]);
+        return $this->load->view('foot');
     }
 
     private function _cache()
@@ -179,6 +177,7 @@ class App extends CI_Controller
         $player_aliases = [];
         $player_ops = [];
         $player_roles = [];
+        $player_weapons = [];
         $player_attackers = [];
         $player_victims = [];
         if (filter_var($id, FILTER_VALIDATE_INT)) {
@@ -189,6 +188,8 @@ class App extends CI_Controller
 
                 if ($tab === 'roles') {
                     $player_roles = $this->players->get_roles_by_id($id);
+                } elseif ($tab === 'weapons') {
+                    $player_weapons = $this->players->get_weapons_by_id($id);
                 } elseif ($tab === 'attackers') {
                     $player_attackers = $this->players->get_attackers_by_id($id);
                 } elseif ($tab === 'victims') {
@@ -220,14 +221,21 @@ class App extends CI_Controller
                         'player_url' => base_url('player/' . $player['id'])
                     ], true)
                 ]);
+            } elseif ($tab === 'weapons') {
+                $this->load->view('player-weapons', [
+                    'items' => $player_weapons,
+                    'player_menu' => $this->load->view('player-menu', [
+                        'active' => 'weapons',
+                        'player_url' => base_url('player/' . $player['id'])
+                    ], true)
+                ]);
             } elseif ($tab === 'attackers') {
                 $this->load->view('player-attackers-victims', [
                     'items' => $player_attackers,
                     'player_menu' => $this->load->view('player-menu', [
                         'active' => 'attackers',
                         'player_url' => base_url('player/' . $player['id'])
-                    ], true),
-                    'player' => $player
+                    ], true)
                 ]);
             } elseif ($tab === 'victims') {
                 $this->load->view('player-attackers-victims', [
@@ -235,8 +243,7 @@ class App extends CI_Controller
                     'player_menu' => $this->load->view('player-menu', [
                         'active' => 'victims',
                         'player_url' => base_url('player/' . $player['id'])
-                    ], true),
-                    'player' => $player
+                    ], true)
                 ]);
             } else { // ops
                 $this->load->view('player-ops', [
@@ -261,15 +268,18 @@ class App extends CI_Controller
         $errors = [];
         $op = null;
         $op_events = [];
+        $op_weapons = [];
         $op_entities = [];
         if (filter_var($id, FILTER_VALIDATE_INT) || filter_var($id, FILTER_VALIDATE_INT) === 0) {
             $op = $this->operations->get_by_id($id);
 
             if ($op) {
                 if ($tab === 'events') {
-                    $op_events = $this->operations->get_events_by_op_id($id);
+                    $op_events = $this->operations->get_events_by_id($id);
+                } elseif ($tab === 'weapons') {
+                    $op_weapons = $this->operations->get_weapons_by_id($id);
                 } else { // entities
-                    $op_entities = $this->operations->get_entities_by_op_id($id);
+                    $op_entities = $this->operations->get_entities_by_id($id);
                 }
             } else {
                 $errors[] = 'Unknown op ID given.';
@@ -291,6 +301,14 @@ class App extends CI_Controller
                     'items' => $op_events,
                     'op_menu' => $this->load->view('op-menu', [
                         'active' => 'events',
+                        'op_url' => base_url('op/' . $op['id'])
+                    ], true)
+                ]);
+            } elseif ($tab === 'weapons') {
+                $this->load->view('op-weapons', [
+                    'items' => $op_weapons,
+                    'op_menu' => $this->load->view('op-menu', [
+                        'active' => 'weapons',
                         'op_url' => base_url('op/' . $op['id'])
                     ], true)
                 ]);
@@ -338,60 +356,20 @@ class App extends CI_Controller
 
         $this->_head('', 'Assorted data');
 
-        $this->load->library('markdown');
-
-        $data_md = '';
-
-        $data_md .= $this->_md_table('Mission authors', $this->assorted->get_mission_authors());
-        $data_md .= $this->_md_table('Maps', $this->assorted->get_maps());
-        $data_md .= $this->_md_table('Winners', $this->assorted->get_winners());
-        $data_md .= $this->_md_table('End messages', $this->assorted->get_end_messages());
-        $data_md .= $this->_md_table('Groups', $this->assorted->get_groups());
-        $data_md .= $this->_md_table('Roles', $this->assorted->get_roles());
-        $data_md .= $this->_md_table('Weapons', $this->assorted->get_weapons());
-        $data_md .= $this->_md_table('Assets', $this->assorted->get_vehicles());
-
-        $this->load->view('md', [
-            'markdown' => $this->markdown->parse($data_md)
+        $this->load->view('arrays-to-tables', [
+            'tables' => [
+                'Winners' => $this->assorted->get_winners(),
+                'End messages' => $this->assorted->get_end_messages(),
+                'Mission authors' => $this->assorted->get_mission_authors(),
+                'Maps' => $this->assorted->get_maps(),
+                'Groups' => $this->assorted->get_groups(),
+                'Roles' => $this->assorted->get_roles(),
+                'Weapons' => $this->assorted->get_weapons(),
+                'Assets' => $this->assorted->get_vehicles()
+            ]
         ]);
 
         $this->_foot();
-    }
-
-    private function _md_table($title = '', $arr = [])
-    {
-        $head = '';
-        if ($title) {
-            $head .= '### ' . $title . "  \n";
-        }
-
-        $body = '';
-        if (count($arr) > 0) {
-            $keys = array_keys($arr[0]);
-            $head .= '| # |';
-            $neck = '| --: |';
-            foreach ($keys as $i => $k) {
-                $head .= ' ' . $k . ' |';
-                if ($i === 0) {
-                    $neck .= ' :-- |';
-                } elseif(is_numeric($arr[0][$k])) {
-                    $neck .= ' --: |';
-                } else {
-                    $neck .= ' :-: |';
-                }
-            }
-            $head .= "\n" . $neck . "\n";
-
-            foreach ($arr as $i => $a) {
-                $body .= '| ' . ($i + 1) . '. |';
-                foreach ($a as $val) {
-                    $body .= ' ' . html_escape($val) . ' |';
-                }
-                $body .= "\n";
-            }
-        }
-
-        return $head . $body . "\n";
     }
 
     public function readme_md()

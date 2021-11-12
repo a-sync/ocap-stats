@@ -61,13 +61,14 @@ $route['clearcache'] = 'admin/clearcache';
 $route['update'] = 'admin/update';
 $route['manage'] = 'admin/operations';
 $route['manage/(:num)'] = 'admin/manage/$1';
-$route['addalias'] = 'admin/addalias';
-$route['fixopdata'] = 'admin/fixopdata';
+$route['add-alias'] = 'data/add_alias';
+$route['fix-op-data'] = 'data/fix_op_data';
 
 $route['players'] = 'app/players';
 $route['player/(:num)'] = 'app/player/$1';
 $route['player/(:num)/ops'] = 'app/player/$1/ops';
 $route['player/(:num)/roles'] = 'app/player/$1/roles';
+$route['player/(:num)/weapons'] = 'app/player/$1/weapons';
 $route['player/(:num)/attackers'] = 'app/player/$1/attackers';
 $route['player/(:num)/victims'] = 'app/player/$1/victims';
 
@@ -75,6 +76,7 @@ $route['ops'] = 'app/ops';
 $route['op/(:num)'] = 'app/op/$1';
 $route['op/(:num)/entities'] = 'app/op/$1/entities';
 $route['op/(:num)/events'] = 'app/op/$1/events';
+$route['op/(:num)/weapons'] = 'app/op/$1/weapons';
 
 $route['commanders'] = 'app/commanders';
 

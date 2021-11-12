@@ -56,6 +56,10 @@ footer {
     margin-top: 20px;
     text-align: center;
 }
+footer .render-stats {
+    font-size: 0.6rem;
+    opacity: 0.6;
+}
 
 #refresh_operations {
     text-align: center;
@@ -67,6 +71,7 @@ footer {
 
 .flex--center {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
 }
 
@@ -128,6 +133,15 @@ a:hover {
 
 img.ocap-link {
     width: 14px;
+}
+
+.mdc-radio.radio--disabled, .mdc-radio.radio--disabled + label {
+    opacity: 0.5;
+}
+
+.array-table {
+    margin: 1.25rem;
+    max-width: 100%;
 }
 
 /* Dark mode */

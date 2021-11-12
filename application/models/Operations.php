@@ -24,7 +24,7 @@ class Operations extends CI_Model
         }
     }
 
-    public function get_all_ids_and_events()
+    public function get_all_ops()
     {
         $re = $this->db
             ->select(['id', 'event', 'UNIX_TIMESTAMP(updated) AS updated', 'start_time'])
@@ -435,7 +435,7 @@ class Operations extends CI_Model
         }
     }
 
-    public function get_entities_by_op_id($id)
+    public function get_entities_by_id($id)
     {
         $this->db
             ->select([
@@ -493,7 +493,7 @@ class Operations extends CI_Model
         }
     }
 
-    public function get_events_by_op_id($id)
+    public function get_events_by_id($id)
     {
         $this->db
             ->select([
@@ -519,6 +519,30 @@ class Operations extends CI_Model
             ->join('players AS attacker_player', 'attacker_player.id = attacker.player_id', 'LEFT')
             ->where('events.operation_id', $id)
             ->order_by("events.frame ASC, victim.name ASC, FIELD(events.event, 'hit', 'killed', '_awake', '_uncon', '_dead')");
+
+        return $this->db->get()->result_array();
+    }
+
+    public function get_weapons_by_id($id)
+    {
+        $this->db
+            ->select('events.weapon')
+            ->select_sum("CASE WHEN events.event = 'hit' THEN 1 ELSE 0 END", 'hits')
+            ->select_sum("CASE WHEN events.event = 'hit' AND attacker.side = victim.side THEN 1 ELSE 0 END", 'fhits')
+            ->select_avg("CASE WHEN events.event = 'hit' THEN events.distance ELSE NULL END", 'avg_hit_dist')
+            ->select_sum("CASE WHEN events.event = 'killed' THEN 1 ELSE 0 END", 'kills')
+            ->select_sum("CASE WHEN events.event = 'killed' AND attacker.side = victim.side THEN 1 ELSE 0 END", 'fkills')
+            ->select_avg("CASE WHEN events.event = 'killed' THEN events.distance ELSE NULL END", 'avg_kill_dist')
+            ->select('COUNT(DISTINCT events.attacker_id) AS players')
+            ->from('events')
+            ->join('entities AS attacker', 'attacker.id = events.attacker_id AND attacker.operation_id = events.operation_id')
+            ->join('entities AS victim', 'victim.id = events.victim_id AND victim.operation_id = events.operation_id')
+            ->where('events.operation_id', $id)
+            ->where('victim.player_id != attacker.player_id')
+            ->where_in('events.event', ['hit', 'killed'])
+            ->where('events.weapon !=', '')
+            ->group_by('events.weapon')
+            ->order_by('kills DESC, hits DESC, fkills ASC, fhits ASC, events.weapon ASC');
 
         return $this->db->get()->result_array();
     }

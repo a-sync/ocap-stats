@@ -14,14 +14,14 @@
                         </span>
                         <span class="mdc-tab__ripple"></span>
                     </a>
-                    <a href="<?php echo base_url('addalias'); ?>" class="mdc-tab" role="tab" aria-selected="true" tabindex="2">
+                    <a href="<?php echo base_url('add-alias'); ?>" class="mdc-tab" role="tab" aria-selected="true" tabindex="2">
                         <span class="mdc-tab__content">
                             <span class="mdc-tab__icon material-icons" aria-hidden="true">reduce_capacity</span>
                             <span class="mdc-tab__text-label">Add player alias</span>
                         </span>
                         <span class="mdc-tab__ripple"></span>
                     </a>
-                    <a href="<?php echo base_url('fixopdata'); ?>" class="mdc-tab" role="tab" aria-selected="true" tabindex="3">
+                    <a href="<?php echo base_url('fix-op-data'); ?>" class="mdc-tab" role="tab" aria-selected="true" tabindex="3">
                         <span class="mdc-tab__content">
                             <span class="mdc-tab__icon material-icons" aria-hidden="true">healing</span>
                             <span class="mdc-tab__text-label">Fill in missing op data</span>

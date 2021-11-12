@@ -24,7 +24,7 @@
                     </span>
                     <span class="mdc-tab__ripple"></span>
                 </a>
-                <!-- <a href="<?php echo $player_url; ?>/weapons" class="mdc-tab<?php if ($active === 'weapons') echo ' mdc-tab--active';  ?>" role="tab" aria-selected="false" tabindex="6">
+                <a href="<?php echo $player_url; ?>/weapons" class="mdc-tab<?php if ($active === 'weapons') echo ' mdc-tab--active';  ?>" role="tab" aria-selected="false" tabindex="6">
                     <span class="mdc-tab__content">
                         <span class="mdc-tab__text-label">Weapons</span>
                     </span>
@@ -32,7 +32,7 @@
                         <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
                     </span>
                     <span class="mdc-tab__ripple"></span>
-                </a> -->
+                </a>
                 <a href="<?php echo $player_url; ?>/attackers" class="mdc-tab<?php if ($active === 'attackers') echo ' mdc-tab--active';  ?>" role="tab" aria-selected="false" tabindex="7">
                     <span class="mdc-tab__content">
                         <span class="mdc-tab__text-label">Attackers</span>

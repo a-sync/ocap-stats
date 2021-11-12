@@ -6,7 +6,6 @@
     Options -MultiViews
     RewriteEngine on
 
-    #AllowOverride All
     RewriteBase /
 
     # Send request via index.php (again, not if its a real file or folder)
@@ -21,4 +20,7 @@
         RewriteRule ^(.*)$ index.php?/$1 [NC,L,QSA]
     </IfModule>
 
+</IfModule>
+<IfModule mod_env.c>
+    SetEnv CI_ENV development
 </IfModule>
