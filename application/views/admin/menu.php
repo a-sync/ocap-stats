@@ -21,10 +21,10 @@
                         </span>
                         <span class="mdc-tab__ripple"></span>
                     </a>
-                    <a href="<?php echo base_url('fix-op-data'); ?>" class="mdc-tab" role="tab" aria-selected="true" tabindex="3">
+                    <a href="<?php echo base_url('fix-data'); ?>" class="mdc-tab" role="tab" aria-selected="true" tabindex="3">
                         <span class="mdc-tab__content">
                             <span class="mdc-tab__icon material-icons" aria-hidden="true">healing</span>
-                            <span class="mdc-tab__text-label">Fill in missing op data</span>
+                            <span class="mdc-tab__text-label">Fix missing op data</span>
                         </span>
                         <span class="mdc-tab__ripple"></span>
                     </a>

@@ -7,6 +7,7 @@ $kills_shots_ratio = '0.00%';
 $shots_kills_ratio = '0.0';
 $shots_hits_ratio = '0.0';
 $fhits = '';
+$kills_deaths_ratio = '';
 
 if ($player['adj_shots'] === false) {
     $hits_shots_ratio = '';
@@ -27,6 +28,12 @@ if ($player['shots'] > 0) {
 }
 if ($player['kills'] > 0) {
     $shots_kills_ratio = number_format($player['shots'] / $player['kills'], 1);
+}
+
+$kills_deaths_ratio_raw = 0;
+if ($player['deaths'] > 0) {
+    $kills_deaths_ratio_raw = $player['kills'] / $player['deaths'];
+    $kills_deaths_ratio = number_format($kills_deaths_ratio_raw, 1);
 }
 
 if ($player['attendance'] > 0) {
@@ -99,8 +106,8 @@ $aliases_names = array_map('html_escape', array_column($aliases, 'name'));
                                     <td class="mdc-data-table__cell"><?php echo $kills_shots_ratio; ?> (<?php echo $shots_kills_ratio; ?>)</td>
                                 </tr>
                                 <tr class="mdc-data-table__row">
-                                    <td class="mdc-data-table__cell">Deaths</td>
-                                    <td class="mdc-data-table__cell"><?php echo $player['deaths']; ?></td>
+                                    <td class="mdc-data-table__cell">Deaths (Kills / Deaths)</td>
+                                    <td class="mdc-data-table__cell"><?php echo $player['deaths']; ?><?php echo $kills_deaths_ratio ? ' (' . $kills_deaths_ratio . ')' : ''; ?></td>
                                 </tr>
 
                                 <?php if ($show_hit_data) : ?>

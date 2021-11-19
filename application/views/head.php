@@ -18,15 +18,11 @@ $icon_url = base_url($this->config->item('site_logo'));
     <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/4.0.0/github-markdown.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/slim-select/1.27.0/slimselect.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slim-select/1.27.0/slimselect.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
-
-    <script src="<?php echo base_url('public/sortable.min.js'); ?>"></script>
-    <link rel="stylesheet" href="<?php echo base_url('public/sortable.css'); ?>">
-
     <link rel="stylesheet" href="<?php echo base_url('public/mdc.min.css'); ?>">
-    <link rel="stylesheet" href="<?php echo base_url('public/app.css'); ?>">
 
+    <link rel="stylesheet" href="<?php echo base_url('public/slimselect.css'); ?>">
+    <link rel="stylesheet" href="<?php echo base_url('public/sortable.css'); ?>">
+    <link rel="stylesheet" href="<?php echo base_url('public/app.css'); ?>">
 </head>
 
 <body class="mdc-typography">

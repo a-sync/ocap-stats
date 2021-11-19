@@ -14,6 +14,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
     <span class="render-stats">{elapsed_time}s / {memory_usage}</span>
 </footer>
 
+<script src="<?php echo base_url('public/sortable.min.js'); ?>"></script>
 <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
 <script type="text/javascript">
     window.mdc.autoInit();

@@ -66,7 +66,6 @@ CTRL+F
   1. op profile stats grouped for each side
   1. store / support operation timestamps & capture delay
   1. data corrections UI
-     * player aliases
      * ops (show missing/current/possible data)
        * commanders
        * winner

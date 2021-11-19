@@ -330,17 +330,6 @@ class Players extends CI_Model
         return false;
     }
 
-    public function get_aliases_by_id($id = false)
-    {
-        $this->db->select(['players.name', 'players.id', 'players.alias_of'])
-            ->from('players')
-            ->where('players.alias_of', $id);
-
-        return $this->db
-            ->get()
-            ->result_array();
-    }
-
     public function get_roles_by_id($id)
     {
         $this->db

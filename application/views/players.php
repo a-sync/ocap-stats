@@ -26,7 +26,7 @@ else :
                                     <?php endif; ?>
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="descending" data-column-id="kills">Kills</th>
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="kills_shots_ratio" title="Kills / Shots (Shots / Kills)">Kill % (S/K)</th>
-                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="ascending" data-column-id="deaths">Deaths</th>
+                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="ascending" data-column-id="deaths" title="Deaths (Kills / Deaths)">Deaths (K/D)</th>
                                     <?php if ($show_hit_data) : ?>
                                         <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="fhits" title="Friendly fire">FF</th>
                                     <?php endif; ?>
@@ -44,6 +44,7 @@ else :
                                     $shots_hits_ratio = '0.0';
                                     $kills_attendance_ratio = '0.0';
                                     $fhits = '';
+                                    $kills_deaths_ratio = '';
 
                                     $hits_shots_ratio_raw = 0;
                                     if ($i['adj_shots'] === false) {
@@ -70,6 +71,12 @@ else :
                                         $shots_kills_ratio = number_format($i['shots'] / $i['kills'], 1);
                                     }
 
+                                    $kills_deaths_ratio_raw = 0;
+                                    if ($i['deaths'] > 0) {
+                                        $kills_deaths_ratio_raw = $i['kills'] / $i['deaths'];
+                                        $kills_deaths_ratio = number_format($kills_deaths_ratio_raw, 1);
+                                    }
+
                                     if ($i['attendance'] > 0) {
                                         $kills_attendance_ratio = number_format($i['kills'] / $i['attendance'], 1);
                                     }
@@ -87,7 +94,7 @@ else :
                                         <?php endif; ?>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['kills']; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo $kills_shots_ratio_raw; ?>"><?php echo $kills_shots_ratio; ?> (<?php echo $shots_kills_ratio; ?>)</td>
-                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['deaths']; ?></td>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo $kills_deaths_ratio_raw; ?>"><?php echo $i['deaths']; ?><?php echo $kills_deaths_ratio ? ' (' . $kills_deaths_ratio . ')' : ''; ?></td>
                                         <?php if ($show_hit_data) : ?>
                                             <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $fhits; ?></td>
                                         <?php endif; ?>

@@ -13,7 +13,7 @@
             </div>
         <?php endif; ?>
         <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center">
-            <?php echo form_open('', ['id' => 'commanders-form']); ?>
+            <?php echo form_open('', ['id' => 'data-form']); ?>
 
             <?php echo form_close(); ?>
         </div>

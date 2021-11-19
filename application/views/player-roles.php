@@ -31,7 +31,7 @@ else :
                                     <?php endif; ?>
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="kills" title="Kills">K</th>
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="kills_shots_ratio" title="Kills / Shots (Shots / Kills)">K% (S/K)</th>
-                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="deaths" title="Deaths">D</th>
+                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="deaths" title="Deaths (Kills / Deaths)">D (K/D)</th>
                                     <?php if ($show_hit_data) : ?>
                                         <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="fhits" title="Friendly fire">FF</th>
                                     <?php endif; ?>
@@ -52,6 +52,8 @@ else :
                                     $shots_kills_ratio = '0.0';
                                     $shots_hits_ratio = '0.0';
                                     $kills_attendance_ratio = '0.0';
+                                    $fhits = '';
+                                    $kills_deaths_ratio = '';
 
                                     $hits_shots_ratio_raw = 0;
                                     if ($i['adj_shots'] === false) {
@@ -65,6 +67,9 @@ else :
                                     } elseif ($i['adj_hits'] > 0) {
                                         $shots_hits_ratio = number_format(intval($i['adj_shots']) / $i['adj_hits'], 1);
                                     }
+                                    if ($i['adj_fhits'] !== false) {
+                                        $fhits = $i['adj_fhits'];
+                                    }
 
                                     $kills_shots_ratio_raw = 0;
                                     if ($i['shots'] > 0) {
@@ -73,6 +78,12 @@ else :
                                     }
                                     if ($i['kills'] > 0) {
                                         $shots_kills_ratio = number_format($i['shots'] / $i['kills'], 1);
+                                    }
+
+                                    $kills_deaths_ratio_raw = 0;
+                                    if ($i['deaths'] > 0) {
+                                        $kills_deaths_ratio_raw = $i['kills'] / $i['deaths'];
+                                        $kills_deaths_ratio = number_format($kills_deaths_ratio_raw, 1);
                                     }
 
                                     if ($i['total_count'] > 0) {
@@ -90,9 +101,9 @@ else :
                                         <?php endif; ?>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['kills']; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo $kills_shots_ratio_raw; ?>"><?php echo $kills_shots_ratio; ?> (<?php echo $shots_kills_ratio; ?>)</td>
-                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['deaths']; ?></td>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo $kills_deaths_ratio_raw; ?>"><?php echo $i['deaths']; ?><?php echo $kills_deaths_ratio ? ' (' . $kills_deaths_ratio . ')' : ''; ?></td>
                                         <?php if ($show_hit_data) : ?>
-                                            <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['fhits']; ?></td>
+                                            <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $fhits; ?></td>
                                         <?php endif; ?>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['fkills']; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['vkills']; ?></td>

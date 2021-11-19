@@ -42,20 +42,60 @@ class Data extends CI_Controller
     public function add_alias()
     {
         $this->load->model('additional_data');
+
+        $errors = [];
+        $alias_of = $this->input->get('alias_of');
+        $add_alias = $this->input->post('add_alias');
+        $player_id = $this->input->post('player_id');
+        $aliases = $this->input->post('aliases');
+        if (!is_array($aliases)) {
+            $aliases = [];
+        }
+
+        if (!is_null($alias_of)) {
+            $current_aliases = $this->additional_data->get_aliases($alias_of);
+
+            return $this->_ajax(array_column($current_aliases, 'id'));
+        } elseif ($add_alias) {
+            log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] updating aliases of ' . $player_id . ' (' . implode(', ', $aliases) . ')');
+
+            if (filter_var($player_id, FILTER_VALIDATE_INT)) {
+                $player_exists = $this->additional_data->player_exists($player_id);
+
+                if ($player_exists) {
+                    $aliases_valid = $this->additional_data->validate_aliases($player_id, $aliases);
+                    if ($aliases_valid) {
+                        $err = $this->additional_data->update_aliases($player_id, $aliases);
+                        $errors = array_merge($errors, $err);
+                    } else {
+                        $errors[] = 'Invalid aliases selected.';
+                    }
+                } else {
+                    $errors[] = 'Unknown player ID given.';
+                }
+            } else {
+                $errors[] = 'Invalid player ID given.';
+            }
+        }
+
         $players = $this->additional_data->get_players_names();
 
-        $errors = ['💩 TODO'];
+        if (count($errors) > 0) {
+            log_message('error', implode('; ', $errors));
+        }
+
         $this->_head('add-alias', 'Add player alias');
 
         $this->load->view('admin/add-alias', [
             'players' => $players,
-            'errors' => $errors
+            'errors' => $errors,
+            'player_id' => $player_id
         ]);
 
         $this->_foot();
     }
 
-    public function fix_op_data()
+    public function fix_data()
     {
         // $this->load->model('players');
         // $this->load->model('operations');
@@ -63,14 +103,28 @@ class Data extends CI_Controller
         // $no_winner = $this->operations->get_ops(true, false, true);
 
         $errors = ['💩 TODO'];
-        $this->_head('fix-op-data', 'Fill in missing op data');
+        $this->_head('fix-data', 'Fix op data');
 
-        $this->load->view('admin/fix-op-data', [
+        $this->load->view('admin/fix-data', [
             // 'ops' => $ops,
             // 'op_units' => $op_units,
             'errors' => $errors
         ]);
 
         $this->_foot();
+    }
+
+    private function _ajax($data)
+    {
+        if (!$this->input->is_ajax_request()) {
+            return show_error(400);
+        }
+
+        $dbg = JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES;
+
+        return $this->output
+            ->set_status_header(200)
+            ->set_content_type('application/json', 'utf-8')
+            ->set_output(json_encode($data, $dbg));
     }
 }

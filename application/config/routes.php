@@ -62,7 +62,7 @@ $route['update'] = 'admin/update';
 $route['manage'] = 'admin/operations';
 $route['manage/(:num)'] = 'admin/manage/$1';
 $route['add-alias'] = 'data/add_alias';
-$route['fix-op-data'] = 'data/fix_op_data';
+$route['fix-data'] = 'data/fix_data';
 
 $route['players'] = 'app/players';
 $route['player/(:num)'] = 'app/player/$1';

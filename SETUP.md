@@ -44,13 +44,13 @@ The DB skeleton is loaded automatically into the `ocapstats` database.
 
 
 ### Required permissions
-You need to make sure that PHP has sufficient permissions to access the _application/cache_ folder.  
+You need to make sure that PHP has sufficient permissions to access the _application/cache_ and  _application/logs_ folder.  
 
 Set the owner to `nobody` (web service user):  
 ```
-sudo chown -R nobody application/cache
+sudo chown -R nobody application/cache application/logs
 ```
 or allow RWX for everyone:  
 ```
-sudo chmod 0777 -R application/cache
+sudo chmod 0777 -R application/cache application/logs
 ```

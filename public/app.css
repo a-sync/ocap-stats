@@ -144,6 +144,11 @@ img.ocap-link {
     max-width: 100%;
 }
 
+.ss-container {
+    width: 100%;
+    min-width: 200px;
+}
+
 /* Dark mode */
 @media (prefers-color-scheme: dark) {
     html, body {
@@ -202,6 +207,11 @@ img.ocap-link {
     }
     .markdown-body table td, .markdown-body table th {
         border-color: var(--mdc-theme-text-hint-on-light);
+    }
+
+    .ss-main .ss-multi-selected .ss-values .ss-value .ss-value-delete {
+        color: var(--mdc-theme-text-primary-on-dark);
+        background-color: var(--mdc-theme-on-error);
     }
 }
 

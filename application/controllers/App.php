@@ -171,6 +171,7 @@ class App extends CI_Controller
         $this->_cache();
 
         $this->load->model('players');
+        $this->load->model('additional_data');
 
         $errors = [];
         $player = null;
@@ -184,7 +185,7 @@ class App extends CI_Controller
             $player = $this->players->get_by_id($id);
 
             if ($player) {
-                $player_aliases = $this->players->get_aliases_by_id($id);
+                $player_aliases = $this->additional_data->get_aliases($id);
 
                 if ($tab === 'roles') {
                     $player_roles = $this->players->get_roles_by_id($id);
@@ -385,19 +386,5 @@ class App extends CI_Controller
         ]);
 
         $this->_foot();
-    }
-
-    private function _ajax($data)
-    {
-        if (!$this->input->is_ajax_request()) {
-            return show_error(400);
-        }
-
-        $dbg = JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES;
-
-        return $this->output
-            ->set_status_header(200)
-            ->set_content_type('application/json', 'utf-8')
-            ->set_output(json_encode($data, $dbg));
     }
 }
