@@ -61,7 +61,9 @@ class Admin extends CI_Controller
             log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] cleared site cache');
         }
 
-        return redirect(base_url('manage'));
+        $re = $this->input->post('redirect') === 'add-alias' ? 'add-alias' : 'manage';
+
+        return redirect(base_url($re));
     }
 
     public function update()
@@ -82,20 +84,19 @@ class Admin extends CI_Controller
 
         if ($update) {
             log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] updated operations.json');
-            $status = download_file(OPERATIONS_JSON_URL, JSONPATH . 'operations.json.tmp');
-            if ($status !== 200) {
-                log_message('error', 'operations.json update returned status code: ' . $status);
+            if (!download_file(OPERATIONS_JSON_URL, JSONPATH . 'operations.json.tmp')) {
+                log_message('error', 'operations.json download failed.');
             }
 
             if (defined('OPERATIONS_JSON_URL_CONTENT_REGEX')) {
                 $matches = [];
                 if (preg_match(OPERATIONS_JSON_URL_CONTENT_REGEX, file_get_contents(JSONPATH . 'operations.json.tmp'), $matches)) {
                     if (!file_put_contents(JSONPATH . 'operations.json.tmp', $matches[1], LOCK_EX)) {
-                        log_message('error', 'operations.json.tmp write failed');
+                        log_message('error', 'operations.json.tmp write failed.');
                         unlink(JSONPATH . 'operations.json.tmp');
                     }
                 } else {
-                    log_message('error', 'operations.json.tmp regex failed');
+                    log_message('error', 'operations.json.tmp regex failed.');
                     unlink(JSONPATH . 'operations.json.tmp');
                 }
             }
@@ -266,7 +267,7 @@ class Admin extends CI_Controller
                                                 if (defined('MANAGE_DATA_JSON_FILES')) {
                                                     $errors[] = 'Download the data file first!';
                                                 } else {
-                                                    $errors[] = 'Data file download failed!';
+                                                    $errors[] = 'Data file download failed.';
                                                 }
                                             }
                                         } else {
@@ -361,10 +362,9 @@ class Admin extends CI_Controller
     private function _manage_json_update($operation)
     {
         $errors = [];
-        $status = download_file(OPERATION_DATA_JSON_URL_PATH . rawurlencode($operation['filename']), JSONPATH . $operation['filename']);
 
-        if ($status !== 200) {
-            $errors[] = 'Operation (' . $operation['id'] . ') data JSON download returned status code: ' . $status;
+        if (!download_file(OPERATION_DATA_JSON_URL_PATH . rawurlencode($operation['filename']), JSONPATH . $operation['filename'])) {
+            $errors[] = 'Operation (' . $operation['id'] . ') data JSON download failed.';
 
             if (file_exists(JSONPATH . $operation['filename']) && filesize(JSONPATH . $operation['filename']) === 0) {
                 unlink(JSONPATH . $operation['filename']);

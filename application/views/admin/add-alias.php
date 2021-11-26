@@ -13,6 +13,20 @@
             </div>
         <?php endif; ?>
 
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center update_field">
+            <?php echo form_open(base_url('clearcache'), ['id' => 'clear_cache'], ['redirect' => 'add-alias']); ?>
+            <button type="submit" name="clear_cache" value="1" class="mdc-button mdc-button--outlined">
+                <span class="mdc-button__ripple"></span>
+                <i class="material-icons mdc-button__icon" aria-hidden="true">auto_delete</i>
+                <span class="mdc-button__label">Clear site cache</span>
+            </button>
+            <br>
+            <i class="mdc-typography--caption operations_json_info">
+                index <?php echo $last_cache_update ? 'cached ' . strtolower(timespan($last_cache_update, '', 2)) . ' ago' : 'not cached'; ?>
+            </i>
+            <?php echo form_close(); ?>
+        </div>
+
         <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center">
 
             <div class="mdc-data-table mdc-elevation--z2">
@@ -44,8 +58,8 @@
                                 <td colspan="2" class="mdc-data-table__cell">
                                     <button type="submit" name="add_alias" value="1" class="mdc-button mdc-button--raised mdc-button--icon-trailing">
                                         <span class="mdc-button__ripple"></span>
-                                        <span class="mdc-button__label">Save</span>
                                         <i class="material-icons mdc-button__icon" aria-hidden="true">save</i>
+                                        <span class="mdc-button__label">Save</span>
                                     </button>
                                 </td>
                             </tr>
@@ -67,6 +81,7 @@
 
     const ss_aliases = new SlimSelect({
         select: '#aliases-select',
+        closeOnSelect: false,
         allowDeselect: true,
         addToBody: true,
         data: players.reduce((res, p) => {
@@ -78,7 +93,10 @@
                 });
             }
             return res;
-        }, [{placeholder:true,text:''}])
+        }, [{
+            placeholder: true,
+            text: ''
+        }])
     });
 
     if (null !== player_id) {
@@ -108,7 +126,10 @@
                             });
                         }
                         return res;
-                    }, [{placeholder:true,text:''}]);
+                    }, [{
+                        placeholder: true,
+                        text: ''
+                    }]);
 
                     ss_aliases.setData(aliases_opts);
                     ss_aliases.enable();
@@ -124,6 +145,9 @@
                 });
             }
             return res;
-        }, [{placeholder:true,text:''}])
+        }, [{
+            placeholder: true,
+            text: ''
+        }])
     });
 </script>

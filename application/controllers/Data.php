@@ -41,6 +41,7 @@ class Data extends CI_Controller
 
     public function add_alias()
     {
+        $this->load->helper(['cache', 'date']);
         $this->load->model('additional_data');
 
         $errors = [];
@@ -84,12 +85,19 @@ class Data extends CI_Controller
             log_message('error', implode('; ', $errors));
         }
 
+        $last_cache_update = 0;
+        $homepage_cache_file = get_cache_file('');
+        if (file_exists($homepage_cache_file)) {
+            $last_cache_update = filemtime($homepage_cache_file);
+        }
+
         $this->_head('add-alias', 'Add player alias');
 
         $this->load->view('admin/add-alias', [
             'players' => $players,
             'errors' => $errors,
-            'player_id' => $player_id
+            'player_id' => $player_id,
+            'last_cache_update' => $last_cache_update
         ]);
 
         $this->_foot();

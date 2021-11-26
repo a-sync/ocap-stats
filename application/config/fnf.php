@@ -50,7 +50,9 @@ $config['hq_role_names'] = [
 $config['ignorable_mission_names'] = [
     'Friday Night Fight DTAS',
     'temp',
-    'FNF_MissionTemplate'
+    'FNF_MissionTemplate',
+    'FNF King of the Fort',
+    'FNF Mission Template'
 ];
 
 $config['sides'] = [
