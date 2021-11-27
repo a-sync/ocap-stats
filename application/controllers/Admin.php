@@ -144,6 +144,7 @@ class Admin extends CI_Controller
                         $o['tag'] = $o['type'];
                     }
                     $o['__valid_event_types'] = $this->_get_valid_event_types($o);
+                    $o['__should_ignore'] = $this->_should_be_ignored($o);
                     array_unshift($operations_rev, $o);
                 }
             }
@@ -178,6 +179,7 @@ class Admin extends CI_Controller
         $operation = null;
         $op_in_db = false;
         $valid_event_types = [];
+        $should_ignore = false;
         $op = false;
         $file_size = '0 B';
         $last_update = 'none';
@@ -199,6 +201,7 @@ class Admin extends CI_Controller
                 if ($operation) {
                     $op_in_db = $this->operations->exists($operation['id']);
                     $valid_event_types = $this->_get_valid_event_types($operation);
+                    $should_ignore = $this->_should_be_ignored($operation);
 
                     // ID was posted
                     if (!is_null($this->input->post('id')) && $operation['id'] === intval($this->input->post('id'))) {
@@ -324,6 +327,7 @@ class Admin extends CI_Controller
             'errors' => $errors,
             'op_in_db' => $op_in_db,
             'valid_event_types' => $valid_event_types,
+            'should_ignore' => $should_ignore,
             'op' => $op,
             'file_size' => $file_size,
             'last_update' => $last_update
@@ -332,11 +336,18 @@ class Admin extends CI_Controller
         $this->_foot();
     }
 
+    private function _should_be_ignored($operation)
+    {
+        if (function_exists('should_op_be_ignored')) {
+            return should_op_be_ignored($operation);
+        }
+
+        return false;
+    }
+
     private function _get_valid_event_types($operation)
     {
-        if (in_array(strtolower($operation['mission_name']), array_map('strtolower', $this->config->item('ignorable_mission_names')))) {
-            return [];
-        } elseif (isset($operation['tag'])) {
+        if (isset($operation['tag'])) {
             $tag_event_types = array_change_key_case($this->config->item('tag_event_types'), CASE_LOWER);
 
             if (count($tag_event_types) > 0) {

@@ -32,8 +32,6 @@ $config['hq_group_names'] = [
 // Keep these ordered by rank
 $config['hq_role_names'] = [];
 
-$config['ignorable_mission_names'] = [];
-
 $config['sides'] = [
     'WEST' => 'BLUFOR',
     'EAST' => 'OPFOR',

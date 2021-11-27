@@ -91,6 +91,11 @@ footer .render-stats {
 .errors.mdc-layout-grid__cell {
     text-align: center;
 }
+
+.errors.mdc-layout-grid__cell h3 {
+    margin-top: 0;
+}
+
 .ignored_operation {
     opacity: 0.4;
 }

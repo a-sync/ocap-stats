@@ -73,16 +73,6 @@ $config['hq_role_names'] = [];
 
 /*
 |--------------------------------------------------------------------------
-| Mission names to ignore
-|--------------------------------------------------------------------------
-|
-| List of mission names that must be ignored when processing.
-|
-*/
-$config['ignorable_mission_names'] = [];
-
-/*
-|--------------------------------------------------------------------------
 | Side names
 |--------------------------------------------------------------------------
 |
@@ -164,11 +154,31 @@ define('OCAP_URL_PREFIX', 'http://localhost:5000/?zoom=1.4&x=-150&y=120&file=');
 
 /*
 |--------------------------------------------------------------------------
+| Should operation be ignored
+|--------------------------------------------------------------------------
+|
+| Helper function to check an operation's available data and recommend 
+| whether or not to ignore this operation.
+|
+*/
+/*
+if (!function_exists('should_op_be_ignored')) {
+    // @param $op array of operation data fields
+    // @return boolean recommendation to ignore the operation or not
+    function should_op_be_ignored($op)
+    {
+        return false;
+    }
+}
+*/
+
+/*
+|--------------------------------------------------------------------------
 | Preprocess operation data
 |--------------------------------------------------------------------------
 |
-| Modify the processed operation's data fields before it is stored in the 
-| database.
+| Helper function to modify a processed operation's data fields before 
+| it is stored in the database.
 |
 */
 /*

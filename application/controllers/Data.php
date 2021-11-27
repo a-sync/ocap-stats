@@ -47,6 +47,8 @@ class Data extends CI_Controller
         $errors = [];
         $alias_of = $this->input->get('alias_of');
         $add_alias = $this->input->post('add_alias');
+        $add_new_player = $this->input->post('add_new_player');
+        $new_player_name = $this->input->post('new_player_name');
         $player_id = $this->input->post('player_id');
         $aliases = $this->input->post('aliases');
         if (!is_array($aliases)) {
@@ -69,13 +71,25 @@ class Data extends CI_Controller
                         $err = $this->additional_data->update_aliases($player_id, $aliases);
                         $errors = array_merge($errors, $err);
                     } else {
-                        $errors[] = 'Invalid aliases selected.';
+                        $errors[] = 'Invalid aliases selected!';
                     }
                 } else {
                     $errors[] = 'Unknown player ID given.';
                 }
             } else {
-                $errors[] = 'Invalid player ID given.';
+                $errors[] = 'Invalid player ID given!';
+            }
+        } elseif ($add_new_player) {
+            log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] adding player ' . $new_player_name);
+
+            if (!is_null($new_player_name) && $new_player_name !== '') {
+                $re = $this->additional_data->add_new_player($new_player_name);
+                $errors = array_merge($errors, $re['errors']);
+                if ($re['player_id'] > 0) {
+                    $player_id = $re['alias_of'] > 0 ? strval($re['alias_of']) : strval($re['player_id']);
+                }
+            } else {
+                $errors[] = 'Player name can not be empty!';
             }
         }
 

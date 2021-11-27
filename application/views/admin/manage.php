@@ -149,7 +149,7 @@ $event_types = $this->config->item('event_types');
                                                     $extra_attr = '';
 
                                                     if (in_array($id, $valid_event_types)) {
-                                                        if (count($valid_event_types) === 1) {
+                                                        if (!$should_ignore && count($valid_event_types) === 1) {
                                                             $extra_attr = ' checked';
                                                         }
                                                     } else {

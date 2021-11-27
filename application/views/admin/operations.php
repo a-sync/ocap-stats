@@ -108,25 +108,29 @@ $event_types = $this->config->item('event_types');
                                                 </span>
                                             </td>
                                         <?php else :
-                                            $vet = count($op['__valid_event_types']);
+                                            $vet_count = 0;
+                                            if (!$op['__should_ignore']) {
+                                                $vet_count = count($op['__valid_event_types']);
+                                            }
+
                                             $hidden = [
                                                 'id' => $op['id'],
                                                 'redirect' => 'list'
                                             ];
 
-                                            if ($vet === 1) {
+                                            if ($vet_count === 1) {
                                                 $hidden['event'] = $op['__valid_event_types'][0];
                                             }
                                         ?>
                                             <td class="mdc-data-table__cell" colspan="2">
                                                 <?php echo form_open(base_url('manage/' . $op['id']), '', $hidden); 
-                                                    if ($vet === 1 && !defined('MANAGE_DATA_JSON_FILES')) : ?>
+                                                    if ($vet_count === 1 && !defined('MANAGE_DATA_JSON_FILES')) : ?>
                                                         <button type="submit" name="action" value="parse" class="mdc-button mdc-button--raised mdc-button--leading">
                                                             <span class="mdc-button__ripple"></span>
                                                             <i class="material-icons mdc-button__icon" aria-hidden="true">publish</i>
                                                             <span class="mdc-button__label">Parse as <?php echo $event_types[$hidden['event']]; ?></span>
                                                         </button>
-                                                    <?php elseif ($vet > 0) : ?>
+                                                    <?php elseif ($vet_count > 0) : ?>
                                                         <a href="<?php echo base_url('manage/' . $op['id']); ?>" class="mdc-button mdc-button--outlined">
                                                             <span class="mdc-button__ripple"></span>
                                                             <span class="mdc-button__label">Process</span>

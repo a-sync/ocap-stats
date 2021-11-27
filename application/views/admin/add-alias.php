@@ -6,13 +6,6 @@
     <div class="mdc-layout-grid__inner">
 
 
-        <?php if (count($errors) > 0) : ?>
-            <div class="errors mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-                <h3>⚠️ Errors</h3>
-                <?php echo implode('<br>', $errors); ?>
-            </div>
-        <?php endif; ?>
-
         <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center update_field">
             <?php echo form_open(base_url('clearcache'), ['id' => 'clear_cache'], ['redirect' => 'add-alias']); ?>
             <button type="submit" name="clear_cache" value="1" class="mdc-button mdc-button--outlined">
@@ -27,13 +20,41 @@
             <?php echo form_close(); ?>
         </div>
 
-        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center">
+        <?php if (count($errors) > 0) : ?>
+            <div class="errors mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+                <h3>⚠️ Errors</h3>
+                <?php echo implode('<br>', $errors); ?>
+            </div>
+        <?php endif; ?>
 
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center">
             <div class="mdc-data-table mdc-elevation--z2">
                 <div class="mdc-data-table__table-container">
-                    <?php echo form_open('', ['id' => 'alias-form']); ?>
+                    <?php echo form_open('', ['id' => 'add-alias-form']); ?>
                     <table class="mdc-data-table__table">
                         <tbody class="mdc-data-table__content">
+                            <tr class="mdc-data-table__row">
+                                <td class="mdc-data-table__cell">New player name</td>
+                                <td class="mdc-data-table__cell">
+                                    <label class="mdc-text-field mdc-text-field--outlined">
+                                        <span class="mdc-notched-outline">
+                                            <span class="mdc-notched-outline__leading"></span>
+                                            <span class="mdc-notched-outline__notch"></span>
+                                            <span class="mdc-notched-outline__trailing"></span>
+                                        </span>
+                                        <input type="text" class="mdc-text-field__input" name="new_player_name" maxlength="255">
+                                    </label>
+                                </td>
+                            </tr>
+                            <tr class="mdc-data-table__row">
+                                <td colspan="2" class="mdc-data-table__cell">
+                                    <button type="submit" name="add_new_player" value="1" class="mdc-button mdc-button--raised mdc-button--icon-trailing">
+                                        <span class="mdc-button__ripple"></span>
+                                        <i class="material-icons mdc-button__icon" aria-hidden="true">person_add</i>
+                                        <span class="mdc-button__label">Add new player</span>
+                                    </button>
+                                </td>
+                            </tr>
                             <tr class="mdc-data-table__row">
                                 <td class="mdc-data-table__cell">Player</td>
                                 <td class="mdc-data-table__cell">
@@ -85,7 +106,7 @@
         allowDeselect: true,
         addToBody: true,
         data: players.reduce((res, p) => {
-            if (null !== player_id && (parseInt(p.alias_of, 2) === 0 || p.alias_of === player_id)) {
+            if (null !== player_id && p.id !== player_id && (parseInt(p.alias_of, 2) === 0 || p.alias_of === player_id)) {
                 res.push({
                     text: p.name,
                     value: p.id,

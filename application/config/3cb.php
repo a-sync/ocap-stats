@@ -32,8 +32,6 @@ $config['hq_role_names'] = [
     'Section Commander'
 ];
 
-$config['ignorable_mission_names'] = [];
-
 $config['sides'] = [
     'WEST' => 'BLUFOR',
     'EAST' => 'OPFOR',

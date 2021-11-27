@@ -32,8 +32,6 @@ $config['hq_role_names'] = [
     'First Platoon Leader'
 ];
 
-$config['ignorable_mission_names'] = [];
-
 $config['sides'] = [
     'WEST' => 'BLUFOR',
     'EAST' => 'OPFOR',

@@ -47,14 +47,6 @@ $config['hq_role_names'] = [
     'Cult Leader'
 ];
 
-$config['ignorable_mission_names'] = [
-    'Friday Night Fight DTAS',
-    'temp',
-    'FNF_MissionTemplate',
-    'FNF King of the Fort',
-    'FNF Mission Template'
-];
-
 $config['sides'] = [
     'WEST' => 'BLUFOR',
     'EAST' => 'OPFOR',
@@ -68,6 +60,29 @@ define('OPERATIONS_JSON_URL', 'http://aar.fridaynightfight.org/api/v1/operations
 define('OPERATION_DATA_JSON_URL_PATH', 'http://aar.fridaynightfight.org/data/');
 define('OCAP_URL_PREFIX', 'http://aar.fridaynightfight.org/?zoom=1.4&x=-150&y=120&file=');
 define('ADJUST_HIT_DATA', 335);
+
+if (!function_exists('should_op_be_ignored')) {
+    function should_op_be_ignored($op)
+    {
+        // Warmup or test mission
+        if (in_array(strtolower($op['mission_name']), array_map('strtolower', [
+            'Friday Night Fight DTAS',
+            'temp',
+            'FNF_MissionTemplate',
+            'FNF King of the Fort',
+            'FNF Mission Template'
+        ]))) {
+            return true;
+        }
+
+        // Non titans game lasting less then 20 minutes
+        if ($op['tag'] !== 'fnftitans' && floor(intval($op['mission_duration']) / 60) < 20) {
+            return true;
+        }
+
+        return false;
+    }
+}
 
 if (!function_exists('preprocess_op_data')) {
     function preprocess_op_data(&$op)

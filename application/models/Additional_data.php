@@ -115,4 +115,36 @@ class Additional_data extends CI_Model
 
         return $errors;
     }
+
+    public function add_new_player($name)
+    {
+        $errors = [];
+        $player_id = 0;
+        $alias_of = 0;
+
+        $p = $this->db
+            ->select(['id', 'alias_of'])
+            ->from('players')
+            ->where('name', $name)
+            ->get()
+            ->result_array();
+
+        if (count($p) > 0) {
+            $errors[] = 'Player already exists.';
+            $player_id = $p[0]['id'];
+            $alias_of = $p[0]['alias_of'];
+        } else {
+            if ($this->db->insert('players', ['name' => $name]) === false) {
+                $errors[] = 'Failed to create new player.';
+            } else {
+                $player_id = $this->db->insert_id();
+            }
+        }
+
+        return [
+            'errors' => $errors,
+            'player_id' => $player_id,
+            'alias_of' => $alias_of
+        ];
+    }
 }
