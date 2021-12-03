@@ -11,7 +11,8 @@ $config['event_types'] = [
     'eu' => 'FNF EU',
     'na' => 'FNF NA',
     'titans' => 'Titans',
-    'tnt' => 'TNT'
+    'tnt' => 'TNT',
+    'vsofcra' => 'FNF vs OFCRA'
 ];
 
 $config['default_selected_event_types'] = ['eu', 'na'];
@@ -22,7 +23,8 @@ $config['tag_event_types'] = [
     'fnfeu2' => 'eu',
     'fnfna' => 'na',
     'fnftitans' => 'titans',
-    'fnftnt' => 'tnt'
+    'fnftnt' => 'tnt',
+    'fnfvofcra' => 'vsofcra'
 ];
 
 // Keep these ordered by rank
