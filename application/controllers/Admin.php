@@ -114,7 +114,6 @@ class Admin extends CI_Controller
         $this->operations();
     }
 
-    // manage
     public function operations()
     {
         require_once(APPPATH . 'third_party/json-machine/load.php');
@@ -122,7 +121,7 @@ class Admin extends CI_Controller
         $this->load->helper(['cache', 'date']);
         $this->load->model('operations');
 
-        $file_size = '0 B';
+        $file_size = 0;
         $last_update = 0;
         $last_cache_update = 0;
         $operations = [];
@@ -131,11 +130,9 @@ class Admin extends CI_Controller
 
         if (file_exists(JSONPATH . 'operations.json')) {
             $last_update = filemtime(JSONPATH . 'operations.json');
-            $file_size_bytes = filesize(JSONPATH . 'operations.json');
+            $file_size = filesize(JSONPATH . 'operations.json');
 
-            if ($file_size_bytes > 0) {
-                $file_size = $this->_convert_filesize($file_size_bytes);
-
+            if (intval($file_size) > 0) {
                 $operations = \JsonMachine\JsonMachine::fromFile(JSONPATH . 'operations.json');
 
                 foreach ($operations as $o) {
@@ -143,8 +140,6 @@ class Admin extends CI_Controller
                     if (!isset($o['tag']) && isset($o['type'])) {
                         $o['tag'] = $o['type'];
                     }
-                    $o['__valid_event_types'] = $this->_get_valid_event_types($o);
-                    $o['__should_ignore'] = $this->_should_be_ignored($o);
                     array_unshift($operations_rev, $o);
                 }
             }
@@ -168,11 +163,11 @@ class Admin extends CI_Controller
         $this->_foot();
     }
 
-    public function manage($op_id = null)
+    public function process($op_id = null)
     {
         require_once(APPPATH . 'third_party/json-machine/load.php');
 
-        $this->load->helper('curl');
+        $this->load->helper(['curl', 'date']);
         $this->load->model('operations');
 
         $errors = [];
@@ -181,7 +176,7 @@ class Admin extends CI_Controller
         $valid_event_types = [];
         $should_ignore = false;
         $op = false;
-        $file_size = '0 B';
+        $file_size = 0;
         $last_update = 'none';
 
         if (file_exists(JSONPATH . 'operations.json')) {
@@ -200,8 +195,8 @@ class Admin extends CI_Controller
 
                 if ($operation) {
                     $op_in_db = $this->operations->exists($operation['id']);
-                    $valid_event_types = $this->_get_valid_event_types($operation);
-                    $should_ignore = $this->_should_be_ignored($operation);
+                    $valid_event_types = get_valid_event_types($operation);
+                    $should_ignore = should_ignore($operation);
 
                     // ID was posted
                     if (!is_null($this->input->post('id')) && $operation['id'] === intval($this->input->post('id'))) {
@@ -227,7 +222,7 @@ class Admin extends CI_Controller
                                         }
 
                                         if (!defined('MANAGE_DATA_JSON_FILES')) {
-                                            $this->_manage_json_del($operation);
+                                            $this->_json_del($operation);
                                         }
                                     } elseif ($action === 'ignore' && $op_in_db === false) {
                                         if (!$this->operations->insert($operation)) {
@@ -240,7 +235,7 @@ class Admin extends CI_Controller
                                         $op_in_db = $this->operations->exists($operation['id']);
 
                                         if (!defined('MANAGE_DATA_JSON_FILES')) {
-                                            $this->_manage_json_del($operation);
+                                            $this->_json_del($operation);
                                         }
                                     } elseif ($action === 'parse' && $op_in_db === false && count($valid_event_types) > 0) {
                                         $event_type = $this->input->post('event');
@@ -248,7 +243,7 @@ class Admin extends CI_Controller
                                             $operation['event'] = $event_type;
 
                                             if (!file_exists(JSONPATH . $operation['filename']) && !defined('MANAGE_DATA_JSON_FILES')) {
-                                                $err = $this->_manage_json_update($operation);
+                                                $err = $this->_json_update($operation);
                                                 $errors = array_merge($errors, $err);
                                             }
 
@@ -258,7 +253,7 @@ class Admin extends CI_Controller
                                                 $opdata = null;
 
                                                 if (count($err) === 0 && !defined('MANAGE_DATA_JSON_FILES')) {
-                                                    $this->_manage_json_del($operation);
+                                                    $this->_json_del($operation);
                                                 }
                                                 $errors = array_merge($errors, $err);
 
@@ -277,10 +272,10 @@ class Admin extends CI_Controller
                                             $errors[] = 'Invalid event type for this operation!';
                                         }
                                     } elseif ($action === 'update' && defined('MANAGE_DATA_JSON_FILES')) {
-                                        $err = $this->_manage_json_update($operation);
+                                        $err = $this->_json_update($operation);
                                         $errors = array_merge($errors, $err);
                                     } elseif ($action === 'del' && defined('MANAGE_DATA_JSON_FILES')) {
-                                        $this->_manage_json_del($operation);
+                                        $this->_json_del($operation);
                                     } else {
                                         $errors[] = 'Invalid action.';
                                     }
@@ -299,7 +294,7 @@ class Admin extends CI_Controller
                     }
 
                     if (file_exists(JSONPATH . $operation['filename'])) {
-                        $file_size = $this->_convert_filesize(filesize(JSONPATH . $operation['filename']));
+                        $file_size = filesize(JSONPATH . $operation['filename']);
                         $last_update = gmdate('Y-m-d H:i:s', filemtime(JSONPATH . $operation['filename']));
                     }
 
@@ -336,41 +331,7 @@ class Admin extends CI_Controller
         $this->_foot();
     }
 
-    private function _should_be_ignored($operation)
-    {
-        if (function_exists('should_op_be_ignored')) {
-            return should_op_be_ignored($operation);
-        }
-
-        return false;
-    }
-
-    private function _get_valid_event_types($operation)
-    {
-        if (isset($operation['tag'])) {
-            $tag_event_types = array_change_key_case($this->config->item('tag_event_types'), CASE_LOWER);
-
-            if (count($tag_event_types) > 0) {
-                $op_tag = strtolower($operation['tag']);
-
-                if (isset($tag_event_types[$op_tag])) {
-                    $valid_event_types = $tag_event_types[$op_tag];
-
-                    if (!is_array($valid_event_types)) {
-                        $valid_event_types = [$valid_event_types];
-                    }
-
-                    return $valid_event_types;
-                } else {
-                    return [];
-                }
-            }
-        }
-
-        return array_keys($this->config->item('event_types'));
-    }
-
-    private function _manage_json_update($operation)
+    private function _json_update($operation)
     {
         $errors = [];
 
@@ -385,22 +346,11 @@ class Admin extends CI_Controller
         return $errors;
     }
 
-    private function _manage_json_del($operation)
+    private function _json_del($operation)
     {
         if (file_exists(JSONPATH . $operation['filename'])) {
             unlink(JSONPATH . $operation['filename']);
         }
-    }
-
-    private function _convert_filesize($bytes, $decimals = 2)
-    {
-        if (intval($bytes) === 0) {
-            return '0 B';
-        }
-        $size = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-        $factor = floor(log($bytes, 1024));
-
-        return sprintf('%.' . $decimals . 'f', $bytes / pow(1024, $factor)) . ' ' . @$size[$factor];
     }
 
     private function _parse_operation_json($operation)

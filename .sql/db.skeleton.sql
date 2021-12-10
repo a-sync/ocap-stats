@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS `entities` (
   `id` int(10) unsigned NOT NULL,
   `player_id` int(10) unsigned NOT NULL,
   `group_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `is_player` tinyint(1) NOT NULL,
+  `is_player` tinyint(1) unsigned NOT NULL,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `role` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `side` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -40,16 +40,39 @@ CREATE TABLE IF NOT EXISTS `entities` (
 --
 
 
+DROP TABLE IF EXISTS `entities_additional_data`;
+CREATE TABLE IF NOT EXISTS `entities_additional_data` (
+  `operation_id` int(10) unsigned NOT NULL,
+  `entity_id` int(10) unsigned NOT NULL,
+  `player_id` int(10) unsigned NOT NULL,
+  `ignore` tinyint(1) unsigned NOT NULL,
+  `hq` tinyint(1) unsigned NOT NULL,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`operation_id`,`entity_id`),
+  KEY `player_id` (`player_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+--
+-- RELATIONS FOR TABLE `entities`:
+--   `operation_id`
+--       `operations` -> `id`
+--   `entity_id`
+--       `entities` -> `id`
+--   `player_id`
+--       `players` -> `id`
+--
+
+
 DROP TABLE IF EXISTS `events`;
 CREATE TABLE IF NOT EXISTS `events` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `operation_id` int(10) unsigned NOT NULL,
   `frame` int(10) unsigned NOT NULL,
   `event` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `victim_id` int(10) unsigned NOT NULL,
+  `victim_id` int(10) unsigned DEFAULT NULL,
   `attacker_id` int(10) unsigned DEFAULT NULL,
-  `weapon` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `weapon` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `distance` int(10) NOT NULL,
+  `data` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `operation_id` (`operation_id`,`attacker_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=1 ;
@@ -87,12 +110,33 @@ CREATE TABLE IF NOT EXISTS `operations` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+DROP TABLE IF EXISTS `ops_additional_data`;
+CREATE TABLE IF NOT EXISTS `ops_additional_data` (
+  `operation_id` int(10) unsigned NOT NULL,
+  `mission_author` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `start_time` datetime DEFAULT NULL,
+  `end_winner` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `end_message` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `verified` tinyint(1) unsigned NOT NULL,
+  PRIMARY KEY (`operation_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+--
+-- RELATIONS FOR TABLE `events`:
+--   `operation_id`
+--       `operations` -> `id`
+--
+
+
 DROP TABLE IF EXISTS `players`;
 CREATE TABLE IF NOT EXISTS `players` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `alias_of` int(10) unsigned NOT NULL,
+  `uid` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `unit_id` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `uid` (`uid`),
   KEY `alias_of` (`alias_of`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=11 ;
 --

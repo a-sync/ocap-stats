@@ -108,7 +108,7 @@ class App extends CI_Controller
                 }
             }
 
-            if (!$events || count($events) === 0) {
+            if (!is_array($events) || count($events) === 0) {
                 return $this->config->item('default_selected_event_types');
             } else {
                 return $events;
@@ -195,7 +195,7 @@ class App extends CI_Controller
                     $player_attackers = $this->players->get_attackers_by_id($id);
                 } elseif ($tab === 'victims') {
                     $player_victims = $this->players->get_victims_by_id($id);
-                } else { //ops
+                } else { // ops
                     $player_ops = $this->players->get_ops_by_id($id);
                 }
             } else {
@@ -265,9 +265,11 @@ class App extends CI_Controller
         $this->_cache();
 
         $this->load->model('operations');
+        $this->load->model('additional_data');
 
         $errors = [];
         $op = null;
+        $op_commanders = [];
         $op_events = [];
         $op_weapons = [];
         $op_entities = [];
@@ -275,12 +277,17 @@ class App extends CI_Controller
             $op = $this->operations->get_by_id($id);
 
             if ($op) {
+                $op_commanders_data = $this->additional_data->get_commanders(true, $op['id'], true);
+                if (isset($op_commanders_data['resolved'][$op['id']])) {
+                    $op_commanders = $op_commanders_data['resolved'][$op['id']];
+                }
+
                 if ($tab === 'events') {
-                    $op_events = $this->operations->get_events_by_id($id);
+                    $op_events = $this->operations->get_events_by_id($op['id']);
                 } elseif ($tab === 'weapons') {
-                    $op_weapons = $this->operations->get_weapons_by_id($id);
+                    $op_weapons = $this->operations->get_weapons_by_id($op['id']);
                 } else { // entities
-                    $op_entities = $this->operations->get_entities_by_id($id);
+                    $op_entities = $this->operations->get_entities_by_id($op['id']);
                 }
             } else {
                 $errors[] = 'Unknown op ID given.';
@@ -293,7 +300,8 @@ class App extends CI_Controller
 
         $this->load->view('op', [
             'op' => $op,
-            'errors' => $errors
+            'errors' => $errors,
+            'op_commanders' => $op_commanders
         ]);
 
         if ($op) {
@@ -333,9 +341,9 @@ class App extends CI_Controller
 
         $events_filter = $this->_filters();
 
-        $this->load->model('players');
+        $this->load->model('additional_data');
 
-        $commanders = $this->players->get_commanders($events_filter);
+        $commanders = $this->additional_data->get_commanders($events_filter);
 
         $this->_head('commanders');
 

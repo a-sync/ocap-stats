@@ -41,7 +41,7 @@ else :
                                             </sup>
                                         </td>
                                         <td class="mdc-data-table__cell"><?php echo html_escape($i['world_name']); ?></td>
-                                        <td class="mdc-data-table__cell"><span title="<?php echo html_escape($i['end_message']); ?>"><?php echo $sides[$i['end_winner']]; ?></span></td>
+                                        <td class="mdc-data-table__cell"><span title="<?php echo html_escape($i['end_message']); ?>" class="side__<?php echo html_escape(strtolower($i['end_winner'])); ?>"><?php echo $sides[$i['end_winner']]; ?></span></td>
                                         <td class="mdc-data-table__cell"><?php echo html_escape($i['mission_author']); ?></td>
                                         <td class="mdc-data-table__cell"><span title="<?php echo html_escape($i['tag']); ?>"><?php echo $event_types[$i['event']]; ?></span></td>
                                         <td class="mdc-data-table__cell"><span title="<?php echo $i['date']; ?>"><?php echo $i['start_time']; ?></span></td>

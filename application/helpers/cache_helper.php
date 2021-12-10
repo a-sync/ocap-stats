@@ -1,5 +1,4 @@
-<?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+<?php defined('BASEPATH') or exit('No direct script access allowed');
 
 /**
  * Output Cache Helper
@@ -21,11 +20,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  *
  * @return string Path to the cache folder.
  */
-if ( ! function_exists('get_cache_folder'))
-{
+if (!function_exists('get_cache_folder')) {
 	function get_cache_folder()
 	{
-		$CI =& get_instance();
+		$CI = &get_instance();
 
 		$path = $CI->config->item('cache_path');
 		$cache_path = ($path == '') ? APPPATH . 'cache/' : $path;
@@ -42,15 +40,14 @@ if ( ! function_exists('get_cache_folder'))
  * @param  string $uri_string Full uri_string() of the target page (e.g. 'blog/comments/123').
  * @return string Path to the cache file.
  */
-if ( ! function_exists('get_cache_file'))
-{
+if (!function_exists('get_cache_file')) {
 	function get_cache_file($uri_string)
 	{
-		$CI =& get_instance();
+		$CI = &get_instance();
 
 		$uri =  $CI->config->item('base_url') .
-				$CI->config->item('index_page') .
-				$uri_string;
+			$CI->config->item('index_page') .
+			$uri_string;
 
 		return get_cache_folder() . md5($uri);
 	}
@@ -63,11 +60,10 @@ if ( ! function_exists('get_cache_file'))
  *
  * @return array get_dir_file_info() of cache files.
  */
-if ( ! function_exists('get_all_cache_files'))
-{
+if (!function_exists('get_all_cache_files')) {
 	function get_all_cache_files()
 	{
-		$CI =& get_instance();
+		$CI = &get_instance();
 
 		$CI->load->helper('file');
 
@@ -84,18 +80,14 @@ if ( ! function_exists('get_all_cache_files'))
  * @param  string  $uri_string Full uri_string() of the target page (e.g. 'blog/comments/123').
  * @return boolean TRUE if the cache file was removed, FALSE if it was not.
  */
-if ( ! function_exists('delete_cache'))
-{
+if (!function_exists('delete_cache')) {
 	function delete_cache($uri_string)
 	{
 		$cache_path = get_cache_file($uri_string);
 
-		if (file_exists($cache_path))
-		{
+		if (file_exists($cache_path)) {
 			return unlink($cache_path);
-		}
-		else
-		{
+		} else {
 			return TRUE;
 		}
 	}
@@ -108,17 +100,14 @@ if ( ! function_exists('delete_cache'))
  *
  * @return void
  */
-if ( ! function_exists('delete_all_cache'))
-{
+if (!function_exists('delete_all_cache')) {
 	function delete_all_cache()
 	{
 		$cache_files = get_all_cache_files();
 
-		foreach ($cache_files as $file)
-		{
+		foreach ($cache_files as $file) {
 			// only delete files with names that are 32 characters in length (MD5)
-			if (strlen($file['name']) === 32 && is_really_writable($file['server_path']))
-			{
+			if (strlen($file['name']) === 32 && is_really_writable($file['server_path'])) {
 				@unlink($file['server_path']);
 			}
 		}
@@ -133,35 +122,29 @@ if ( ! function_exists('delete_all_cache'))
  *
  * @return void
  */
-if ( ! function_exists('delete_expired_cache'))
-{
+if (!function_exists('delete_expired_cache')) {
 	function delete_expired_cache()
 	{
-		$CI =& get_instance();
+		$CI = &get_instance();
 
 		$CI->load->helper('file');
 
 		$files = get_dir_file_info(get_cache_folder());
 
-		foreach ($files as $file)
-		{
-			if (strlen($file['name']) !== 32)
-			{
+		foreach ($files as $file) {
+			if (strlen($file['name']) !== 32) {
 				continue;
 			}
 
-			if ( ! $fp = @fopen($file['server_path'], FOPEN_READ))
-			{
+			if (!$fp = @fopen($file['server_path'], FOPEN_READ)) {
 				continue;
 			}
 
 			flock($fp, LOCK_SH);
 
 			$time_str = '';
-			while (($char = fgetc($fp)) !== FALSE)
-			{
-				if ($char === 'T')
-				{
+			while (($char = fgetc($fp)) !== FALSE) {
+				if ($char === 'T') {
 					break;
 				}
 				$time_str .= $char;
@@ -170,10 +153,8 @@ if ( ! function_exists('delete_expired_cache'))
 			flock($fp, LOCK_UN);
 			fclose($fp);
 
-			if (ctype_digit($time_str) && time() >= (int)$time_str)
-			{
-				if (is_really_writable($file['server_path']))
-				{
+			if (ctype_digit($time_str) && time() >= (int)$time_str) {
+				if (is_really_writable($file['server_path'])) {
 					@unlink($file['server_path']);
 				}
 			}
@@ -189,29 +170,24 @@ if ( ! function_exists('delete_expired_cache'))
  * @param  string $uri_string Full uri_string() of the target page.
  * @return mixed  Time from the cache file or FALSE if there was a problem.
  */
-if ( ! function_exists('get_cache_expiration'))
-{
+if (!function_exists('get_cache_expiration')) {
 	function get_cache_expiration($uri_string)
 	{
 		$cache_path = get_cache_file($uri_string);
 
-		if ( ! @file_exists($cache_path))
-		{
+		if (!@file_exists($cache_path)) {
 			return FALSE;
 		}
 
-		if ( ! $fp = @fopen($cache_path, FOPEN_READ))
-		{
+		if (!$fp = @fopen($cache_path, FOPEN_READ)) {
 			return FALSE;
 		}
 
 		flock($fp, LOCK_SH);
 
 		$time_str = '';
-		while (($char = fgetc($fp)) !== FALSE)
-		{
-			if ($char === 'T')
-			{
+		while (($char = fgetc($fp)) !== FALSE) {
+			if ($char === 'T') {
 				break;
 			}
 			$time_str .= $char;
@@ -220,12 +196,9 @@ if ( ! function_exists('get_cache_expiration'))
 		flock($fp, LOCK_UN);
 		fclose($fp);
 
-		if (ctype_digit($time_str))
-		{
+		if (ctype_digit($time_str)) {
 			return (int)$time_str;
-		}
-		else
-		{
+		} else {
 			return FALSE;
 		}
 	}

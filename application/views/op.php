@@ -43,7 +43,11 @@ $sides = $this->config->item('sides');
                                 </tr>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Winner</td>
-                                    <td class="mdc-data-table__cell"><?php echo $sides[$op['end_winner']]; ?></td>
+                                    <td class="mdc-data-table__cell">
+                                        <span class="side__<?php echo html_escape(strtolower($op['end_winner'])); ?>">
+                                            <?php echo $sides[$op['end_winner']]; ?>
+                                        </span>
+                                    </td>
                                 </tr>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">End message</td>
@@ -76,6 +80,21 @@ $sides = $this->config->item('sides');
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Players</td>
                                     <td class="mdc-data-table__cell"><?php echo $op['players']; ?></td>
+                                </tr>
+                                <tr class="mdc-data-table__row">
+                                    <td class="mdc-data-table__cell">Commanders</td>
+                                    <td class="mdc-data-table__cell">
+                                        <?php
+                                        foreach ($op_commanders as $c) {
+                                            $name_title = '';
+                                            $name = '<a href="' . base_url('player/') . $c['player_id'] . '">' . html_escape($c['entity_name']) . '</a>';
+                                            if ($c['entity_name'] !== $c['name']) {
+                                                $name_title = ' title="' . html_escape($c['name']) . '"';
+                                            }
+                                            echo '<span' . $name_title . '>' . $name . '</span> (<span class="side__' . html_escape(strtolower($c['side'])) . '">' . $sides[$c['side']] . '</span>)<br>';
+                                        }
+                                        ?>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>

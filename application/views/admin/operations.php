@@ -14,7 +14,7 @@ $event_types = $this->config->item('event_types');
             </button>
             <br>
             <i class="mdc-typography--caption operations_json_info">
-                <?php echo count($operations); ?> entries (<?php echo $file_size; ?>)
+                <?php echo count($operations); ?> entries (<?php echo convert_filesize($file_size); ?>)
                 <br>
                 <?php echo $last_update ? 'updated ' . strtolower(timespan($last_update, '', 2)) . ' ago' : 'not downloaded'; ?>
             </i>
@@ -51,9 +51,6 @@ $event_types = $this->config->item('event_types');
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col">Duration</th>
                                     <?php if (isset($op0['tag'])) : ?>
                                         <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Tag</th>
-                                    <?php endif; ?>
-                                    <?php if (isset($op0['can_import'])) : ?>
-                                        <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Can import</th>
                                     <?php endif; ?>
                                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Event</th>
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col">Updated</th>
@@ -95,9 +92,6 @@ $event_types = $this->config->item('event_types');
                                         <?php if (isset($op['tag'])) : ?>
                                             <td class="mdc-data-table__cell"><?php echo html_escape($op['tag']); ?></td>
                                         <?php endif; ?>
-                                        <?php if (isset($op['can_import'])) : ?>
-                                            <td class="mdc-data-table__cell"><?php echo $op['can_import'] ? 'Yes' : 'No'; ?></td>
-                                        <?php endif; ?>
                                         <?php if ($op_in_db) : ?>
                                             <td class="mdc-data-table__cell">
                                                 <?php echo $label; ?>
@@ -109,8 +103,10 @@ $event_types = $this->config->item('event_types');
                                             </td>
                                         <?php else :
                                             $vet_count = 0;
-                                            if (!$op['__should_ignore']) {
-                                                $vet_count = count($op['__valid_event_types']);
+                                            $op_valid_event_types = get_valid_event_types($op);
+                                            $op_should_be_ignored = should_ignore($op);
+                                            if (!$op_should_be_ignored) {
+                                                $vet_count = count($op_valid_event_types);
                                             }
 
                                             $hidden = [
@@ -119,28 +115,28 @@ $event_types = $this->config->item('event_types');
                                             ];
 
                                             if ($vet_count === 1) {
-                                                $hidden['event'] = $op['__valid_event_types'][0];
+                                                $hidden['event'] = $op_valid_event_types[0];
                                             }
                                         ?>
                                             <td class="mdc-data-table__cell" colspan="2">
-                                                <?php echo form_open(base_url('manage/' . $op['id']), '', $hidden); 
-                                                    if ($vet_count === 1 && !defined('MANAGE_DATA_JSON_FILES')) : ?>
-                                                        <button type="submit" name="action" value="parse" class="mdc-button mdc-button--raised mdc-button--leading">
-                                                            <span class="mdc-button__ripple"></span>
-                                                            <i class="material-icons mdc-button__icon" aria-hidden="true">publish</i>
-                                                            <span class="mdc-button__label">Parse as <?php echo $event_types[$hidden['event']]; ?></span>
-                                                        </button>
-                                                    <?php elseif ($vet_count > 0) : ?>
-                                                        <a href="<?php echo base_url('manage/' . $op['id']); ?>" class="mdc-button mdc-button--outlined">
-                                                            <span class="mdc-button__ripple"></span>
-                                                            <span class="mdc-button__label">Process</span>
-                                                        </a>
-                                                    <?php endif; ?>
-                                                    <button type="submit" name="action" value="ignore" class="mdc-button mdc-button--outlined">
+                                                <?php echo form_open(base_url('manage/' . $op['id']), '', $hidden);
+                                                if ($vet_count === 1 && !defined('MANAGE_DATA_JSON_FILES')) : ?>
+                                                    <button type="submit" name="action" value="parse" class="mdc-button mdc-button--raised mdc-button--leading">
                                                         <span class="mdc-button__ripple"></span>
-                                                        <i class="material-icons mdc-button__icon" aria-hidden="true">not_interested</i>
-                                                        <span class="mdc-button__label">Ignore</span>
+                                                        <i class="material-icons mdc-button__icon" aria-hidden="true">publish</i>
+                                                        <span class="mdc-button__label">Parse as <?php echo $event_types[$hidden['event']]; ?></span>
                                                     </button>
+                                                <?php elseif ($vet_count > 0) : ?>
+                                                    <a href="<?php echo base_url('manage/' . $op['id']); ?>" class="mdc-button mdc-button--outlined">
+                                                        <span class="mdc-button__ripple"></span>
+                                                        <span class="mdc-button__label">Process</span>
+                                                    </a>
+                                                <?php endif; ?>
+                                                <button type="submit" name="action" value="ignore" class="mdc-button mdc-button--outlined">
+                                                    <span class="mdc-button__ripple"></span>
+                                                    <i class="material-icons mdc-button__icon" aria-hidden="true">not_interested</i>
+                                                    <span class="mdc-button__label">Ignore</span>
+                                                </button>
                                                 <?php echo form_close(); ?>
                                             </td>
                                         <?php endif; ?>

@@ -100,6 +100,7 @@ class Assorted extends CI_Model
             ->select_sum("CASE WHEN event = 'killed' THEN 1 ELSE NULL END", 'kills')
             ->select_avg("CASE WHEN event = 'killed' THEN distance ELSE NULL END", 'avg_kill_dist')
             ->from('events')
+            ->where_in('events.event', ['hit', 'killed'])
             ->group_by('weapon')
             ->order_by('kills DESC, hits DESC, weapon ASC');
 

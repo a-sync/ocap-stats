@@ -55,8 +55,18 @@ else :
                                     if ($i['distance'] > 0) {
                                         $distance = html_escape($i['distance']) . ' m';
                                     }
+
+                                    if ($i['event'] === 'connected' || $i['event'] === 'disconnected') {
+                                        $i['event'] = html_escape($i['data']) . ' ' . $i['event'];
+                                    } elseif ($i['event'] === 'captured') {
+                                        $d = json_decode($i['data']);
+                                        $i['event'] = html_escape($d[1]) . ' captured ' . html_escape($d[0]);
+                                    } elseif ($i['event'] === 'terminalHackStarted' || $i['event'] === 'terminalHackUpdate' || $i['event'] === 'terminalHackCanceled') {
+                                        $d = json_decode($i['data']);
+                                        $i['event'] = $i['event'] . ' by ' . html_escape($d[0]);
+                                    }
                                 ?>
-                                    <tr class="mdc-data-table__row">
+                                    <tr class="mdc-data-table__row event__<?php echo html_escape($i['event']); ?>">
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $time; ?></td>
                                         <td class="mdc-data-table__cell cell__title <?php echo $attacker_side_class; ?>">
                                             <span<?php echo $attacker_title; ?>><?php echo $attacker_name; ?></span>

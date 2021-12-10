@@ -16,7 +16,7 @@
                     </a>
                     <a href="<?php echo base_url(''); ?>" class="mdc-tab<?php if ($active === 'ops') echo ' mdc-tab--active';  ?>" role="tab" aria-selected="true" tabindex="2">
                         <span class="mdc-tab__content">
-                            <span class="mdc-tab__icon material-icons" aria-hidden="true">list</span>
+                            <span class="mdc-tab__icon material-icons" aria-hidden="true">calendar_month</span>
                             <span class="mdc-tab__text-label">Ops</span>
                         </span>
                         <span class="mdc-tab__ripple"></span>

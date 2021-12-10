@@ -135,8 +135,9 @@ class Operations extends CI_Model
                             'event' => $event_name,
                             'victim_id' => $e['id'],
                             'attacker_id' => null,
-                            'weapon' => '',
-                            'distance' => 0
+                            'weapon' => null,
+                            'distance' => 0,
+                            'data' => null
                         ];
                     }
                 }
@@ -164,15 +165,15 @@ class Operations extends CI_Model
             'end_message' => ''
         ];
 
-        /** event: hit / killed
-         * [0] frame nr.
-         * [1] event
-         * [2] victim id
-         * [3][0] attacker id / "null" / -1
-         * [3][1] weapon (if attacker is not null)
-         * [4] distance (m)
-         */
         foreach ($data as $e) {
+            /** event: hit / killed
+             * [0] frame nr.
+             * [1] event
+             * [2] victim id
+             * [3][0] attacker id / "null" / -1
+             * [3][1] weapon (if attacker is not null)
+             * [4] distance (m)
+             */
             if ($e[1] === 'hit' || $e[1] === 'killed') {
                 $attacker = null;
                 $weapon = '';
@@ -187,9 +188,17 @@ class Operations extends CI_Model
                     'victim_id' => $e[2],
                     'attacker_id' => $attacker,
                     'weapon' => $weapon,
-                    'distance' => intval($e[4])
+                    'distance' => intval($e[4]),
+                    'data' => null
                 ];
-            } elseif ($e[1] === 'endMission') {
+            }
+            /** event: endMission
+             * [0] frame nr.
+             * [1] event
+             * [2][0] winner
+             * [2][1] message
+             */
+            elseif ($e[1] === 'endMission') {
                 if (is_array($e[2])) {
                     $re['end_winner'] = element(0, $e[2], '');
                     $re['end_message'] = element(1, $e[2], '');
@@ -197,6 +206,88 @@ class Operations extends CI_Model
                     $re['end_winner'] = element(2, $e, '');
                     $re['end_message'] = element(3, $e, '');
                 }
+            }
+            /** event: connected / disconnected
+             * [0] frame nr.
+             * [1] event
+             * [2] message
+             */
+            elseif ($e[1] === 'connected' || $e[1] === 'disconnected') {
+                $re['events'][] = [
+                    'frame' => $e[0],
+                    'event' => $e[1],
+                    'victim_id' => null,
+                    'attacker_id' => null,
+                    'weapon' => null,
+                    'distance' => 0,
+                    'data' => $e[2]
+                ];
+            }
+            /** event: capturedFlag
+             * [0] frame nr.
+             * [1] event
+             * [2][0] unit name
+             * [2][1] unit color
+             * [2][2] objective color
+             * [2][3] objective position
+             */
+            elseif ($e[1] === 'capturedFlag') {
+                array_unshift($e[2], 'flag');
+                $re['events'][] = [
+                    'frame' => $e[0],
+                    'event' => 'captured',
+                    'victim_id' => null,
+                    'attacker_id' => null,
+                    'weapon' => null,
+                    'distance' => 0,
+                    'data' => json_encode($e[2])
+                ];
+            }
+            /** event: captured
+             * [0] frame nr.
+             * [1] event
+             * [2][0] capture type (eg.: flag)
+             * [2][1] unit name
+             * [2][2] unit color
+             * [2][3] objective color
+             * [2][4] objective position
+             */
+            elseif ($e[1] === 'captured') {
+                $re['events'][] = [
+                    'frame' => $e[0],
+                    'event' => $e[1],
+                    'victim_id' => null,
+                    'attacker_id' => null,
+                    'weapon' => null,
+                    'distance' => 0,
+                    'data' => json_encode($e[2])
+                ];
+            }
+            /** event: terminalHackStarted / terminalHackUpdate / terminalHackCanceled
+             * [0] frame nr.
+             * [1] event
+             * [2][0] unit name
+             * [2][1] unit color
+             * [2][2] terminal color
+             * [2][3] terminal identifier
+             * [2][4] terminal position
+             * [2][5] countdown timer
+             */
+            elseif ($e[1] === 'terminalHackStarted' || $e[1] === 'terminalHackUpdate' || $e[1] === 'terminalHackCanceled') {
+                $re['events'][] = [
+                    'frame' => $e[0],
+                    'event' => $e[1],
+                    'victim_id' => null,
+                    'attacker_id' => null,
+                    'weapon' => null,
+                    'distance' => 0,
+                    'data' => json_encode($e[2])
+                ];
+            }
+            /** show what needs to be implemented
+             */
+            else {
+                log_message('error', 'Unknown event type: ' . strval($e[1]) . ' @ frame ' . strval($e[0]));
             }
         }
 
@@ -254,7 +345,7 @@ class Operations extends CI_Model
                 $aid = $e['attacker_id'];
                 $vid = $e['victim_id'];
 
-                if ($vid && $e['event'] === 'killed') {
+                if (!is_null($vid) && $e['event'] === 'killed') {
                     if ($entities[$vid]['deaths'] === 0 || isset($_dead_events[$vid])) { // only count _dead one time to make sure it's registered
                         $entities[$vid]['deaths']++;
                     }
@@ -377,7 +468,7 @@ class Operations extends CI_Model
         return $new_players;
     }
 
-    public function get_ops($events_filter, $id = false, $empty_end_winner_only = false)
+    public function get_ops($events_filter, $id = false)
     {
         if (is_array($events_filter) && count($events_filter) > 0) {
             $this->db->where_in('operations.event', $events_filter);
@@ -414,10 +505,6 @@ class Operations extends CI_Model
             ->join('entities', 'entities.operation_id = operations.id AND entities.player_id != 0', 'LEFT')
             ->group_by('operations.id')
             ->order_by('operations.id', 'DESC');
-
-        if ($empty_end_winner_only) {
-            $this->db->where('operations.end_winner', '');
-        }
 
         return $this->db
             ->get()
@@ -501,6 +588,7 @@ class Operations extends CI_Model
                 'events.event',
                 'events.weapon',
                 'events.distance',
+                'events.data',
 
                 'victim.name AS victim_name',
                 'victim.side AS victim_side',
@@ -513,7 +601,7 @@ class Operations extends CI_Model
                 'attacker_player.id AS attacker_player_id'
             ])
             ->from('events')
-            ->join('entities AS victim', 'victim.id = events.victim_id AND victim.operation_id = ' . $id)
+            ->join('entities AS victim', 'victim.id = events.victim_id AND victim.operation_id = ' . $id, 'LEFT')
             ->join('entities AS attacker', 'attacker.id = events.attacker_id AND attacker.operation_id = ' . $id, 'LEFT')
             ->join('players AS victim_player', 'victim_player.id = victim.player_id', 'LEFT')
             ->join('players AS attacker_player', 'attacker_player.id = attacker.player_id', 'LEFT')

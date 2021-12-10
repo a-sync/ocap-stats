@@ -32,6 +32,14 @@ $event_types = $this->config->item('event_types');
                                     <td class="mdc-data-table__cell"><?php echo html_escape($operation['mission_name']); ?></td>
                                 </tr>
                                 <tr class="mdc-data-table__row">
+                                    <td class="mdc-data-table__cell">Filename</td>
+                                    <td class="mdc-data-table__cell">
+                                        <span class="mdc-typography--caption">
+                                            <a target="_blank" title="OCAP" href="<?php echo OCAP_URL_PREFIX . rawurlencode($operation['filename']); ?>"><?php echo html_escape($operation['filename']); ?></a>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Map</td>
                                     <td class="mdc-data-table__cell"><?php echo html_escape($operation['world_name']); ?></td>
                                 </tr>
@@ -55,12 +63,6 @@ $event_types = $this->config->item('event_types');
                                         <td class="mdc-data-table__cell"><?php echo html_escape($operation['tag']); ?></td>
                                     </tr>
                                 <?php endif; ?>
-                                <?php if (isset($operation['can_import'])) : ?>
-                                    <tr class="mdc-data-table__row">
-                                        <td class="mdc-data-table__cell">Can import</td>
-                                        <td class="mdc-data-table__cell"><?php echo $operation['can_import'] ? 'Yes' : 'No'; ?></td>
-                                    </tr>
-                                <?php endif; ?>
                                 <?php if ($op_parsed) : ?>
                                     <tr class="mdc-data-table__row">
                                         <td class="mdc-data-table__cell">Event</td>
@@ -74,18 +76,22 @@ $event_types = $this->config->item('event_types');
                                 <?php if ($op_parsed) : ?>
                                     <tr class="mdc-data-table__row">
                                         <td class="mdc-data-table__cell">
-                                            Start time (UTC)
-                                            <br>
-                                            &nbsp; &rdca; Europe/London
-                                            <br>
-                                            &nbsp; &rdca; America/New_York
+                                            <p>
+                                                Start time (UTC)
+                                                <br>
+                                                &nbsp; &rdca; Europe/London
+                                                <br>
+                                                &nbsp; &rdca; America/New_York
+                                            </p>
                                         </td>
                                         <td class="mdc-data-table__cell">
-                                            <?php echo html_escape($op['start_time']); ?>
-                                            <br>
-                                            &nbsp; &rdca; <?php echo (new \DateTime($op['start_time'], new \DateTimeZone('UTC')))->setTimezone(new \DateTimeZone('Europe/London'))->format('Y-m-d H:i:s'); ?>
-                                            <br>
-                                            &nbsp; &rdca; <?php echo (new \DateTime($op['start_time'], new \DateTimeZone('UTC')))->setTimezone(new \DateTimeZone('America/New_York'))->format('Y-m-d H:i:s'); ?>
+                                            <p>
+                                                <?php echo html_escape($op['start_time']); ?>
+                                                <br>
+                                                &nbsp; &rdca; <?php echo (new \DateTime($op['start_time'], new \DateTimeZone('UTC')))->setTimezone(new \DateTimeZone('Europe/London'))->format('Y-m-d H:i:s'); ?>
+                                                <br>
+                                                &nbsp; &rdca; <?php echo (new \DateTime($op['start_time'], new \DateTimeZone('UTC')))->setTimezone(new \DateTimeZone('America/New_York'))->format('Y-m-d H:i:s'); ?>
+                                            </p>
                                         </td>
                                     </tr>
                                 <?php endif; ?>
@@ -99,19 +105,11 @@ $event_types = $this->config->item('event_types');
                                         <td class="mdc-data-table__cell"><?php echo html_escape($op['players']); ?></td>
                                     </tr>
                                 <?php endif; ?>
-                                <tr class="mdc-data-table__row">
-                                    <td class="mdc-data-table__cell">Filename</td>
-                                    <td class="mdc-data-table__cell">
-                                        <span class="mdc-typography--caption">
-                                            <a target="_blank" title="OCAP" href="<?php echo OCAP_URL_PREFIX . rawurlencode($operation['filename']); ?>"><?php echo html_escape($operation['filename']); ?></a>
-                                        </span>
-                                    </td>
-                                </tr>
                                 <?php if (defined('MANAGE_DATA_JSON_FILES') || $last_update !== 'none') : ?>
                                     <tr class="mdc-data-table__row">
                                         <td class="mdc-data-table__cell">File date</td>
                                         <td class="mdc-data-table__cell">
-                                            <?php echo html_escape($last_update); ?> (<?php echo html_escape($file_size); ?>)
+                                            <?php echo html_escape($last_update); ?> (<?php echo convert_filesize($file_size); ?>)
                                             <?php if (defined('MANAGE_DATA_JSON_FILES')) : ?>
                                                 <button type="submit" name="action" value="update" class="mdc-button mdc-button--leading">
                                                     <span class="mdc-button__ripple"></span>
@@ -137,7 +135,13 @@ $event_types = $this->config->item('event_types');
                                 <?php if ($op_in_db) : ?>
                                     <tr class="mdc-data-table__row">
                                         <td class="mdc-data-table__cell">Updated</td>
-                                        <td class="mdc-data-table__cell"><?php echo gmdate('Y-m-d H:i:s', $op['updated']); ?></td>
+                                        <td class="mdc-data-table__cell">
+                                            <p>
+                                                <?php echo gmdate('Y-m-d H:i:s', $op['updated']); ?>
+                                                <br>
+                                                <?php echo timespan($op['updated'], '', 2); ?> ago
+                                            </p>
+                                        </td>
                                     </tr>
                                 <?php endif; ?>
                                 <?php if ($op_in_db === false) : ?>

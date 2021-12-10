@@ -41,3 +41,14 @@ define('OPERATIONS_JSON_URL_CONTENT_REGEX', '/let opList = (\[.*\]);\s*\n/');
 define('OPERATION_DATA_JSON_URL_PATH', 'https://game.ofcra.org/ocap/data/');
 define('OCAP_URL_PREFIX', 'https://game.ofcra.org/ocap/#');
 define('ADJUST_HIT_DATA', -1);
+
+if (!function_exists('should_op_be_ignored')) {
+    function should_op_be_ignored($op)
+    {
+        if (isset($op['can_import']) && !$op['can_import']) {
+            return true;
+        }
+
+        return false;
+    }
+}

@@ -222,6 +222,8 @@ img.ocap-link {
 
 .side__, .side__ a:link, .mdc-data-table td.side__ a:visited {
 }
+.side__logic, .side__logic a:link, .mdc-data-table td.side__logic a:visited {
+}
 .side__unknown, .side__unknown a:link, .mdc-data-table td.side__unknown a:visited {
     color: #b29900 !important;
 }

@@ -63,13 +63,5 @@ CTRL+F
   1. format timestamps to local TZ
   1. player profile tabs:
      * rivals (enemy commanders)
-  1. op profile stats grouped for each side
   1. store / support operation timestamps & capture delay
-  1. data corrections UI
-     * ops (show missing/current/possible data)
-       * commanders
-       * winner
-       * start time
-       * in game time
-       * author
-       * invalid entities (multiple entities of players)
+  1. data corrections UI for invalid entities, reassigned players
