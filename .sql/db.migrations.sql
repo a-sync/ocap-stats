@@ -1,4 +1,6 @@
+--
 -- 2021-12-10
+--
 ALTER TABLE `entities` CHANGE `is_player` `is_player` TINYINT(1) UNSIGNED NOT NULL;
 
 ALTER TABLE `events` CHANGE `victim_id` `victim_id` INT(10) UNSIGNED NULL DEFAULT NULL, CHANGE `weapon` `weapon` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL, ADD `data` VARCHAR(255) NULL DEFAULT NULL ;

@@ -20,6 +20,35 @@ $event_types = $this->config->item('event_types');
             <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center">
                 <div class="mdc-data-table mdc-elevation--z2">
                     <div class="mdc-data-table__table-container">
+                        <div class="mdc-tab-bar">
+                            <div class="mdc-tab-scroller">
+                                <div class="mdc-tab-scroller__scroll-area">
+                                    <div class="mdc-tab-scroller__scroll-content">
+                                        <a href="<?php echo base_url('manage/' . $operation['id']); ?>" class="mdc-tab mdc-tab--active" role="tab" aria-selected="true" tabindex="5">
+                                            <span class="mdc-tab__content">
+                                                <span class="mdc-tab__text-label">Process data</span>
+                                            </span>
+                                            <span class="mdc-tab-indicator mdc-tab-indicator--active">
+                                                <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
+                                            </span>
+                                            <span class="mdc-tab__ripple"></span>
+                                        </a>
+                                        <?php if ($op_parsed) : ?>
+                                            <a href="<?php echo base_url('fix-data/' . $operation['id']); ?>" class="mdc-tab" role="tab" aria-selected="false" tabindex="6">
+                                                <span class="mdc-tab__content">
+                                                    <span class="mdc-tab__text-label">Verify data</span>
+                                                </span>
+                                                <span class="mdc-tab-indicator">
+                                                    <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
+                                                </span>
+                                                <span class="mdc-tab__ripple"></span>
+                                            </a>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <?php echo form_open('', ['id' => 'manage-form'], ['id' => $operation['id']]); ?>
                         <table class="mdc-data-table__table">
                             <tbody class="mdc-data-table__content">
@@ -46,7 +75,7 @@ $event_types = $this->config->item('event_types');
                                 <?php if ($op_parsed) : ?>
                                     <tr class="mdc-data-table__row">
                                         <td class="mdc-data-table__cell">Winner</td>
-                                        <td class="mdc-data-table__cell"><?php echo html_escape($op['end_winner']); ?></td>
+                                        <td class="mdc-data-table__cell"><?php print_end_winners($op['end_winner']); ?></td>
                                     </tr>
                                     <tr class="mdc-data-table__row">
                                         <td class="mdc-data-table__cell">End message</td>
@@ -176,7 +205,7 @@ $event_types = $this->config->item('event_types');
                                     </tr>
                                     <tr class="mdc-data-table__row">
                                         <td colspan="2" class="mdc-data-table__cell">
-                                            <button type="submit" name="action" value="parse" class="mdc-button mdc-button--raised mdc-button--leading" <?php echo (defined('MANAGE_DATA_JSON_FILES') && $last_update === 'none') ? ' disabled' : ''; ?>>
+                                            <button type="submit" name="action" value="parse" class="mdc-button<?php echo $should_ignore ? '' : ' mdc-button--raised mdc-button--leading'; ?>" <?php echo (defined('MANAGE_DATA_JSON_FILES') && $last_update === 'none') ? ' disabled' : ''; ?>>
                                                 <span class="mdc-button__ripple"></span>
                                                 <i class="material-icons mdc-button__icon" aria-hidden="true">publish</i>
                                                 <span class="mdc-button__label">Parse operation data</span>

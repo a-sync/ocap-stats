@@ -49,14 +49,41 @@ function print_hq_entity_info($entity)
             <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center">
                 <div class="mdc-data-table mdc-elevation--z2">
                     <div class="mdc-data-table__table-container">
+                        <div class="mdc-tab-bar">
+                            <div class="mdc-tab-scroller">
+                                <div class="mdc-tab-scroller__scroll-area">
+                                    <div class="mdc-tab-scroller__scroll-content">
+                                        <a href="<?php echo base_url('manage/' . $op['id']); ?>" class="mdc-tab" role="tab" aria-selected="true" tabindex="5">
+                                            <span class="mdc-tab__content">
+                                                <span class="mdc-tab__text-label">Process data</span>
+                                            </span>
+                                            <span class="mdc-tab-indicator">
+                                                <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
+                                            </span>
+                                            <span class="mdc-tab__ripple"></span>
+                                        </a>
+                                        <a href="<?php echo base_url('fix-data/' . $op['id']); ?>" class="mdc-tab mdc-tab--active" role="tab" aria-selected="false" tabindex="6">
+                                            <span class="mdc-tab__content">
+                                                <span class="mdc-tab__text-label">Verify data</span>
+                                            </span>
+                                            <span class="mdc-tab-indicator mdc-tab-indicator--active">
+                                                <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
+                                            </span>
+                                            <span class="mdc-tab__ripple"></span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <?php echo form_open('', ['id' => 'op-data-form'], ['id' => $op['id']]); ?>
                         <table class="mdc-data-table__table">
                             <thead>
                                 <tr class="mdc-data-table__header-row">
                                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Data</th>
-                                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Current</th>
-                                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Edit</th>
-                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col">Override</th>
+                                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Current value</th>
+                                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Override</th>
+                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col">Edited</th>
                                 </tr>
                             </thead>
                             <tbody class="mdc-data-table__content">
@@ -95,7 +122,18 @@ function print_hq_entity_info($entity)
                                 </tr>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Players</td>
-                                    <td class="mdc-data-table__cell" colspan="3"><?php echo $op['players']; ?></td>
+                                    <td class="mdc-data-table__cell" colspan="3">
+                                        <p>
+                                            <?php
+                                            $pps = [];
+                                            foreach ($op_sides as $s => $pc) {
+                                                $pps[] = '<span class="side__' . html_escape(strtolower($s)) . '">' . $sides[$s] . '</span> ' . $pc;
+                                            }
+                                            ?>
+                                            <?php echo $op['players']; ?>
+                                            <small>(<?php echo implode(' + ', $pps); ?>)</small>
+                                        </p>
+                                    </td>
                                 </tr>
 
                                 <tr class="mdc-data-table__row">
@@ -121,7 +159,7 @@ function print_hq_entity_info($entity)
                                 </tr>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Winner</td>
-                                    <td class="mdc-data-table__cell"><?php echo html_escape($op['end_winner']); ?></td>
+                                    <td class="mdc-data-table__cell"><?php print_end_winners($op['end_winner']); ?></td>
                                     <td class="mdc-data-table__cell">#todo</td>
                                     <td class="mdc-data-table__cell mdc-data-table__cell--numeric">
                                         <div class="mdc-form-field filters_checkbox">
@@ -219,7 +257,7 @@ function print_hq_entity_info($entity)
                                         </div>
                                     </td>
                                 </tr>
-                                <?php foreach ($op_sides as $s) :
+                                <?php foreach ($op_sides as $s => $pc) :
                                     $cmd_icon = $warn_icon;
                                     if (isset($hq_verified[$s])) {
                                         $cmd_icon = $fixed_icon;
@@ -289,7 +327,7 @@ function print_hq_entity_info($entity)
                                                     <div class="mdc-checkbox__ripple"></div>
                                                 </div>
                                             </div>
-                                            <label for="<?php echo 'op-' . $op['id']; ?>">Data verified</label>
+                                            <label for="<?php echo 'op-' . $op['id']; ?>">All data verified</label>
                                         </div>
                                     </td>
                                 </tr>
@@ -311,6 +349,7 @@ function print_hq_entity_info($entity)
                             </tbody>
                         </table>
                         <?php echo form_close(); ?>
+
                     </div>
                 </div>
             </div>

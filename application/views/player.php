@@ -71,7 +71,7 @@ $aliases_names = array_map('html_escape', array_column($aliases, 'name'));
                                 <?php if (count($aliases) > 0) : ?>
                                     <tr class="mdc-data-table__row">
                                         <td class="mdc-data-table__cell">Aliases</td>
-                                        <td class="mdc-data-table__cell"><?php echo implode(' <br>', $aliases_names); ?></td>
+                                        <td class="mdc-data-table__cell"><p><?php echo implode(' <br>', $aliases_names); ?></p></td>
                                     </tr>
                                 <?php endif; ?>
 

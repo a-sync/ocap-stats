@@ -131,7 +131,7 @@ class Data extends CI_Controller
             ->set_output(json_encode($data, $json_flags));
     }
 
-    public function fix_data()
+    public function fix_data($tab = 'missing')
     {
         $this->load->model('additional_data');
 
@@ -141,7 +141,7 @@ class Data extends CI_Controller
             return count($v) > 1;
         }));
 
-        $ops = $this->additional_data->get_ops_with_missing_data(false, $op_ids_with_resolved_hq);
+        $ops = $this->additional_data->get_ops_with_missing_data(false, $op_ids_with_resolved_hq, ($tab === 'unverified' ? true : false));
 
         $this->_head('fix-data', 'Fix missing OP data');
 
@@ -149,7 +149,8 @@ class Data extends CI_Controller
             'items' => $ops,
             'hq_unambiguous' => $ops_leads_all['unambiguous'],
             'hq_verified' => $ops_leads_all['verified'],
-            'errors' => $errors
+            'errors' => $errors,
+            'tab' => $tab
         ]);
 
         $this->_foot();

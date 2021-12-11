@@ -1,30 +1,65 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
 
-if (count($items) === 0) :
-    echo '<div class="mdc-typography--body1 list__no_items">No ops with missing data...</div>';
-else :
-    echo '<div class="mdc-typography--caption list__total">' . count($items) . ' ops with missing data</div>';
+if($tab === 'unverified') {
+    $items_type = ' unverified ops';
+} else { // missing
+    $items_type = ' ops missing data';
+}
 
-    $event_types = $this->config->item('event_types');
-    $sides = $this->config->item('sides');
-    $warn_icon = '<span class="material-icons">warning</span>';
-    $flaky_icon = '<span class="material-icons">flaky</span>';
-    $fixed_icon = '<span class="material-icons">check</span>';
+if (count($items) === 0) {
+    echo '<div class="mdc-typography--body1 list__no_items">No' . $items_type . '...</div>';
+} else {
+    echo '<div class="mdc-typography--caption list__total">' . count($items) . $items_type . '</div>';
+}
+
+$event_types = $this->config->item('event_types');
+$sides = $this->config->item('sides');
+$warn_icon = '<span class="material-icons">warning</span>';
+$flaky_icon = '<span class="material-icons">flaky</span>';
+$fixed_icon = '<span class="material-icons">check</span>';
 ?>
-    <div class="mdc-layout-grid">
-        <div class="mdc-layout-grid__inner">
+<div class="mdc-layout-grid">
+    <div class="mdc-layout-grid__inner">
 
 
-            <?php if (count($errors) > 0) : ?>
-                <div class="errors mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-                    <h3>⚠️ Errors</h3>
-                    <?php echo implode('<br>', $errors); ?>
-                </div>
-            <?php endif; ?>
+        <?php if (count($errors) > 0) : ?>
+            <div class="errors mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+                <h3>⚠️ Errors</h3>
+                <?php echo implode('<br>', $errors); ?>
+            </div>
+        <?php endif; ?>
 
-            <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center">
-                <div class="mdc-data-table mdc-elevation--z2">
-                    <div class="mdc-data-table__table-container">
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center">
+            <div class="mdc-data-table mdc-elevation--z2">
+                <div class="mdc-data-table__table-container">
+                    <div class="mdc-tab-bar">
+                        <div class="mdc-tab-scroller">
+                            <div class="mdc-tab-scroller__scroll-area">
+                                <div class="mdc-tab-scroller__scroll-content">
+                                    <a href="<?php echo base_url('fix-data'); ?>" class="mdc-tab<?php if ($tab === 'missing') echo ' mdc-tab--active';  ?>" role="tab" aria-selected="true" tabindex="5">
+                                        <span class="mdc-tab__content">
+                                            <span class="mdc-tab__text-label">Missing data</span>
+                                        </span>
+                                        <span class="mdc-tab-indicator<?php if ($tab === 'missing') echo ' mdc-tab-indicator--active';  ?>">
+                                            <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
+                                        </span>
+                                        <span class="mdc-tab__ripple"></span>
+                                    </a>
+                                    <a href="<?php echo base_url('fix-data/unverified'); ?>" class="mdc-tab<?php if ($tab === 'unverified') echo ' mdc-tab--active';  ?>" role="tab" aria-selected="false" tabindex="6">
+                                        <span class="mdc-tab__content">
+                                            <span class="mdc-tab__text-label">Unverified</span>
+                                        </span>
+                                        <span class="mdc-tab-indicator<?php if ($tab === 'unverified') echo ' mdc-tab-indicator--active';  ?>">
+                                            <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
+                                        </span>
+                                        <span class="mdc-tab__ripple"></span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <?php if (count($items) > 0) : ?>
                         <table class="mdc-data-table__table sortable">
                             <thead>
                                 <tr class="mdc-data-table__header-row">
@@ -73,9 +108,19 @@ else :
                                             ?>
                                         </td>
                                         <td class="mdc-data-table__cell">
-                                            <span title="<?php echo html_escape($i['end_message']); ?>" class="side__<?php echo html_escape(strtolower($i['end_winner'])); ?>"><?php echo $sides[$i['end_winner']]; ?></span>
+                                            <?php
+                                            $end_message_icon = '';
+                                            if (is_null($i['ad_end_message'])) {
+                                                if ($i['end_message'] === '') {
+                                                    $end_message_icon = ' ⚠️';
+                                                }
+                                            } else {
+                                                $end_message_icon = ' ✔️';
+                                            }
+                                            ?>
+                                            <?php print_end_winners($i['end_winner'], $i['end_message'].$end_message_icon); ?>
                                             <?php if (is_null($i['ad_end_winner'])) {
-                                                if (!$i['end_winner']) {
+                                                if ($i['end_winner'] === '') {
                                                     echo $warn_icon;
                                                 }
                                             } else {
@@ -85,7 +130,7 @@ else :
                                         <td class="mdc-data-table__cell">
                                             <?php echo html_escape($i['mission_author']); ?>
                                             <?php if (is_null($i['ad_mission_author'])) {
-                                                if (!$i['mission_author']) {
+                                                if ($i['mission_author'] === '') {
                                                     echo $warn_icon;
                                                 }
                                             } else {
@@ -108,12 +153,11 @@ else :
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
-                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
-
-
         </div>
-    </div>
 
-<?php endif; ?>
+
+    </div>
+</div>

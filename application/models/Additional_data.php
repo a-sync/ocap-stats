@@ -128,11 +128,11 @@ class Additional_data extends CI_Model
             }
         }
 
-        $leads = $this->_get_commander_prospects($events_filter, $op_ids);
+        $prospects = $this->_get_commander_prospects($events_filter, $op_ids);
 
         $op_leads = [];
         $ambiguous_op_leads = [];
-        foreach ($leads as $l) {
+        foreach ($prospects as $l) {
             $op_id = $l['operation_id'];
             $side = $l['side'];
 
@@ -168,10 +168,10 @@ class Additional_data extends CI_Model
                 $ambiguous_op_leads[$op_id][$side][] = $l;
             }
         }
+        $prospects = null;
+        $unambiguous_op_leads = $op_leads;
 
         $verified_op_leads = $this->_get_verified_commanders($events_filter, $op_ids);
-
-        $unambiguous_op_leads = $op_leads;
         foreach ($verified_op_leads as $op_id => $ol) {
             // if (isset($op_leads[$op_id])) {
             //     $op_leads[$op_id] = [];
@@ -183,14 +183,14 @@ class Additional_data extends CI_Model
 
         if ($return_ops_data === true) {
             return [
-                'unambiguous' => $unambiguous_op_leads,
                 'ambiguous' => $ambiguous_op_leads,
+                'unambiguous' => $unambiguous_op_leads,
                 'verified' => $verified_op_leads,
                 'resolved' => $op_leads
             ];
         }
-        $unambiguous_op_leads = null;
         $ambiguous_op_leads = null;
+        $unambiguous_op_leads = null;
         $verified_op_leads = null;
 
         $matching_sides = [];
@@ -222,7 +222,8 @@ class Additional_data extends CI_Model
                 }
 
                 if ($l['end_winner'] !== '') {
-                    if ($l['end_winner'] === $l['side']) {
+                    $winner_sides = explode('/', $l['end_winner']);
+                    if (in_array($l['side'], $winner_sides)) {
                         $commanders[$id][$l['side']]['win']++;
                         $commanders[$id]['win_total']++;
                     } else {
@@ -442,7 +443,7 @@ class Additional_data extends CI_Model
         ];
     }
 
-    public function get_ops_with_missing_data($id = false, $op_ids_with_unambiguous_hq = [])
+    public function get_ops_with_missing_data($id = false, $op_ids_with_unambiguous_hq = [], $all_unverified = false)
     {
         if ($id !== false) {
             if (!is_array($id)) {
@@ -479,13 +480,17 @@ class Additional_data extends CI_Model
             ->join('ops_additional_data AS oad', 'oad.operation_id = operations.id', 'LEFT')
             ->where('operations.event !=', '')
             ->where('IFNULL(oad.verified, 0) !=', 1)
-            ->group_start()
-            ->or_where('operations.mission_author', '')
-            ->or_where('operations.start_time LIKE', '%00:00:00')
-            ->or_where('operations.end_winner', '')
-            ->or_where_not_in('operations.id', $op_ids_with_unambiguous_hq)
-            ->group_end()
             ->order_by('operations.id', 'DESC');
+
+        if (!$all_unverified) {
+            $this->db
+                ->group_start()
+                ->or_where('operations.mission_author', '')
+                ->or_where('operations.start_time LIKE', '%00:00:00')
+                ->or_where('operations.end_winner', '')
+                ->or_where_not_in('operations.id', $op_ids_with_unambiguous_hq)
+                ->group_end();
+        }
 
         return $this->db
             ->get()
@@ -495,7 +500,10 @@ class Additional_data extends CI_Model
     public function get_op_sides($id)
     {
         $this->db
-            ->select('side')
+            ->select([
+                'side',
+                'COUNT(DISTINCT entities.player_id) AS players'
+            ])
             ->from('entities')
             ->where('entities.operation_id', $id)
             ->where('entities.is_player', 1)
@@ -505,6 +513,6 @@ class Additional_data extends CI_Model
             ->get()
             ->result_array();
 
-        return array_column($re, 'side');
+        return array_column($re, 'players', 'side');
     }
 }

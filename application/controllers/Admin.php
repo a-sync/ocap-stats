@@ -256,6 +256,7 @@ class Admin extends CI_Controller
                                                     $this->_json_del($operation);
                                                 }
                                                 $errors = array_merge($errors, $err);
+                                                log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] operation (' . $operation['id'] . ') parsing finished (errors: ' . count($errors) . ')');
 
                                                 if (count($errors) === 0 && $redirect === 'list') {
                                                     return redirect(base_url('manage/#id-' . $operation['id']));

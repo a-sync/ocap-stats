@@ -79,6 +79,10 @@ class App extends CI_Controller
         }
     }
 
+    public function favicon_ico() {
+        show_404('', false);
+    }
+
     private function _filters()
     {
         $events = $this->input->get('events');
@@ -270,6 +274,7 @@ class App extends CI_Controller
         $errors = [];
         $op = null;
         $op_commanders = [];
+        $op_sides = [];
         $op_events = [];
         $op_weapons = [];
         $op_entities = [];
@@ -281,6 +286,8 @@ class App extends CI_Controller
                 if (isset($op_commanders_data['resolved'][$op['id']])) {
                     $op_commanders = $op_commanders_data['resolved'][$op['id']];
                 }
+
+                $op_sides = $this->additional_data->get_op_sides($op['id']);
 
                 if ($tab === 'events') {
                     $op_events = $this->operations->get_events_by_id($op['id']);
@@ -301,7 +308,8 @@ class App extends CI_Controller
         $this->load->view('op', [
             'op' => $op,
             'errors' => $errors,
-            'op_commanders' => $op_commanders
+            'op_commanders' => $op_commanders,
+            'op_sides' => $op_sides
         ]);
 
         if ($op) {

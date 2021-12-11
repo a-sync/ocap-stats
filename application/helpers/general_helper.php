@@ -52,3 +52,24 @@ if (!function_exists('get_valid_event_types')) {
         return array_keys($CI->config->item('event_types'));
     }
 }
+
+if (!function_exists('print_end_winners')) {
+    function print_end_winners($end_winner, $end_message = null)
+    {
+        $CI = &get_instance();
+        $sides = $CI->config->item('sides');
+
+        $title = '';
+        if (!is_null($end_message)) {
+            $title = ' title="'.html_escape($end_message).'"';
+        }
+
+        $winner_sides = explode('/', $end_winner);
+        $winners = [];
+        foreach ($winner_sides as $s) {
+            $winners[] = '<span class="side__' . html_escape(strtolower($s)) . '"' . $title . '>' . $sides[$s] . '</span>';
+        }
+
+        echo implode(' / ', $winners);
+    }
+}

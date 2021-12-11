@@ -9,7 +9,7 @@
                 <div class="mdc-tab-scroller__scroll-content">
                     <a href="<?php echo base_url('manage'); ?>" class="mdc-tab" role="tab" aria-selected="true" tabindex="1">
                         <span class="mdc-tab__content">
-                            <span class="mdc-tab__icon material-icons" aria-hidden="true">checklist_rtl</span>
+                            <span class="mdc-tab__icon material-icons" aria-hidden="true">rule</span>
                             <span class="mdc-tab__text-label">Operations</span>
                         </span>
                         <span class="mdc-tab__ripple"></span>

@@ -122,7 +122,8 @@ class Players extends CI_Model
                 'operations.filename',
                 'operations.event',
                 'operations.start_time',
-                'operations.end_winner'
+                'operations.end_winner',
+                'operations.end_message'
             ])
             ->select_sum('shots')
             ->select_sum('hits')
@@ -222,21 +223,24 @@ class Players extends CI_Model
             ->select_sum("CASE WHEN events.event = 'killed' AND attacker.side = victim.side THEN 1 ELSE 0 END", 'fkills')
             ->select_avg("CASE WHEN events.event = 'killed' THEN events.distance ELSE NULL END", 'avg_kill_dist')
             ->from('events')
-            ->join('entities AS attacker', 'attacker.id = events.attacker_id AND attacker.operation_id = events.operation_id')
-            ->join('entities AS victim', 'victim.id = events.victim_id AND victim.operation_id = events.operation_id')
+            ->join('entities AS attacker', 'attacker.id = events.attacker_id AND attacker.operation_id = events.operation_id', $type === 'attackers' ? 'LEFT' : 'INNER')
+            ->join('entities AS victim', 'victim.id = events.victim_id AND victim.operation_id = events.operation_id', $type === 'victims' ? 'LEFT' : 'INNER')
             ->where('victim.player_id != attacker.player_id')
             ->where_in('events.event', ['hit', 'killed'])
-            ->group_by('players.id')
             ->order_by('kills DESC, hits DESC, fkills ASC, fhits ASC, players.name ASC');
 
         if ($type === 'attackers') {
             $this->db
-                ->join('players', 'players.id = attacker.player_id')
-                ->where('victim.player_id', $id);
+                ->join('players', 'players.id = attacker.player_id', 'LEFT')
+                ->select('attacker.class')
+                ->where('victim.player_id', $id)
+                ->group_by('players.id, attacker.class');
         } elseif ($type === 'victims') {
             $this->db
-                ->join('players', 'players.id = victim.player_id')
-                ->where('attacker.player_id', $id);
+                ->join('players', 'players.id = victim.player_id', 'LEFT')
+                ->select('victim.class')
+                ->where('attacker.player_id', $id)
+                ->group_by('players.id, victim.class');
         }
 
         return $this->db->get()->result_array();

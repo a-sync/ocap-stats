@@ -53,7 +53,6 @@ h1 {
     margin-top: 20px;
 }
 footer {
-    margin-top: 20px;
     text-align: center;
 }
 footer .render-stats {
@@ -178,8 +177,8 @@ img.ocap-link {
         color: var(--mdc-theme-error);
     }
 
-    .mdc-checkbox__background {
-        border-color: #222222 !important;
+    .mdc-checkbox__native-control:enabled:not(:checked)~.mdc-checkbox__background {
+        border-color: #444444 !important;
     }
 
     a:link {

@@ -439,6 +439,30 @@ class Operations extends CI_Model
         return $errors;
     }
 
+    public function purge($id)
+    {
+        $del_events = $this->db->delete('events', ['operation_id' => $id]);
+        $del_entities = $this->db->delete('entities', ['operation_id' => $id]);
+        $del_operation = $this->db->delete('operations', ['id' => $id]);
+
+        if ($del_events && $del_entities && $del_operation) {
+            return false;
+        } else {
+            $errors = [];
+            if ($del_events === false) {
+                $errors[] = 'Error when deleting from events table. ';
+            }
+            if ($del_entities === false) {
+                $errors[] = 'Error when deleting from entities table. ';
+            }
+            if ($del_operation === false) {
+                $errors[] = 'Error when deleting from operations table. ';
+            }
+
+            return $errors;
+        }
+    }
+
     private function get_all_players()
     {
         return $this->db
@@ -554,30 +578,6 @@ class Operations extends CI_Model
             ->order_by('is_player DESC, kills DESC, deaths ASC, hits DESC, vkills DESC, shots ASC, id ASC');
 
         return $this->db->get()->result_array();
-    }
-
-    public function purge($id)
-    {
-        $del_events = $this->db->delete('events', ['operation_id' => $id]);
-        $del_entities = $this->db->delete('entities', ['operation_id' => $id]);
-        $del_operation = $this->db->delete('operations', ['id' => $id]);
-
-        if ($del_events && $del_entities && $del_operation) {
-            return false;
-        } else {
-            $errors = [];
-            if ($del_events === false) {
-                $errors[] = 'Error when deleting from events table. ';
-            }
-            if ($del_entities === false) {
-                $errors[] = 'Error when deleting from entities table. ';
-            }
-            if ($del_operation === false) {
-                $errors[] = 'Error when deleting from operations table. ';
-            }
-
-            return $errors;
-        }
     }
 
     public function get_events_by_id($id)
