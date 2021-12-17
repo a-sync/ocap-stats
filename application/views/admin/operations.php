@@ -80,7 +80,7 @@ $event_types = $this->config->item('event_types');
                                                 <?php echo $op['id']; ?>
                                             </a>
                                         </td>
-                                        <td class="mdc-data-table__cell" <?php echo $start_time_title; ?>><?php echo html_escape($op['date']); ?></td>
+                                        <td class="mdc-data-table__cell"><span <?php echo $start_time_title; ?>><?php echo html_escape($op['date']); ?></span></td>
                                         <td class="mdc-data-table__cell cell__title">
                                             <?php echo html_escape($op['mission_name']); ?> (<span class="mdc-typography--subtitle2"><?php echo html_escape($op['world_name']); ?></span>)
                                             <br>
@@ -127,7 +127,7 @@ $event_types = $this->config->item('event_types');
                                                         <span class="mdc-button__label">Parse as <?php echo $event_types[$hidden['event']]; ?></span>
                                                     </button>
                                                 <?php elseif ($vet_count > 0) : ?>
-                                                    <a href="<?php echo base_url('manage/' . $op['id']); ?>" class="mdc-button mdc-button--outlined">
+                                                    <a href="<?php echo base_url('manage/' . $op['id']); ?>" class="mdc-button mdc-button--raised mdc-button--leading">
                                                         <span class="mdc-button__ripple"></span>
                                                         <span class="mdc-button__label">Process</span>
                                                     </a>

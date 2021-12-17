@@ -120,10 +120,13 @@ class Players extends CI_Model
                 'operations.mission_duration',
                 'operations.world_name',
                 'operations.filename',
+                'operations.tag',
                 'operations.event',
+                'operations.date',
                 'operations.start_time',
                 'operations.end_winner',
-                'operations.end_message'
+                'operations.end_message',
+                '(SELECT COUNT(DISTINCT ents.player_id) FROM entities AS ents WHERE ents.operation_id = operations.id) AS players_total'
             ])
             ->select_sum('shots')
             ->select_sum('hits')
@@ -132,10 +135,10 @@ class Players extends CI_Model
             ->select_sum('fkills')
             ->select_sum('vkills')
             ->select_sum('deaths')
-            ->from('entities')
-            ->where('entities.player_id', $id)
+            ->from('operations')
+            ->join('entities', 'entities.operation_id = operations.id', 'RIGHT')
             ->join('players', 'players.id = entities.player_id')
-            ->join('operations', 'operations.id = entities.operation_id')
+            ->where('entities.player_id', $id)
             ->group_by('entities.id, entities.operation_id')
             ->order_by('entities.operation_id DESC, entities.id ASC');
 

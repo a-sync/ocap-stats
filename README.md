@@ -64,4 +64,4 @@ CTRL+F
   1. player profile tabs:
      * rivals (enemy commanders)
   1. store / support operation timestamps & capture delay
-  1. data corrections UI for invalid entities, reassigned players
+  1. ignore / reassign entities

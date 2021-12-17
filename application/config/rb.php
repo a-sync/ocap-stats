@@ -9,28 +9,37 @@ $config['site_logo'] = 'public/rb_logo.png';
 
 $config['event_types'] = [
     'tvt' => 'TvT',
+    'tvt2' => 'TvT II',
     'if' => 'Iron Front',
-    'brutal' => 'Brutal'
+    'brutal' => 'Brutal',
+    'ltvt' => 'Light TvT'
 ];
 
-$config['default_selected_event_types'] = ['tvt'];
+$config['default_selected_event_types'] = [
+    'tvt',
+    'tvt2'
+];
 
 $config['tag_event_types'] = [
     'TvT' => 'tvt',
     'TvT_II' => 'tvt',
-    'TvT_Tactical' => 'tvt',
+    'TvT_Tactical' => 'ltvt',
     'IF' => 'if',
     'Brutal' => 'brutal',
 ];
 
 // Keep these ordered by rank
-$config['hq_group_names'] = [
+$config['cmd_group_names'] = [
+    'HQ',
+    'Штаб',
     'Alpha 1-1',
-    'Alpha 1-2'
+    'Alpha 1-2',
+    'Альфа 1-1',
+    'Альфа 1-2'
 ];
 
 // Keep these ordered by rank
-$config['hq_role_names'] = [];
+$config['cmd_role_names'] = [];
 
 $config['sides'] = [
     'WEST' => 'BLUFOR',

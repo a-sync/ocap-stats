@@ -28,7 +28,7 @@ $config['tag_event_types'] = [
 ];
 
 // Keep these ordered by rank
-$config['hq_group_names'] = [
+$config['cmd_group_names'] = [
     'CMD',
     'PLTHQ',
     'OPF PLT HQ',
@@ -40,7 +40,7 @@ $config['hq_group_names'] = [
 ];
 
 // Keep these ordered by rank
-$config['hq_role_names'] = [
+$config['cmd_role_names'] = [
     'Company Commander',
     'Platoon Leader',
     'Platoon Leader (HVT)',

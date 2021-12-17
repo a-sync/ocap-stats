@@ -28,6 +28,22 @@ $sides = $this->config->item('sides');
                                     <td class="mdc-data-table__cell"><?php echo $op['id']; ?></td>
                                 </tr>
                                 <tr class="mdc-data-table__row">
+                                    <td class="mdc-data-table__cell">Date</td>
+                                    <td class="mdc-data-table__cell"><?php echo $op['date']; ?></td>
+                                </tr>
+                                <tr class="mdc-data-table__row">
+                                    <td class="mdc-data-table__cell">Start time</td>
+                                    <td class="mdc-data-table__cell"><?php echo $op['start_time']; ?></td>
+                                </tr>
+                                <tr class="mdc-data-table__row">
+                                    <td class="mdc-data-table__cell">Tag</td>
+                                    <td class="mdc-data-table__cell"><?php echo html_escape($op['tag']); ?></td>
+                                </tr>
+                                <tr class="mdc-data-table__row">
+                                    <td class="mdc-data-table__cell">Event</td>
+                                    <td class="mdc-data-table__cell"><?php echo $event_types[$op['event']]; ?></td>
+                                </tr>
+                                <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Mission</td>
                                     <td class="mdc-data-table__cell">
                                         <?php echo html_escape($op['mission_name']); ?>
@@ -42,32 +58,8 @@ $sides = $this->config->item('sides');
                                     <td class="mdc-data-table__cell"><?php echo html_escape($op['world_name']); ?></td>
                                 </tr>
                                 <tr class="mdc-data-table__row">
-                                    <td class="mdc-data-table__cell">Winner</td>
-                                    <td class="mdc-data-table__cell"><?php print_end_winners($op['end_winner']); ?></td>
-                                </tr>
-                                <tr class="mdc-data-table__row">
-                                    <td class="mdc-data-table__cell">End message</td>
-                                    <td class="mdc-data-table__cell"><?php echo html_escape($op['end_message']); ?></td>
-                                </tr>
-                                <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Author</td>
                                     <td class="mdc-data-table__cell"><?php echo html_escape($op['mission_author']); ?></td>
-                                </tr>
-                                <tr class="mdc-data-table__row">
-                                    <td class="mdc-data-table__cell">Tag</td>
-                                    <td class="mdc-data-table__cell"><?php echo html_escape($op['tag']); ?></td>
-                                </tr>
-                                <tr class="mdc-data-table__row">
-                                    <td class="mdc-data-table__cell">Event</td>
-                                    <td class="mdc-data-table__cell"><?php echo $event_types[$op['event']]; ?></td>
-                                </tr>
-                                <tr class="mdc-data-table__row">
-                                    <td class="mdc-data-table__cell">Date</td>
-                                    <td class="mdc-data-table__cell"><?php echo $op['date']; ?></td>
-                                </tr>
-                                <tr class="mdc-data-table__row">
-                                    <td class="mdc-data-table__cell">Start time</td>
-                                    <td class="mdc-data-table__cell"><?php echo $op['start_time']; ?></td>
                                 </tr>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Duration</td>
@@ -83,10 +75,18 @@ $sides = $this->config->item('sides');
                                                 $pps[] = '<span class="side__' . html_escape(strtolower($s)) . '">' . $sides[$s] . '</span> ' . $pc;
                                             }
                                             ?>
-                                            <?php echo $op['players']; ?>
+                                            <?php echo $op['players_total']; ?>
                                             <small>(<?php echo implode(' + ', $pps); ?>)</small>
                                         </p>
                                     </td>
+                                </tr>
+                                <tr class="mdc-data-table__row">
+                                    <td class="mdc-data-table__cell">Winner</td>
+                                    <td class="mdc-data-table__cell"><?php print_end_winners($op['end_winner']); ?></td>
+                                </tr>
+                                <tr class="mdc-data-table__row">
+                                    <td class="mdc-data-table__cell">End message</td>
+                                    <td class="mdc-data-table__cell"><?php echo html_escape($op['end_message']); ?></td>
                                 </tr>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Commanders</td>

@@ -46,7 +46,7 @@ $config['tag_event_types'] = [];
 
 /*
 |--------------------------------------------------------------------------
-| HQ group names
+| CMD group names
 |--------------------------------------------------------------------------
 |
 | List of group names to select the commanders from.  
@@ -54,14 +54,14 @@ $config['tag_event_types'] = [];
 |
 | IMPORTANT: Keep these ordered by rank!
 */
-$config['hq_group_names'] = [
+$config['cmd_group_names'] = [
     'Alpha 1-1',
     'Alpha 2-1'
 ];
 
 /*
 |--------------------------------------------------------------------------
-| HQ role names
+| CMD role names
 |--------------------------------------------------------------------------
 |
 | List of role names to consider when selecting the commanders.  
@@ -69,7 +69,7 @@ $config['hq_group_names'] = [
 |
 | IMPORTANT: Keep these ordered by rank!
 */
-$config['hq_role_names'] = [];
+$config['cmd_role_names'] = [];
 
 /*
 |--------------------------------------------------------------------------

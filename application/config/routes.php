@@ -62,10 +62,11 @@ $route['clearcache'] = 'admin/clearcache';
 $route['update'] = 'admin/update';
 $route['manage'] = 'admin/operations';
 $route['manage/(:num)'] = 'admin/process/$1';
+
+$route['manage/(:num)/verify'] = 'data/verify/$1';
 $route['add-alias'] = 'data/add_alias';
 $route['fix-data'] = 'data/fix_data';
 $route['fix-data/unverified'] = 'data/fix_data/unverified';
-$route['fix-data/(:num)'] = 'data/override_op_data/$1';
 
 $route['players'] = 'app/players';
 $route['player/(:num)'] = 'app/player/$1';

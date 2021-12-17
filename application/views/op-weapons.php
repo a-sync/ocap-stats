@@ -62,7 +62,7 @@ $sides = $this->config->item('sides');
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['fhits']; ?></td>
                                     <?php endif; ?>
                                     <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['fkills']; ?></td>
-                                    <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['players']; ?></td>
+                                    <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['players_total']; ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>

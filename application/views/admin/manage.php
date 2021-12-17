@@ -1,6 +1,7 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
 
 $event_types = $this->config->item('event_types');
+$sides = $this->config->item('sides');
 ?>
 
 <div class="mdc-layout-grid">
@@ -14,9 +15,7 @@ $event_types = $this->config->item('event_types');
             </div>
         <?php endif; ?>
 
-        <?php if ($operation) :
-            $op_parsed = ($op_in_db && $op && $op['event'] !== '') ? true : false;
-        ?>
+        <?php if ($operation) : ?>
             <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center">
                 <div class="mdc-data-table mdc-elevation--z2">
                     <div class="mdc-data-table__table-container">
@@ -33,8 +32,8 @@ $event_types = $this->config->item('event_types');
                                             </span>
                                             <span class="mdc-tab__ripple"></span>
                                         </a>
-                                        <?php if ($op_parsed) : ?>
-                                            <a href="<?php echo base_url('fix-data/' . $operation['id']); ?>" class="mdc-tab" role="tab" aria-selected="false" tabindex="6">
+                                        <?php if ($op_in_db && $op && $op['event'] !== '') : ?>
+                                            <a href="<?php echo base_url('manage/' . $operation['id'] . '/verify'); ?>" class="mdc-tab" role="tab" aria-selected="false" tabindex="6">
                                                 <span class="mdc-tab__content">
                                                     <span class="mdc-tab__text-label">Verify data</span>
                                                 </span>
@@ -57,6 +56,17 @@ $event_types = $this->config->item('event_types');
                                     <td class="mdc-data-table__cell"><?php echo html_escape($operation['id']); ?></td>
                                 </tr>
                                 <tr class="mdc-data-table__row">
+                                    <td class="mdc-data-table__cell">Date</td>
+                                    <td class="mdc-data-table__cell"><?php echo html_escape($operation['date']); ?></td>
+                                </tr>
+
+                                <?php if (isset($operation['tag'])) : ?>
+                                    <tr class="mdc-data-table__row">
+                                        <td class="mdc-data-table__cell">Tag</td>
+                                        <td class="mdc-data-table__cell"><?php echo html_escape($operation['tag']); ?></td>
+                                    </tr>
+                                <?php endif; ?>
+                                <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Mission</td>
                                     <td class="mdc-data-table__cell"><?php echo html_escape($operation['mission_name']); ?></td>
                                 </tr>
@@ -72,71 +82,13 @@ $event_types = $this->config->item('event_types');
                                     <td class="mdc-data-table__cell">Map</td>
                                     <td class="mdc-data-table__cell"><?php echo html_escape($operation['world_name']); ?></td>
                                 </tr>
-                                <?php if ($op_parsed) : ?>
-                                    <tr class="mdc-data-table__row">
-                                        <td class="mdc-data-table__cell">Winner</td>
-                                        <td class="mdc-data-table__cell"><?php print_end_winners($op['end_winner']); ?></td>
-                                    </tr>
-                                    <tr class="mdc-data-table__row">
-                                        <td class="mdc-data-table__cell">End message</td>
-                                        <td class="mdc-data-table__cell"><?php echo html_escape($op['end_message']); ?></td>
-                                    </tr>
-                                    <tr class="mdc-data-table__row">
-                                        <td class="mdc-data-table__cell">Author</td>
-                                        <td class="mdc-data-table__cell"><?php echo html_escape($op['mission_author']); ?></td>
-                                    </tr>
-                                <?php endif; ?>
-                                <?php if (isset($operation['tag'])) : ?>
-                                    <tr class="mdc-data-table__row">
-                                        <td class="mdc-data-table__cell">Tag</td>
-                                        <td class="mdc-data-table__cell"><?php echo html_escape($operation['tag']); ?></td>
-                                    </tr>
-                                <?php endif; ?>
-                                <?php if ($op_parsed) : ?>
-                                    <tr class="mdc-data-table__row">
-                                        <td class="mdc-data-table__cell">Event</td>
-                                        <td class="mdc-data-table__cell"><?php echo $event_types[$op['event']]; ?></td>
-                                    </tr>
-                                <?php endif; ?>
-                                <tr class="mdc-data-table__row">
-                                    <td class="mdc-data-table__cell">Date</td>
-                                    <td class="mdc-data-table__cell"><?php echo html_escape($operation['date']); ?></td>
-                                </tr>
-                                <?php if ($op_parsed) : ?>
-                                    <tr class="mdc-data-table__row">
-                                        <td class="mdc-data-table__cell">
-                                            <p>
-                                                Start time (UTC)
-                                                <br>
-                                                &nbsp; &rdca; Europe/London
-                                                <br>
-                                                &nbsp; &rdca; America/New_York
-                                            </p>
-                                        </td>
-                                        <td class="mdc-data-table__cell">
-                                            <p>
-                                                <?php echo html_escape($op['start_time']); ?>
-                                                <br>
-                                                &nbsp; &rdca; <?php echo (new \DateTime($op['start_time'], new \DateTimeZone('UTC')))->setTimezone(new \DateTimeZone('Europe/London'))->format('Y-m-d H:i:s'); ?>
-                                                <br>
-                                                &nbsp; &rdca; <?php echo (new \DateTime($op['start_time'], new \DateTimeZone('UTC')))->setTimezone(new \DateTimeZone('America/New_York'))->format('Y-m-d H:i:s'); ?>
-                                            </p>
-                                        </td>
-                                    </tr>
-                                <?php endif; ?>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Duration</td>
                                     <td class="mdc-data-table__cell"><?php echo floor(intval($operation['mission_duration']) / 60); ?>m</td>
                                 </tr>
-                                <?php if ($op_parsed) : ?>
-                                    <tr class="mdc-data-table__row">
-                                        <td class="mdc-data-table__cell">Players</td>
-                                        <td class="mdc-data-table__cell"><?php echo html_escape($op['players']); ?></td>
-                                    </tr>
-                                <?php endif; ?>
                                 <?php if (defined('MANAGE_DATA_JSON_FILES') || $last_update !== 'none') : ?>
                                     <tr class="mdc-data-table__row">
-                                        <td class="mdc-data-table__cell">File date</td>
+                                        <td class="mdc-data-table__cell">File date (size)</td>
                                         <td class="mdc-data-table__cell">
                                             <?php echo html_escape($last_update); ?> (<?php echo convert_filesize($file_size); ?>)
                                             <?php if (defined('MANAGE_DATA_JSON_FILES')) : ?>
@@ -158,18 +110,6 @@ $event_types = $this->config->item('event_types');
                                                     </button>
                                                 <?php endif; ?>
                                             <?php endif; ?>
-                                        </td>
-                                    </tr>
-                                <?php endif; ?>
-                                <?php if ($op_in_db) : ?>
-                                    <tr class="mdc-data-table__row">
-                                        <td class="mdc-data-table__cell">Updated</td>
-                                        <td class="mdc-data-table__cell">
-                                            <p>
-                                                <?php echo gmdate('Y-m-d H:i:s', $op['updated']); ?>
-                                                <br>
-                                                <?php echo timespan($op['updated'], '', 2); ?> ago
-                                            </p>
                                         </td>
                                     </tr>
                                 <?php endif; ?>
@@ -217,7 +157,17 @@ $event_types = $this->config->item('event_types');
                                             </button>
                                         </td>
                                     </tr>
-                                <?php elseif ($op_in_db === true) : ?>
+                                <?php else : ?>
+                                    <tr class="mdc-data-table__row">
+                                        <td class="mdc-data-table__cell">Updated</td>
+                                        <td class="mdc-data-table__cell">
+                                            <p>
+                                                <?php echo gmdate('Y-m-d H:i:s', $op['updated']); ?>
+                                                <br>
+                                                <?php echo timespan($op['updated'], '', 2); ?> ago
+                                            </p>
+                                        </td>
+                                    </tr>
                                     <tr class="mdc-data-table__row">
                                         <td colspan="2" class="mdc-data-table__cell">
                                             <button type="submit" name="action" value="purge" class="mdc-button mdc-button--outlined">

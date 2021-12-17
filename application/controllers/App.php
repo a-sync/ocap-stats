@@ -79,7 +79,8 @@ class App extends CI_Controller
         }
     }
 
-    public function favicon_ico() {
+    public function favicon_ico()
+    {
         show_404('', false);
     }
 
@@ -240,7 +241,8 @@ class App extends CI_Controller
                     'player_menu' => $this->load->view('player-menu', [
                         'active' => 'attackers',
                         'player_url' => base_url('player/' . $player['id'])
-                    ], true)
+                    ], true),
+                    'tab' => 'attackers'
                 ]);
             } elseif ($tab === 'victims') {
                 $this->load->view('player-attackers-victims', [
@@ -248,7 +250,8 @@ class App extends CI_Controller
                     'player_menu' => $this->load->view('player-menu', [
                         'active' => 'victims',
                         'player_url' => base_url('player/' . $player['id'])
-                    ], true)
+                    ], true),
+                    'tab' => 'victims'
                 ]);
             } else { // ops
                 $this->load->view('player-ops', [
@@ -319,7 +322,8 @@ class App extends CI_Controller
                     'op_menu' => $this->load->view('op-menu', [
                         'active' => 'events',
                         'op_url' => base_url('op/' . $op['id'])
-                    ], true)
+                    ], true),
+                    'op_commanders' => $op_commanders
                 ]);
             } elseif ($tab === 'weapons') {
                 $this->load->view('op-weapons', [
@@ -335,7 +339,8 @@ class App extends CI_Controller
                     'op_menu' => $this->load->view('op-menu', [
                         'active' => 'entities',
                         'op_url' => base_url('op/' . $op['id'])
-                    ], true)
+                    ], true),
+                    'op_commanders' => $op_commanders
                 ]);
             }
         }

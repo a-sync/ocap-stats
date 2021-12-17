@@ -69,8 +69,6 @@ table.sortable thead tr th {
 }
 
 table.sortable thead tr th sup {
-  position: absolute;
-  right: 0;
   pointer-events: none;
 }
 

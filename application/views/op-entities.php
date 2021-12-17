@@ -77,13 +77,18 @@ $sides = $this->config->item('sides');
                                 if (defined('ADJUST_HIT_DATA') && $i['operation_id'] < ADJUST_HIT_DATA) {
                                     $fhits = '';
                                 }
+
+                                $medal = '';
+                                if (isset($op_commanders[$i['side']]) && $op_commanders[$i['side']]['entity_id'] === $i['id']) {
+                                    $medal = '<span class="side__' . html_escape(strtolower($i['side'])) . '">🎖</span>';
+                                }
                             ?>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['id']; ?></td>
                                     <td class="mdc-data-table__cell cell__title">
-                                        <span<?php echo $name_title; ?>><?php echo $name; ?></span>
+                                        <span<?php echo $name_title; ?>><?php echo $name; ?></span><?php echo $medal; ?>
                                     </td>
-                                    <td class="mdc-data-table__cell <?php echo 'side__' . html_escape(strtolower($i['side'])); ?>"><?php echo html_escape($group); ?></td>
+                                    <td class="mdc-data-table__cell side__<?php echo html_escape(strtolower($i['side'])); ?>"><?php echo html_escape($group); ?></td>
                                     <td class="mdc-data-table__cell"><?php echo html_escape($role); ?></td>
 
                                     <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['shots']; ?></td>

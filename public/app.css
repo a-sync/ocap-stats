@@ -82,6 +82,9 @@ footer .render-stats {
 .filters_checkbox label {
     cursor: pointer;
 }
+.mdc-touch-target-wrapper + label, .mdc-radio + label {
+    cursor: pointer;
+}
 
 #update_operations, #clear_cache, .operations_json_info {
     text-align: center;
@@ -153,6 +156,22 @@ img.ocap-link {
     min-width: 200px;
 }
 
+#op-data-form .mdc-text-field, #add-alias-form .mdc-text-field {
+    min-width: 100%;
+    height: 40px;
+}
+#op-data-form .mdc-text-field .mdc-text-field__input, #add-alias-form .mdc-text-field .mdc-text-field__input {
+    padding: 0;
+}
+
+.mdc-radio {
+    margin-left: 4px;
+}
+
+.verified-icon {
+    font-size: inherit;
+}
+
 /* Dark mode */
 @media (prefers-color-scheme: dark) {
     html, body {
@@ -178,7 +197,11 @@ img.ocap-link {
     }
 
     .mdc-checkbox__native-control:enabled:not(:checked)~.mdc-checkbox__background {
-        border-color: #444444 !important;
+        border-color: rgba(232,230,227,0.54) !important;
+    }
+
+    .mdc-checkbox__native-control:disabled:not(:checked)~.mdc-checkbox__background {
+        border-color: rgba(232,230,227,0.26) !important;
     }
 
     a:link {
@@ -216,6 +239,13 @@ img.ocap-link {
     .ss-main .ss-multi-selected .ss-values .ss-value .ss-value-delete {
         color: var(--mdc-theme-text-primary-on-dark);
         background-color: var(--mdc-theme-on-error);
+    }
+
+    .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover .mdc-notched-outline .mdc-notched-outline__leading, .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover .mdc-notched-outline .mdc-notched-outline__notch, .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover .mdc-notched-outline .mdc-notched-outline__trailing {
+        border-color: rgba(232,230,227,0.87);
+    }
+    .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__leading,.mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__notch,.mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__trailing {
+        border-color: var(--mdc-theme-text-hint-on-background);
     }
 }
 

@@ -19,13 +19,13 @@ $config['default_selected_event_types'] = ['official', 'public', 'small', 'pve']
 $config['tag_event_types'] = [];
 
 // Keep these ordered by rank
-$config['hq_group_names'] = [
+$config['cmd_group_names'] = [
     'Alpha 1-1',
     'Alpha 1-2'
 ];
 
 // Keep these ordered by rank
-$config['hq_role_names'] = [];
+$config['cmd_role_names'] = [];
 
 $config['sides'] = [
     'WEST' => 'BLUFOR',

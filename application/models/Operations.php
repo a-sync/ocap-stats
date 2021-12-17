@@ -414,13 +414,10 @@ class Operations extends CI_Model
 
                 if (count($new_players) > 0) {
                     $added_players = $this->add_players($new_players);
-                    if ($added_players === false) {
-                        $errors[] = 'Failed to save players.';
-                    } else {
-                        foreach ($added_players as $p) {
-                            foreach ($p['entity_ids'] as $eid) {
-                                $entities[$eid]['player_id'] = $p['player_id'];
-                            }
+                    $errors = array_merge($errors, $added_players['errors']);
+                    foreach ($added_players['new_players'] as $p) {
+                        foreach ($p['entity_ids'] as $eid) {
+                            $entities[$eid]['player_id'] = $p['player_id'];
                         }
                     }
                 }
@@ -474,22 +471,19 @@ class Operations extends CI_Model
 
     private function add_players($new_players)
     {
-        $batch = [];
-        foreach ($new_players as $p) {
-            $batch[] = ['name' => $p['name']];
-        }
-
-        if ($this->db->insert_batch('players', $batch) === false) {
-            return false;
-        } else {
-            $first_id = $this->db->insert_id();
-
-            foreach ($new_players as $i => $p) {
-                $new_players[$i]['player_id'] = $first_id++;
+        $errors = [];
+        foreach ($new_players as $i => $p) {
+            if ($this->db->insert('players', ['name' => $p['name']]) === false) {
+                $errors[] = 'Failed to create new player (' . $p['name'] . ')';
+            } else {
+                $new_players[$i]['player_id'] = $this->db->insert_id();
             }
         }
 
-        return $new_players;
+        return [
+            'errors' => $errors,
+            'new_players' => $new_players
+        ];
     }
 
     public function get_ops($events_filter, $id = false)
@@ -522,13 +516,14 @@ class Operations extends CI_Model
                 'operations.mission_author',
                 'operations.start_time',
                 'operations.end_winner',
-                'operations.end_message'
+                'operations.end_message',
+                'operations.verified'
             ])
-            ->select('COUNT(DISTINCT entities.player_id) AS players')
+            ->select('COUNT(DISTINCT entities.player_id) AS players_total')
             ->from('operations')
             ->join('entities', 'entities.operation_id = operations.id AND entities.player_id != 0', 'LEFT')
             ->group_by('operations.id')
-            ->order_by('operations.id', 'DESC');
+            ->order_by('operations.id DESC');
 
         return $this->db
             ->get()
@@ -572,10 +567,9 @@ class Operations extends CI_Model
             ->select_sum('deaths')
             ->from('entities')
             ->join('players', 'players.id = entities.player_id', 'LEFT')
-            ->join('operations', 'operations.id = entities.operation_id')
             ->where('entities.operation_id', $id)
             ->group_by('entities.id')
-            ->order_by('is_player DESC, kills DESC, deaths ASC, hits DESC, vkills DESC, shots ASC, id ASC');
+            ->order_by('is_player DESC, kills DESC, deaths ASC, hits DESC, vkills DESC, shots ASC, entities.id ASC');
 
         return $this->db->get()->result_array();
     }
@@ -589,6 +583,8 @@ class Operations extends CI_Model
                 'events.weapon',
                 'events.distance',
                 'events.data',
+                'events.victim_id',
+                'events.attacker_id',
 
                 'victim.name AS victim_name',
                 'victim.side AS victim_side',
@@ -621,7 +617,7 @@ class Operations extends CI_Model
             ->select_sum("CASE WHEN events.event = 'killed' THEN 1 ELSE 0 END", 'kills')
             ->select_sum("CASE WHEN events.event = 'killed' AND attacker.side = victim.side THEN 1 ELSE 0 END", 'fkills')
             ->select_avg("CASE WHEN events.event = 'killed' THEN events.distance ELSE NULL END", 'avg_kill_dist')
-            ->select('COUNT(DISTINCT events.attacker_id) AS players')
+            ->select('COUNT(DISTINCT events.attacker_id) AS players_total')
             ->from('events')
             ->join('entities AS attacker', 'attacker.id = events.attacker_id AND attacker.operation_id = events.operation_id')
             ->join('entities AS victim', 'victim.id = events.victim_id AND victim.operation_id = events.operation_id')

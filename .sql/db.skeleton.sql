@@ -28,6 +28,8 @@ CREATE TABLE IF NOT EXISTS `entities` (
   `fkills` int(10) unsigned NOT NULL DEFAULT '0',
   `vkills` int(10) unsigned NOT NULL DEFAULT '0',
   `deaths` int(10) unsigned NOT NULL DEFAULT '0',
+  `ignore` TINYINT(1) unsigned DEFAULT NULL,
+  `cmd` TINYINT(1) unsigned DEFAULT NULL,
   PRIMARY KEY (`operation_id`,`id`),
   KEY `player_id` (`player_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -35,28 +37,6 @@ CREATE TABLE IF NOT EXISTS `entities` (
 -- RELATIONS FOR TABLE `entities`:
 --   `operation_id`
 --       `operations` -> `id`
---   `player_id`
---       `players` -> `id`
---
-
-
-DROP TABLE IF EXISTS `entities_additional_data`;
-CREATE TABLE IF NOT EXISTS `entities_additional_data` (
-  `operation_id` int(10) unsigned NOT NULL,
-  `entity_id` int(10) unsigned NOT NULL,
-  `player_id` int(10) unsigned NOT NULL,
-  `ignore` tinyint(1) unsigned NOT NULL,
-  `hq` tinyint(1) unsigned NOT NULL,
-  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`operation_id`,`entity_id`),
-  KEY `player_id` (`player_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
---
--- RELATIONS FOR TABLE `entities`:
---   `operation_id`
---       `operations` -> `id`
---   `entity_id`
---       `entities` -> `id`
 --   `player_id`
 --       `players` -> `id`
 --
@@ -106,26 +86,9 @@ CREATE TABLE IF NOT EXISTS `operations` (
   `start_time` datetime NOT NULL,
   `end_winner` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
   `end_message` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `verified` tinyint(1) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-
-DROP TABLE IF EXISTS `ops_additional_data`;
-CREATE TABLE IF NOT EXISTS `ops_additional_data` (
-  `operation_id` int(10) unsigned NOT NULL,
-  `mission_author` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `start_time` datetime DEFAULT NULL,
-  `end_winner` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `end_message` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `verified` tinyint(1) unsigned NOT NULL,
-  PRIMARY KEY (`operation_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
---
--- RELATIONS FOR TABLE `events`:
---   `operation_id`
---       `operations` -> `id`
---
 
 
 DROP TABLE IF EXISTS `players`;

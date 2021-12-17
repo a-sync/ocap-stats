@@ -61,7 +61,10 @@ class Admin extends CI_Controller
             log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] cleared site cache');
         }
 
-        $re = $this->input->post('redirect') === 'add-alias' ? 'add-alias' : 'manage';
+        $re = $this->input->post('redirect');
+        if (!in_array($re, ['add-alias', 'fix-data', 'fix-data/unverified'])) {
+            $re = 'manage';
+        }
 
         return redirect(base_url($re));
     }
@@ -118,7 +121,7 @@ class Admin extends CI_Controller
     {
         require_once(APPPATH . 'third_party/json-machine/load.php');
 
-        $this->load->helper(['cache', 'date']);
+        $this->load->helper('cache');
         $this->load->model('operations');
 
         $file_size = 0;
@@ -167,7 +170,7 @@ class Admin extends CI_Controller
     {
         require_once(APPPATH . 'third_party/json-machine/load.php');
 
-        $this->load->helper(['curl', 'date']);
+        $this->load->helper('curl');
         $this->load->model('operations');
 
         $errors = [];

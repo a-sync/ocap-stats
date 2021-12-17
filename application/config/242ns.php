@@ -20,13 +20,13 @@ $config['tag_event_types'] = [
 ];
 
 // Keep these ordered by rank
-$config['hq_group_names'] = [
+$config['cmd_group_names'] = [
     'Alpha 1-1',
     'Alpha 2-1'
 ];
 
 // Keep these ordered by rank
-$config['hq_role_names'] = [
+$config['cmd_role_names'] = [
     'Commander',
     'Platoon Leader',
     'First Platoon Leader'

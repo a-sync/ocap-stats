@@ -2,9 +2,9 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 if (count($items) === 0) {
-    echo '<div class="mdc-typography--body1 list__no_items">No players found...</div>';
+    echo '<div class="mdc-typography--body1 list__no_items">No ' . $tab . ' found...</div>';
 } else {
-    echo '<div class="mdc-typography--caption list__total">' . count($items) . ' players</div>';
+    echo '<div class="mdc-typography--caption list__total">' . count($items) . ' ' . $tab . '</div>';
 }
 
 $show_hit_data = (!defined('ADJUST_HIT_DATA') || ADJUST_HIT_DATA >= 0) ? true : false;

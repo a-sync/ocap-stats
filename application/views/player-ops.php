@@ -24,8 +24,10 @@ $sides = $this->config->item('sides');
                         <thead>
                             <tr class="mdc-data-table__header-row">
                                 <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="descending" data-column-id="op_id" title="Alias">ID</th>
-                                <th class="mdc-data-table__header-cell cell__title" role="columnheader" scope="col" aria-sort="none" data-column-id="op_info" title="Event @ Start time (Duration)">
-                                    Mission <sup class="mdc-typography--caption">(Map) <span title="End message">Winner</span></sup>
+                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="date" title="Start time">Date</th>
+                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="event" title="Tag">Event</th>
+                                <th class="mdc-data-table__header-cell cell__title" role="columnheader" scope="col" aria-sort="none" data-column-id="op_info" title="Map, Duration, Players">
+                                    Mission <sup class="mdc-typography--caption"><span title="End message">Winner</span></sup>
                                 </th>
                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="group">Group</th>
                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="role">Role</th>
@@ -104,14 +106,14 @@ $sides = $this->config->item('sides');
                                     <td class="mdc-data-table__cell mdc-data-table__cell--numeric">
                                         <a href="<?php echo base_url('op/') . $i['operation_id']; ?>" <?php echo $alias_title; ?>><?php echo $i['operation_id']; ?></a>
                                     </td>
+                                    <td class="mdc-data-table__cell"><span title="<?php echo $i['start_time']; ?>"><?php echo html_escape($i['date']); ?></span></td>
+                                    <td class="mdc-data-table__cell"><span title="<?php echo html_escape($i['tag']); ?>"><?php echo $event_types[$i['event']]; ?></span></td>
                                     <td class="mdc-data-table__cell">
-                                        <span title="<?php echo $event_types[$i['event']]; ?> @ <?php echo $i['start_time']; ?> (<?php echo $duration_min ?>m)">
-                                            <?php echo html_escape($i['mission_name']); ?>&nbsp;<sup class="mdc-typography--caption"><a target="_blank" title="OCAP" href="<?php echo OCAP_URL_PREFIX . rawurlencode($i['filename']); ?>"><img src="<?php echo base_url('public/ocap_logo.png'); ?>" alt="OCAP" class="ocap-link"></a>
-                                                (<?php echo html_escape($i['world_name']); ?>) <?php print_end_winners($i['end_winner'], $i['end_message']); ?>
-                                            </sup>
+                                        <span title="<?php echo implode(', ', [html_escape($i['world_name']), $duration_min . ' minutes', $i['players_total'] . ' players']); ?>">
+                                            <?php echo html_escape($i['mission_name']); ?>&nbsp;<sup class="mdc-typography--caption"><a target="_blank" title="OCAP" href="<?php echo OCAP_URL_PREFIX . rawurlencode($i['filename']); ?>"><img src="<?php echo base_url('public/ocap_logo.png'); ?>" alt="OCAP" class="ocap-link"></a>&nbsp;<?php print_end_winners($i['end_winner'], $i['end_message']); ?>
                                         </span>
                                     </td>
-                                    <td class="mdc-data-table__cell <?php echo 'side__' . html_escape(strtolower($i['side'])); ?>"><?php echo html_escape($group); ?></td>
+                                    <td class="mdc-data-table__cell side__<?php echo html_escape(strtolower($i['side'])); ?>"><?php echo html_escape($group); ?></td>
                                     <td class="mdc-data-table__cell"><?php echo html_escape($role); ?></td>
                                     <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['shots']; ?></td>
                                     <?php if ($show_hit_data) : ?>
