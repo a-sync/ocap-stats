@@ -222,7 +222,7 @@ class Data extends CI_Controller
                                 if (is_array($end_winner) && count($end_winner) > 0) {
                                     $winners = [];
                                     foreach ($end_winner as $w) {
-                                        if (isset($op_sides[$w])) {
+                                        if ($w !== '' && isset($op_sides[$w])) {
                                             $winners[] = $w;
                                         }
                                     }
@@ -238,19 +238,21 @@ class Data extends CI_Controller
                                 if (is_array($cmd)) {
                                     $entities_upd = [];
                                     foreach ($op_sides as $s => $pc) {
-                                        if (isset($cmd[$s]) && is_numeric($cmd[$s])) {
-                                            if (intval($cmd[$s]) === -1) {
-                                                if (isset($op_commanders_data['unambiguous'][$op['id']][$s])) {
+                                        if ($pc > 0) {
+                                            if (isset($cmd[$s]) && is_numeric($cmd[$s])) {
+                                                if (intval($cmd[$s]) === -1) {
+                                                    if (isset($op_commanders_data['unambiguous'][$op['id']][$s])) {
+                                                        $entities_upd[] = [
+                                                            'id' => $op_commanders_data['unambiguous'][$op['id']][$s]['entity_id'],
+                                                            'cmd' => 0
+                                                        ];
+                                                    }
+                                                } else {
                                                     $entities_upd[] = [
-                                                        'id' => $op_commanders_data['unambiguous'][$op['id']][$s]['entity_id'],
-                                                        'cmd' => 0
+                                                        'id' => intval($cmd[$s]),
+                                                        'cmd' => 1
                                                     ];
                                                 }
-                                            } else {
-                                                $entities_upd[] = [
-                                                    'id' => intval($cmd[$s]),
-                                                    'cmd' => 1
-                                                ];
                                             }
                                         }
                                     }

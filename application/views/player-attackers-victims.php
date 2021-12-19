@@ -22,7 +22,7 @@ $sides = $this->config->item('sides');
                         <thead>
                             <tr class="mdc-data-table__header-row">
 
-                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="name">Name</th>
+                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="name" title="Asset class">Name</th>
                                 <?php if ($show_hit_data) : ?>
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="hits" title="Hits">H</th>
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="avg_hit_dist" title="Average hit distance">μH</th>
@@ -39,10 +39,14 @@ $sides = $this->config->item('sides');
                         <tbody class="mdc-data-table__content">
                             <?php
                             foreach ($items as $index => $i) :
-                                $name = $i['name'] ? html_escape($i['name']) : html_escape($i['class']);
-                                if ($i['id']) {
-                                    $name = '<a href="' . base_url('player/') . $i['id'] . '">' . $name . '</a>';
+                                $name = html_escape($i['name']);
+                                if (isset($i['player_id']) && !is_null($i['player_id'])) {
+                                    $name = '<a href="' . base_url('player/') . $i['player_id'] . '">' . $name . '</a>';
                                 } else {
+                                    $name = '<span title="' . html_escape($i['class']) . '">' . $name . '</span>';
+                                }
+
+                                if ($i['type'] !== 'unit') {
                                     $i['fhits'] = '';
                                     $i['fkills'] = '';
                                 }

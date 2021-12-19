@@ -51,6 +51,7 @@ h1 {
 .list__no_items {
     text-align: center;
     margin-top: 20px;
+    margin-bottom: 20px;
 }
 footer {
     text-align: center;
@@ -134,10 +135,6 @@ a:hover {
     margin-right: auto;
 }
 
-.markdown__cell h1 {
-    display: none;
-}
-
 img.ocap-link {
     width: 14px;
 }
@@ -181,25 +178,30 @@ img.ocap-link {
     h1 {
         color: var(--mdc-theme-text-primary-on-dark);
     }
-    
+
     .list__total {
         color: var(--mdc-theme-text-hint-on-dark);
     }
-
     .list__no_items {
         color: var(--mdc-theme-text-primary-on-dark);
     }
+
     footer {
         color: var(--mdc-theme-text-disabled-on-dark);
+    }
+    footer a.github {
+        fill: #c6cbd1;
     }
     .errors {
         color: var(--mdc-theme-error);
     }
 
+    .mdc-text-field:not(.mdc-text-field--disabled) .mdc-text-field__input {
+        color: var(--mdc-theme-text-primary-on-background, #fff);
+    }
     .mdc-checkbox__native-control:enabled:not(:checked)~.mdc-checkbox__background {
         border-color: rgba(232,230,227,0.54) !important;
     }
-
     .mdc-checkbox__native-control:disabled:not(:checked)~.mdc-checkbox__background {
         border-color: rgba(232,230,227,0.26) !important;
     }
@@ -222,10 +224,6 @@ img.ocap-link {
     }
     .markdown-body h2 {
         border-bottom: 1px solid #555555;
-    }
-
-    footer a.github {
-        fill: #c6cbd1;
     }
 
     .markdown-body table tr, .markdown-body table tr:nth-child(2n) {

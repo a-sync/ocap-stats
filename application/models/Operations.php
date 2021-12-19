@@ -84,7 +84,8 @@ class Operations extends CI_Model
                 'kills' => 0,
                 'fkills' => 0,
                 'vkills' => 0,
-                'deaths' => 0
+                'deaths' => 0,
+                '_deaths' => 0
             ];
 
             /* :UPDATE:UNIT: aka position: https://github.com/OCAP2/addon/blob/main/addons/%40ocap/addons/ocap/functions/fn_startCaptureLoop.sqf#L146
@@ -123,7 +124,7 @@ class Operations extends CI_Model
                         $event_name = '';
                         if ($last_state === 0) {
                             $event_name = '_dead';
-                            $entities[$e['id']]['deaths'] = 1;
+                            $entities[$e['id']]['_deaths']++;
                         } elseif ($last_state === 1) {
                             $event_name = '_awake';
                         } elseif ($last_state === 2) {
@@ -337,8 +338,6 @@ class Operations extends CI_Model
         }
 
         if ($this->insert($details)) {
-
-            $_dead_events = [];
             foreach ($events as $i => $e) {
                 $events[$i]['operation_id'] = $details['id'];
 
@@ -346,10 +345,7 @@ class Operations extends CI_Model
                 $vid = $e['victim_id'];
 
                 if (!is_null($vid) && $e['event'] === 'killed') {
-                    if ($entities[$vid]['deaths'] === 0 || isset($_dead_events[$vid])) { // only count _dead one time to make sure it's registered
-                        $entities[$vid]['deaths']++;
-                    }
-                    $_dead_events[$vid] = true;
+                    $entities[$vid]['deaths']++;
                 }
 
                 if (!is_null($aid) && !is_null($vid) && $aid !== $vid && isset($entities[$aid])) {
@@ -390,6 +386,9 @@ class Operations extends CI_Model
                 $new_players = [];
                 foreach ($entities as $i => $e) {
                     $entities[$i]['operation_id'] = $details['id'];
+
+                    $entities[$i]['deaths'] = max($e['deaths'], $e['_deaths']);
+                    unset($entities[$i]['_deaths']);
 
                     if ($e['is_player']) {
                         $pi = array_search($e['name'], $player_names);

@@ -43,7 +43,7 @@ $config['sides'] = [
 
 define('OPERATIONS_JSON_URL', 'https://ocap.3commandobrigade.com/api/v1/operations?tag=&name=&newer=2017-06-01&older=2099-12-12');
 define('OPERATION_DATA_JSON_URL_PATH', 'https://ocap.3commandobrigade.com/data/');
-define('OCAP_URL_PREFIX', 'https://ocap.3commandobrigade.com/?zoom=1.4&x=-150&y=120&file=');
+define('OCAP_URL_PREFIX', 'https://ocap.3commandobrigade.com/?zoom=1.4&x=-100&y=100&file=');
 
 if (!function_exists('preprocess_op_data')) {
     function preprocess_op_data(&$op)

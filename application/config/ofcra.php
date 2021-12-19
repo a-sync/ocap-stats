@@ -10,28 +10,33 @@ $config['site_logo'] = 'public/ofcra_logo.png';
 $config['event_types'] = [
     'official' => 'Official game',
     'public' => 'Public game',
-    'small' => 'Small game',
-    'pve' => 'PVE'
+    'small' => 'Small game'
 ];
 
-$config['default_selected_event_types'] = ['official', 'public', 'small', 'pve'];
+$config['default_selected_event_types'] = ['official', 'public'];
 
 $config['tag_event_types'] = [];
 
 // Keep these ordered by rank
 $config['cmd_group_names'] = [
-    'Alpha 1-1',
-    'Alpha 1-2'
+    'Headquarter',
+    'HQ',
+    'Bluelead',
+    'Redlead',
+    'One',
+    '1',
+    'Alpha',
+    'Alpha 1-1'
 ];
 
 // Keep these ordered by rank
 $config['cmd_role_names'] = [];
 
 $config['sides'] = [
-    'WEST' => 'BLUFOR',
-    'EAST' => 'OPFOR',
-    'GUER' => 'IND',
-    'CIV' => 'CIV',
+    'WEST' => 'Bluefor',
+    'EAST' => 'Redfor',
+    'GUER' => 'Greenfor',
+    'CIV' => 'Civilian',
     '' => '',
     'UNKNOWN' => 'unknown'
 ];

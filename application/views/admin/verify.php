@@ -45,6 +45,7 @@ foreach ($op_player_entities as $e) {
 
         <?php if ($op) :
             $duration_min = floor(intval($op['mission_duration']) / 60);
+            $duration_sec = floor(intval($op['mission_duration']) % 60);
             $verified = boolval(intval($op['verified']));
             $verified_attr = $verified ? ' disabled' : '';
             $verified_class = $verified ? ' mdc-text-field--disabled' : '';
@@ -79,7 +80,7 @@ foreach ($op_player_entities as $e) {
                             </div>
                         </div>
 
-                        <?php echo form_open('', ['id' => 'op-data-form', 'onreset' => 'reset_form()'], ['id' => $op['id']]); ?>
+                        <?php echo form_open('', ['id' => 'op-data-form', 'onreset' => 'on_reset_form()'], ['id' => $op['id']]); ?>
                         <table class="mdc-data-table__table">
                             <tbody class="mdc-data-table__content">
                                 <tr class="mdc-data-table__row">
@@ -115,7 +116,7 @@ foreach ($op_player_entities as $e) {
                                                     <span class="mdc-notched-outline__notch"></span>
                                                     <span class="mdc-notched-outline__trailing"></span>
                                                 </span>
-                                                <input type="text" class="mdc-text-field__input" name="start_time" minlength="19" maxlength="19" value="<?php echo html_escape($op['start_time']); ?>" pattern="/^[0-2][0-9]{3}-[0-1][0-9]-[0-3][0-9]\ [0-2][0-9]:[0-5][0-9]:[0-5][0-9]$/" <?php echo $verified_attr; ?>>
+                                                <input type="text" class="mdc-text-field__input" name="start_time" minlength="19" maxlength="19" value="<?php echo html_escape($op['start_time']); ?>" pattern="^[0-2][0-9]{3}-[0-1][0-9]-[0-3][0-9] [0-2][0-9]:[0-5][0-9]:[0-5][0-9]$" <?php echo $verified_attr; ?>>
                                             </label>
                                             <br>
                                             &nbsp; &rdca; <?php echo (new \DateTime($op['start_time'], new \DateTimeZone('UTC')))->setTimezone(new \DateTimeZone('Europe/London'))->format('Y-m-d H:i:s'); ?>
@@ -195,7 +196,7 @@ foreach ($op_player_entities as $e) {
                                 </tr>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Duration</td>
-                                    <td class="mdc-data-table__cell"><?php echo $duration_min; ?></td>
+                                    <td class="mdc-data-table__cell"><?php echo $duration_min; ?>m <?php echo $duration_sec; ?>s</td>
                                 </tr>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Players</td>
@@ -204,7 +205,9 @@ foreach ($op_player_entities as $e) {
                                             <?php
                                             $pps = [];
                                             foreach ($op_sides as $s => $pc) {
-                                                $pps[] = '<span class="side__' . html_escape(strtolower($s)) . '">' . $sides[$s] . '</span> ' . $pc;
+                                                if ($pc > 0) {
+                                                    $pps[] = '<span class="side__' . html_escape(strtolower($s)) . '">' . $sides[$s] . '</span> ' . $pc;
+                                                }
                                             }
                                             ?>
                                             <?php echo $op['players_total']; ?>
@@ -216,7 +219,7 @@ foreach ($op_player_entities as $e) {
                                     <td class="mdc-data-table__cell">
                                         Winner
                                         <?php
-                                        if (!isset($op_sides[$op['end_winner']])) {
+                                        if ($op['end_winner'] === '') {
                                             echo $warn_icon;
                                         }
                                         ?>
@@ -224,27 +227,31 @@ foreach ($op_player_entities as $e) {
                                     <td class="mdc-data-table__cell">
                                         <?php $winner_sides = explode('/', $op['end_winner']);
                                         foreach ($op_sides as $s => $pc) :
-                                            $extra_attr = '';
-                                            if (in_array($s, $winner_sides)) {
-                                                $extra_attr = ' checked';
-                                            }
+                                            if ($s !== '') :
+                                                $extra_attr = '';
+                                                if (in_array($s, $winner_sides)) {
+                                                    $extra_attr = ' checked';
+                                                }
                                         ?>
-                                            <div class="mdc-form-field">
-                                                <div class="mdc-touch-target-wrapper">
-                                                    <div class="mdc-checkbox mdc-checkbox--touch">
-                                                        <input type="checkbox" class="mdc-checkbox__native-control" id="<?php echo 'end_winner-' . strtolower(html_escape($s)); ?>" name="end_winner[]" value="<?php echo html_escape($s); ?>" <?php echo $extra_attr . $verified_attr; ?>>
-                                                        <div class="mdc-checkbox__background">
-                                                            <svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24">
-                                                                <path class="mdc-checkbox__checkmark-path" fill="none" d="M1.73,12.91 8.1,19.28 22.79,4.59">
-                                                            </svg>
-                                                            <div class="mdc-checkbox__mixedmark"></div>
+                                                <div class="mdc-form-field">
+                                                    <div class="mdc-touch-target-wrapper">
+                                                        <div class="mdc-checkbox mdc-checkbox--touch">
+                                                            <input type="checkbox" class="mdc-checkbox__native-control" id="<?php echo 'end_winner-' . strtolower(html_escape($s)); ?>" name="end_winner[]" value="<?php echo html_escape($s); ?>" <?php echo $extra_attr . $verified_attr; ?>>
+                                                            <div class="mdc-checkbox__background">
+                                                                <svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24">
+                                                                    <path class="mdc-checkbox__checkmark-path" fill="none" d="M1.73,12.91 8.1,19.28 22.79,4.59">
+                                                                </svg>
+                                                                <div class="mdc-checkbox__mixedmark"></div>
+                                                            </div>
+                                                            <div class="mdc-checkbox__ripple"></div>
                                                         </div>
-                                                        <div class="mdc-checkbox__ripple"></div>
                                                     </div>
+                                                    <label for="<?php echo 'end_winner-' . strtolower(html_escape($s)); ?>"><?php echo $pc > 0 ? $sides[$s] : '<i>' . $sides[$s] . '</i>'; ?></label>
                                                 </div>
-                                                <label for="<?php echo 'end_winner-' . strtolower(html_escape($s)); ?>"><?php echo $sides[$s]; ?></label>
-                                            </div>
-                                        <?php endforeach; ?>
+                                        <?php
+                                            endif;
+                                        endforeach;
+                                        ?>
                                     </td>
                                 </tr>
                                 <tr class="mdc-data-table__row">
@@ -267,68 +274,73 @@ foreach ($op_player_entities as $e) {
                                         </label>
                                     </td>
                                 </tr>
-                                <?php foreach ($op_sides as $s => $pc) :
-                                    $cmd_icon = $warn_icon;
-                                    if (isset($cmd_verified[$s])) {
-                                        $cmd_icon = $fixed_icon;
-                                    } elseif (isset($cmd_unambiguous[$s]) && count($cmd_unambiguous[$s]) > 1) {
-                                        $cmd_icon = $flaky_icon;
-                                    }
+                                <?php
+                                foreach ($op_sides as $s => $pc) :
+                                    if ($pc > 0) :
+                                        $cmd_icon = $warn_icon;
+                                        if (isset($cmd_verified[$s])) {
+                                            $cmd_icon = $fixed_icon;
+                                        } elseif (isset($cmd_unambiguous[$s])) {
+                                            $cmd_icon = $flaky_icon;
+                                        }
                                 ?>
-                                    <tr class="mdc-data-table__row">
-                                        <td class="mdc-data-table__cell">
-                                            <?php
-                                            echo '<span class="side__' . html_escape(strtolower($s)) . '">' . $sides[$s] . '</span> commander ' . $cmd_icon;
-                                            ?>
-                                        </td>
-                                        <td class="mdc-data-table__cell">
-                                            <p>
-                                            <div class="mdc-form-field ss-container">
-                                                <select id="cmd-<?php echo html_escape(strtolower($s)); ?>" name="cmd[<?php echo html_escape($s); ?>]" <?php echo $verified_attr; ?>>
-                                                    <option value="-1">-- no commander --</option>
-                                                    <?php
-                                                    $curr = isset($cmd_resolved[$s]) ? $cmd_resolved[$s]['entity_id'] : null;
-                                                    $printed = [];
-                                                    if (isset($cmd_unambiguous[$s])) {
-                                                        echo '<optgroup label="Prospect"><option value="' . $cmd_unambiguous[$s]['entity_id'] . '"' . ($curr === $cmd_unambiguous[$s]['entity_id'] ? ' selected' : '') . '>';
-                                                        print_cmd_entity_info($cmd_unambiguous[$s], true);
-                                                        echo '</option></optgroup>';
-                                                        $printed[] = $cmd_unambiguous[$s]['entity_id'];
-                                                    }
-                                                    if (isset($cmd_ambiguous[$s])) {
-                                                        echo '<optgroup label="Prospects">';
-                                                        foreach ($cmd_ambiguous[$s] as $c) {
-                                                            if (!in_array($c['entity_id'], $printed)) {
-                                                                echo '<option value="' . $c['entity_id'] . '"' . ($curr === $c['entity_id'] ? ' selected' : '') . '>';
-                                                                print_cmd_entity_info($c, true);
+                                        <tr class="mdc-data-table__row">
+                                            <td class="mdc-data-table__cell">
+                                                <?php
+                                                echo '<span class="side__' . html_escape(strtolower($s)) . '">' . $sides[$s] . '</span> commander ' . $cmd_icon;
+                                                ?>
+                                            </td>
+                                            <td class="mdc-data-table__cell">
+                                                <p>
+                                                <div class="mdc-form-field ss-container">
+                                                    <select id="cmd-<?php echo html_escape(strtolower($s)); ?>" name="cmd[<?php echo html_escape($s); ?>]" <?php echo $verified_attr; ?>>
+                                                        <option value="-1">-- no commander --</option>
+                                                        <?php
+                                                        $curr = isset($cmd_resolved[$s]) ? $cmd_resolved[$s]['entity_id'] : null;
+                                                        $printed = [];
+                                                        if (isset($cmd_unambiguous[$s])) {
+                                                            echo '<optgroup label="Prospect"><option value="' . $cmd_unambiguous[$s]['entity_id'] . '"' . ($curr === $cmd_unambiguous[$s]['entity_id'] ? ' selected' : '') . '>';
+                                                            print_cmd_entity_info($cmd_unambiguous[$s], true);
+                                                            echo '</option></optgroup>';
+                                                            $printed[] = $cmd_unambiguous[$s]['entity_id'];
+                                                        }
+                                                        if (isset($cmd_ambiguous[$s])) {
+                                                            echo '<optgroup label="Prospects">';
+                                                            foreach ($cmd_ambiguous[$s] as $c) {
+                                                                if (!in_array($c['entity_id'], $printed)) {
+                                                                    echo '<option value="' . $c['entity_id'] . '"' . ($curr === $c['entity_id'] ? ' selected' : '') . '>';
+                                                                    print_cmd_entity_info($c, true);
+                                                                    echo '</option>';
+                                                                    $printed[] = $c['entity_id'];
+                                                                }
+                                                            }
+                                                            echo '</optgroup>';
+                                                        }
+                                                        foreach ($op_player_entities_grouped[$s] as $g => $ents) {
+                                                            echo '<optgroup label="' . html_escape($g) . '">';
+                                                            foreach ($ents as $c) {
+                                                                $extra_attr = '';
+                                                                if (intval($c['ignore']) === 1) {
+                                                                    $extra_attr = ' disabled';
+                                                                } elseif ($c['entity_id'] === $curr) {
+                                                                    $extra_attr = ' selected';
+                                                                }
+                                                                echo '<option value="' . $c['entity_id'] . '"' . $extra_attr . '>';
+                                                                print_cmd_entity_info($c);
                                                                 echo '</option>';
-                                                                $printed[] = $c['entity_id'];
                                                             }
+                                                            echo '</optgroup>';
                                                         }
-                                                        echo '</optgroup>';
-                                                    }
-                                                    foreach ($op_player_entities_grouped[$s] as $g => $ents) {
-                                                        echo '<optgroup label="' . html_escape($g) . '">';
-                                                        foreach ($ents as $c) {
-                                                            $extra_attr = '';
-                                                            if (intval($c['ignore']) === 1) {
-                                                                $extra_attr = ' disabled';
-                                                            } elseif ($c['entity_id'] === $curr) {
-                                                                $extra_attr = ' selected';
-                                                            }
-                                                            echo '<option value="' . $c['entity_id'] . '"' . $extra_attr . '>';
-                                                            print_cmd_entity_info($c);
-                                                            echo '</option>';
-                                                        }
-                                                        echo '</optgroup>';
-                                                    }
-                                                    ?>
-                                                </select>
-                                            </div>
-                                            </p>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
+                                                        ?>
+                                                    </select>
+                                                </div>
+                                                </p>
+                                            </td>
+                                        </tr>
+                                <?php
+                                    endif;
+                                endforeach;
+                                ?>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Updated</td>
                                     <td class="mdc-data-table__cell">
@@ -387,14 +399,21 @@ foreach ($op_player_entities as $e) {
 
 <script src="<?php echo base_url('public/slimselect.min.js'); ?>"></script>
 <script>
-    <?php foreach ($op_sides as $s => $pc) : ?>
-        new SlimSelect({
-            select: '#cmd-<?php echo html_escape(strtolower($s)); ?>',
-            addToBody: true
-        });
-    <?php endforeach; ?>
+    <?php
+    foreach ($op_sides as $s => $pc) :
+        if ($pc > 0) :
+    ?>
+            new SlimSelect({
+                select: '#cmd-<?php echo html_escape(strtolower($s)); ?>',
+                addToBody: true
+            });
+    <?php
+        endif;
+    endforeach;
+    ?>
 
-    function reset_form() {
+    function on_reset_form() {
+        // make sure the SlimSelect instances reflect the current state
         setTimeout(() => {
             const ss_arr = document.querySelectorAll('.ss-container > select');
             const event = new Event('change');

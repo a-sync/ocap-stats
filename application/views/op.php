@@ -72,7 +72,9 @@ $sides = $this->config->item('sides');
                                             <?php
                                             $pps = [];
                                             foreach ($op_sides as $s => $pc) {
-                                                $pps[] = '<span class="side__' . html_escape(strtolower($s)) . '">' . $sides[$s] . '</span> ' . $pc;
+                                                if ($pc > 0) {
+                                                    $pps[] = '<span class="side__' . html_escape(strtolower($s)) . '">' . $sides[$s] . '</span> ' . $pc;
+                                                }
                                             }
                                             ?>
                                             <?php echo $op['players_total']; ?>

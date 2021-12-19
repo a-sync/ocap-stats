@@ -12,7 +12,8 @@ $config['event_types'] = [
     'na' => 'FNF NA',
     'titans' => 'Titans',
     'tnt' => 'TNT',
-    'vsofcra' => 'FNF vs OFCRA'
+    'vsofcra' => 'FNF vs OFCRA',
+    'soon' => 'SOON'
 ];
 
 $config['default_selected_event_types'] = ['eu', 'na'];
@@ -24,7 +25,8 @@ $config['tag_event_types'] = [
     'fnfna' => 'na',
     'fnftitans' => 'titans',
     'fnftnt' => 'tnt',
-    'fnfvofcra' => 'vsofcra'
+    'fnfvofcra' => 'vsofcra',
+    'SOON' => 'soon'
 ];
 
 // Keep these ordered by rank
@@ -43,10 +45,10 @@ $config['cmd_group_names'] = [
 $config['cmd_role_names'] = [
     'Company Commander',
     'Platoon Leader',
-    'Platoon Leader (HVT)',
-    'Osamba Bind Layden',
     'Chief',
-    'Cult Leader'
+    'Evil General',
+    'Cult Leader',
+    'Osamba Bind Layden'
 ];
 
 $config['sides'] = [
@@ -60,7 +62,7 @@ $config['sides'] = [
 
 define('OPERATIONS_JSON_URL', 'http://aar.fridaynightfight.org/api/v1/operations?tag=&name=&newer=2017-06-01&older=2099-12-12');
 define('OPERATION_DATA_JSON_URL_PATH', 'http://aar.fridaynightfight.org/data/');
-define('OCAP_URL_PREFIX', 'http://aar.fridaynightfight.org/?zoom=1.4&x=-150&y=120&file=');
+define('OCAP_URL_PREFIX', 'http://aar.fridaynightfight.org/?zoom=1.4&x=-100&y=100&file=');
 define('ADJUST_HIT_DATA', 335);
 
 if (!function_exists('should_op_be_ignored')) {

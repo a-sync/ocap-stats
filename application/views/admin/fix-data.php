@@ -146,9 +146,11 @@ $fixed_icon = '<span class="material-icons">check</span>';
                                                 $commanders_icon = $fixed_icon;
                                             } elseif (isset($cmd_unambiguous[$i['id']])) {
                                                 $ops_cmd_entities = $cmd_unambiguous[$i['id']];
-                                                if (count($cmd_unambiguous[$i['id']]) > 1) {
-                                                    $commanders_icon = $flaky_icon;
-                                                }
+                                                $commanders_icon = $flaky_icon;
+                                            }
+
+                                            if (count($ops_cmd_entities) < $i['sides_total']) {
+                                                $commanders_icon = $warn_icon;
                                             }
 
                                             $commanders_list = [];

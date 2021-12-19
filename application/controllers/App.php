@@ -398,9 +398,9 @@ class App extends CI_Controller
     {
         $this->_cache();
 
-        $this->_head('', 'About');
-
         $this->load->library('markdown');
+
+        $this->_head('', 'About');
 
         $this->load->view('md', [
             'markdown' => $this->markdown->transform_file(APPPATH . '../README.md')

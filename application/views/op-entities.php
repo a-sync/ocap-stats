@@ -22,7 +22,7 @@ $sides = $this->config->item('sides');
                         <thead>
                             <tr class="mdc-data-table__header-row">
                                 <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="entity_id">ID</th>
-                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="name" title="Player name">Name</th>
+                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="name" title="Player name / Asset class">Name</th>
                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="group">Group</th>
                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="role">Role</th>
 
@@ -44,17 +44,13 @@ $sides = $this->config->item('sides');
 
                                 $role = $i['role'];
                                 $group = $i['group_name'] === '' ? $sides[$i['side']] : $i['group_name'];
-                                if ($i['class'] !== '') {
-                                    $role = $i['class'];
-                                } else {
-                                    if (strpos($role, '@') !== false) {
-                                        $role_group_arr = explode('@', $i['role']);
-                                        if (isset($role_group_arr[0]) && $role_group_arr[0] !== '') {
-                                            $role = $role_group_arr[0];
-                                        }
-                                        if (isset($role_group_arr[1]) && $role_group_arr[1] !== '') {
-                                            $group = $role_group_arr[1];
-                                        }
+                                if (strpos($role, '@') !== false) {
+                                    $role_group_arr = explode('@', $i['role']);
+                                    if (isset($role_group_arr[0]) && $role_group_arr[0] !== '') {
+                                        $role = $role_group_arr[0];
+                                    }
+                                    if (isset($role_group_arr[1]) && $role_group_arr[1] !== '') {
+                                        $group = $role_group_arr[1];
                                     }
                                 }
 
@@ -66,6 +62,8 @@ $sides = $this->config->item('sides');
                                     if ($player_name !== '' && $i['name'] !== $player_name) {
                                         $name_title = ' title="' . html_escape($player_name) . '"';
                                     }
+                                } elseif ($i['class']) {
+                                    $name_title = ' title="' . html_escape($i['class']) . '"';
                                 }
 
                                 $hits = $i['hits'];

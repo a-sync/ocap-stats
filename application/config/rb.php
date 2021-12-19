@@ -22,7 +22,7 @@ $config['default_selected_event_types'] = [
 
 $config['tag_event_types'] = [
     'TvT' => 'tvt',
-    'TvT_II' => 'tvt',
+    'TvT_II' => 'tvt2',
     'TvT_Tactical' => 'ltvt',
     'IF' => 'if',
     'Brutal' => 'brutal',
@@ -52,7 +52,7 @@ $config['sides'] = [
 
 define('OPERATIONS_JSON_URL', 'https://ocap.red-bear.ru/api/v1/operations/get?type=&name=&newer=2017-06-01&older=2099-12-12&_=1');
 define('OPERATION_DATA_JSON_URL_PATH', 'https://ocap.red-bear.ru/data/');
-define('OCAP_URL_PREFIX', 'https://ocap.red-bear.ru/?zoom=1.4&x=-150&y=120&file=');
+define('OCAP_URL_PREFIX', 'https://ocap.red-bear.ru/?zoom=1.4&x=-100&y=100&file=');
 define('ADJUST_HIT_DATA', -1);
 
 if (!function_exists('preprocess_op_data')) {

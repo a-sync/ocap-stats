@@ -217,36 +217,72 @@ class Players extends CI_Model
 
     private function get_opponents_by_id($id, $type)
     {
-        $this->db
-            ->select(['players.id', 'players.name'])
-            ->select_sum("CASE WHEN events.event = 'hit' THEN 1 ELSE 0 END", 'hits')
-            ->select_sum("CASE WHEN events.event = 'hit' AND attacker.side = victim.side THEN 1 ELSE 0 END", 'fhits')
-            ->select_avg("CASE WHEN events.event = 'hit' THEN events.distance ELSE NULL END", 'avg_hit_dist')
-            ->select_sum("CASE WHEN events.event = 'killed' THEN 1 ELSE 0 END", 'kills')
-            ->select_sum("CASE WHEN events.event = 'killed' AND attacker.side = victim.side THEN 1 ELSE 0 END", 'fkills')
-            ->select_avg("CASE WHEN events.event = 'killed' THEN events.distance ELSE NULL END", 'avg_kill_dist')
-            ->from('events')
-            ->join('entities AS attacker', 'attacker.id = events.attacker_id AND attacker.operation_id = events.operation_id', $type === 'attackers' ? 'LEFT' : 'INNER')
-            ->join('entities AS victim', 'victim.id = events.victim_id AND victim.operation_id = events.operation_id', $type === 'victims' ? 'LEFT' : 'INNER')
-            ->where('victim.player_id != attacker.player_id')
-            ->where_in('events.event', ['hit', 'killed'])
-            ->order_by('kills DESC, hits DESC, fkills ASC, fhits ASC, players.name ASC');
+        $opponents = [];
+        $entity_types = ['unit', 'vehicle'];
+        foreach ($entity_types as $et) {
+            $this->db
+                ->select_sum("CASE WHEN events.event = 'hit' THEN 1 ELSE 0 END", 'hits')
+                ->select_sum("CASE WHEN events.event = 'hit' AND attacker.side = victim.side THEN 1 ELSE 0 END", 'fhits')
+                ->select_avg("CASE WHEN events.event = 'hit' THEN events.distance ELSE NULL END", 'avg_hit_dist')
+                ->select_sum("CASE WHEN events.event = 'killed' THEN 1 ELSE 0 END", 'kills')
+                ->select_sum("CASE WHEN events.event = 'killed' AND attacker.side = victim.side THEN 1 ELSE 0 END", 'fkills')
+                ->select_avg("CASE WHEN events.event = 'killed' THEN events.distance ELSE NULL END", 'avg_kill_dist')
+                ->from('events')
+                ->join('entities AS attacker', 'attacker.id = events.attacker_id AND attacker.operation_id = events.operation_id', $type === 'attackers' ? 'LEFT' : 'INNER')
+                ->join('entities AS victim', 'victim.id = events.victim_id AND victim.operation_id = events.operation_id', $type !== 'attackers' ? 'LEFT' : 'INNER')
+                ->where('victim.player_id != attacker.player_id')
+                ->where_in('events.event', ['hit', 'killed'])
+                ->order_by('kills DESC, hits DESC, fkills ASC, fhits ASC, name ASC');
 
-        if ($type === 'attackers') {
-            $this->db
-                ->join('players', 'players.id = attacker.player_id', 'LEFT')
-                ->select('attacker.class')
-                ->where('victim.player_id', $id)
-                ->group_by('players.id, attacker.class');
-        } elseif ($type === 'victims') {
-            $this->db
-                ->join('players', 'players.id = victim.player_id', 'LEFT')
-                ->select('victim.class')
-                ->where('attacker.player_id', $id)
-                ->group_by('players.id, victim.class');
+            if ($type === 'attackers') {
+                $this->db
+                    ->select(['attacker.type', 'attacker.class'])
+                    ->where('attacker.type', $et)
+                    ->where('victim.player_id', $id);
+
+                if ($et === 'unit') {
+                    $this->db
+                        ->select(['players.id as player_id', 'players.name'])
+                        ->join('players', 'players.id = attacker.player_id')
+                        ->group_by('players.id');
+                } else { // vehicle
+                    $this->db
+                        ->select('attacker.name')
+                        ->group_by('attacker.name, attacker.class');
+                }
+            } else { // victims
+                $this->db
+                    ->select(['victim.type', 'victim.class'])
+                    ->where('victim.type', $et)
+                    ->where('attacker.player_id', $id);
+
+                if ($et === 'unit') {
+                    $this->db
+                        ->select(['players.id as player_id', 'players.name'])
+                        ->join('players', 'players.id = victim.player_id')
+                        ->group_by('players.id');
+                } else { // vehicle
+                    $this->db
+                        ->select('victim.name')
+                        ->group_by('victim.name, victim.class');
+                }
+            }
+
+            $res = $this->db->get()->result_array();
+            if ($res && count($res) > 0) {
+                $opponents = array_merge($opponents, $res);
+            }
         }
 
-        return $this->db->get()->result_array();
+        $kills = array_column($opponents, 'kills');
+        $hits = array_column($opponents, 'hits');
+        $fkills = array_column($opponents, 'fkills');
+        $fhits = array_column($opponents, 'fhits');
+        $names = array_column($opponents, 'name');
+
+        array_multisort($kills, SORT_DESC, SORT_NUMERIC, $hits, SORT_DESC, SORT_NUMERIC, $fkills, SORT_ASC, SORT_NUMERIC, $fhits, SORT_ASC, SORT_NUMERIC, $names, SORT_ASC, SORT_STRING, $opponents);
+
+        return $opponents;
     }
 
     public function get_attackers_by_id($id)

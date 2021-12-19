@@ -43,7 +43,7 @@ else :
                                             </span>
                                         </td>
                                         <td class="mdc-data-table__cell"><?php echo html_escape($i['mission_author']); ?></td>
-                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo $duration_min; ?>"><?php echo $duration_min; ?>m</td>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo intval($i['mission_duration']); ?>"><?php echo $duration_min; ?>m</td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['players_total']; ?></td>
                                         <td class="mdc-data-table__cell"><?php print_end_winners($i['end_winner'], $i['end_message']); ?></td>
                                     </tr>

@@ -15,7 +15,10 @@ $sides = $this->config->item('sides');
             </div>
         <?php endif; ?>
 
-        <?php if ($operation) : ?>
+        <?php if ($operation) : 
+            $duration_min = floor(intval($operation['mission_duration']) / 60);
+            $duration_sec = floor(intval($operation['mission_duration']) % 60);
+        ?>
             <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center">
                 <div class="mdc-data-table mdc-elevation--z2">
                     <div class="mdc-data-table__table-container">
@@ -84,7 +87,7 @@ $sides = $this->config->item('sides');
                                 </tr>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Duration</td>
-                                    <td class="mdc-data-table__cell"><?php echo floor(intval($operation['mission_duration']) / 60); ?>m</td>
+                                    <td class="mdc-data-table__cell"><?php echo $duration_min; ?>m <?php echo $duration_sec; ?>s</td>
                                 </tr>
                                 <?php if (defined('MANAGE_DATA_JSON_FILES') || $last_update !== 'none') : ?>
                                     <tr class="mdc-data-table__row">

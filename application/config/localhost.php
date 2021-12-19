@@ -128,7 +128,7 @@ define('OPERATION_DATA_JSON_URL_PATH', 'http://localhost:5000/data/');
 | at the end.
 |
 */
-define('OCAP_URL_PREFIX', 'http://localhost:5000/?zoom=1.4&x=-150&y=120&file=');
+define('OCAP_URL_PREFIX', 'http://localhost:5000/?zoom=1.4&x=-100&y=100&file=');
 
 /*
 |--------------------------------------------------------------------------

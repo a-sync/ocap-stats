@@ -40,11 +40,11 @@
     nr. of framesFired events (only counts main weapon and sidearm rounds afaik.)  
   \+ nr. of projectile markes tied to a _unit_ (grenades, rockets, etc.)  
   * **Hits**  
-    nr. of `hit` events as attacker, where vitctim is any _unit_ or _vehicle_ (asset)  
+    nr. of `hit` events as attacker, where victim is any _unit_ or _vehicle_ (asset)  
   * **Kills**  
     nr. of `killed` events as attacker, where victim is any _unit_ or _vehicle_ (asset)  
   * **Deaths**  
-    nr. of `killed` events as victim, where attacker is any _unit_ or _vehicle_ (asset), or has at least one `_dead` event  
+    MAX( nr. of `killed` events, nr. of `_dead` events ) as victim  
   * **Frienldy fire**  
     nr. of `hit` events as attacker, where victim is any _unit_ on the same side  
   * **Teamkills**  
@@ -52,7 +52,7 @@
   * **Destroyed assets**  
     nr. of `killed` events as attacker, where victim is a _vehicle_ (asset)  
 
-Self inflicted and environmental hits / kills (_something_) are omitted!  
+Self inflicted and environmental hits / kills (_something_) are omitted! (except for deaths)  
 
 
 ## Search
@@ -63,5 +63,5 @@ CTRL+F
   1. format timestamps to local TZ
   1. player profile tabs:
      * rivals (enemy commanders)
-  1. store / support operation timestamps & capture delay
-  1. ignore / reassign entities
+  1. store / support multiple operation timestamps & dynamic capture delay
+  1. ui to edit entities player assignment

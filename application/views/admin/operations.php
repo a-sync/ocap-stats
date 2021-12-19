@@ -59,6 +59,7 @@ $event_types = $this->config->item('event_types');
                             <tbody class="mdc-data-table__content">
                                 <?php foreach ($operations as $op) :
                                     $duration_min = floor(intval($op['mission_duration']) / 60);
+                                    $duration_sec = floor(intval($op['mission_duration']) % 60);
 
                                     $op_in_db = isset($ops_in_db[$op['id']]);
                                     $append_class = '';
@@ -88,7 +89,7 @@ $event_types = $this->config->item('event_types');
                                                 <a title="OCAP" target="_blank" href="<?php echo OCAP_URL_PREFIX . rawurlencode($op['filename']); ?>"><?php echo html_escape($op['filename']); ?></a>
                                             </span>
                                         </td>
-                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $duration_min; ?>m</td>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $duration_min; ?>m <?php echo $duration_sec; ?>s</td>
                                         <?php if (isset($op['tag'])) : ?>
                                             <td class="mdc-data-table__cell"><?php echo html_escape($op['tag']); ?></td>
                                         <?php endif; ?>

@@ -249,10 +249,10 @@ class Additional_data extends CI_Model
     private function _return_commander($entity_1, $entity_2)
     {
         if ($entity_1['group_name'] !== $entity_2['group_name']) {
-            $cmd_group_names = $this->config->item('cmd_group_names');
+            $cmd_group_names = array_map('strtolower', $this->config->item('cmd_group_names'));
             if (count($cmd_group_names) > 0) {
-                $e1_group_index = array_search($entity_1['group_name'], $cmd_group_names);
-                $e2_group_index = array_search($entity_2['group_name'], $cmd_group_names);
+                $e1_group_index = array_search(strtolower($entity_1['group_name']), $cmd_group_names);
+                $e2_group_index = array_search(strtolower($entity_2['group_name']), $cmd_group_names);
 
                 if ($e1_group_index !== $e2_group_index) {
                     if ($e2_group_index === false) return $entity_1;
@@ -472,7 +472,8 @@ class Additional_data extends CI_Model
                 'operations.mission_author',
                 'operations.start_time',
                 'operations.end_winner',
-                'operations.end_message'
+                'operations.end_message',
+                '(SELECT COUNT(DISTINCT ents.side) FROM entities AS ents WHERE ents.operation_id = operations.id AND ents.is_player = 1) AS sides_total'
             ])
             ->from('operations')
             ->where('operations.event !=', '')
@@ -498,20 +499,40 @@ class Additional_data extends CI_Model
     {
         $this->db
             ->select([
-                'side',
+                'entities.side',
                 'COUNT(DISTINCT entities.player_id) AS players_total'
             ])
             ->from('entities')
             ->where('entities.operation_id', $id)
             ->where('entities.is_player', 1)
-            ->group_by('side')
+            ->group_by('entities.side')
             ->order_by('entities.id ASC');
 
-        $re = $this->db
+        $players = $this->db
             ->get()
             ->result_array();
 
-        return array_column($re, 'players_total', 'side');
+        $op_sides = array_column($players, 'players_total', 'side');
+
+        $this->db
+            ->select('entities.side')
+            ->from('entities')
+            ->where('entities.operation_id', $id)
+            ->where('entities.is_player', 0)
+            ->group_by('entities.side')
+            ->order_by('entities.id ASC');
+
+        $others = $this->db
+            ->get()
+            ->result_array();
+
+        foreach ($others as $r) {
+            if (!isset($op_sides[$r['side']])) {
+                $op_sides[$r['side']] = 0;
+            }
+        }
+
+        return $op_sides;
     }
 
     public function get_op_player_entities($id)
