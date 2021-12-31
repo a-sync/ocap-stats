@@ -21,8 +21,6 @@
   1. player stats are collected based on name only (aliases must be set manually to mitigate this)  
   1. ops recorded before using OCAP2 v1.1.0 had no proper tracking for hit events where the victim is a player  
      * Hits / Shots percent and Shots / Hits must be adjusted accordingly
-  1. some units have less shots then hits  
-     * some weapons produce multiple hit events (eg. MAAWS)
   1. players can have multiple entities in the same op (rejoins/role switch)  
      * this affects role data since there is no explicit way to tell which entity was actually playing
      * in a few cases two entities of the same player have `killed` events in a single op (dc/spectator bug/_something_?)
@@ -61,7 +59,7 @@ CTRL+F
 
 ## TODO:
   1. format timestamps to local TZ
+  1. filter op events visibility by type
   1. player profile tabs:
      * rivals (enemy commanders)
-  1. store / support multiple operation timestamps & dynamic capture delay
   1. ui to edit entities player assignment

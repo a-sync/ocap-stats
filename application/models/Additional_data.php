@@ -40,7 +40,7 @@ class Additional_data extends CI_Model
             'entities.group_name',
             'entities.role',
             "SUBSTRING_INDEX(entities.role, '@', 1) AS role_name",
-            'entities.ignore',
+            'entities.invalid',
             'entities.cmd',
             'operations.end_winner'
         ])
@@ -89,7 +89,7 @@ class Additional_data extends CI_Model
             'entities.group_name',
             'entities.role',
             "SUBSTRING_INDEX(entities.role, '@', 1) AS role_name",
-            'entities.ignore',
+            'entities.invalid',
             'entities.cmd',
             'operations.end_winner'
         ])
@@ -182,7 +182,7 @@ class Additional_data extends CI_Model
         $matching_sides = [];
         foreach ($op_leads as $op_id => $ol) {
             foreach ($ol as $side => $l)
-                if ((!is_null($l['cmd']) && intval($l['cmd']) === 0) || intval($l['ignore']) === 1) {
+                if ((!is_null($l['cmd']) && intval($l['cmd']) === 0) || intval($l['invalid']) === 1) {
                     unset($op_leads[$op_id][$side]);
                 } elseif (!isset($matching_sides[$side])) {
                     $matching_sides[$side] = true;
@@ -304,12 +304,12 @@ class Additional_data extends CI_Model
 
     public function get_players_names($aliases = null)
     {
-        $this->db->select(['players.name', 'players.id', 'players.alias_of'])
+        $this->db->select(['name', 'id', 'alias_of', 'uid'])
             ->from('players')
-            ->order_by('players.name ASC');
+            ->order_by('name ASC');
 
         if (!is_null($aliases)) {
-            $this->db->where('players.alias_of' . ($aliases ? ' !=' : ''), 0);
+            $this->db->where('alias_of' . ($aliases ? ' !=' : ''), 0);
         }
 
         return $this->db
@@ -319,18 +319,18 @@ class Additional_data extends CI_Model
 
     public function get_aliases($player_id)
     {
-        $this->db->select(['players.name', 'players.id'])
+        $this->db->select(['name', 'id'])
             ->from('players')
-            ->where('players.alias_of', $player_id);
+            ->where('alias_of', $player_id);
 
         return $this->db
             ->get()
             ->result_array();
     }
 
-    public function player_exists($player_id)
+    private function validate_aliases($player_id, $alias_ids)
     {
-        $re = $this->db
+        $player = $this->db
             ->select('id')
             ->from('players')
             ->where('alias_of', 0)
@@ -338,43 +338,51 @@ class Additional_data extends CI_Model
             ->get()
             ->result_array();
 
-        if (count($re) === 0) {
-            return false;
-        } else {
-            return true;
+        if (count($player) === 0) {
+            return ['Unknown player ID given!'];
         }
-    }
 
-    public function validate_aliases($player_id, $alias_ids)
-    {
         if (count($alias_ids) === 0) {
-            return true;
+            return [];
         }
 
         if (in_array($player_id, $alias_ids)) {
-            return false;
+            return ['Self ID in alias list.'];
         }
 
-        $re = $this->db
-            ->select('id')
+        $errors = [];
+
+        $alias_players = $this->db
+            ->select(['id', 'alias_of', 'uid'])
             ->from('players')
             ->where('id !=', $player_id)
             ->where_in('id', $alias_ids)
             ->get()
             ->result_array();
 
-        $diff = array_diff($alias_ids, array_column($re, 'id'));
-
-        if (count($diff) === 0) {
-            return true;
-        } else {
-            return false;
+        $not_found = array_diff($alias_ids, array_column($alias_players, 'id'));
+        if (count($not_found) > 0) {
+            $errors[] = ['Invalid IDs in alias list.'];
         }
+
+        foreach ($alias_players as $ap) {
+            if ($ap['alias_of'] && $ap['alias_of'] !== $player_id) {
+                $errors[] = 'Player #' . $ap['id'] . ' is alias of player #' . $ap['alias_of'] . ' already!';
+            }
+            if ($ap['uid'] !== null) {
+                $errors[] = 'Player #' . $ap['id'] . ' has UID!';
+            }
+        }
+
+        return $errors;
     }
 
     public function update_aliases($player_id, $alias_ids)
     {
-        $errors = [];
+        $errors = $this->validate_aliases($player_id, $alias_ids);
+        if (count($errors) > 0) {
+            return $errors;
+        }
 
         $current_aliases = $this->get_aliases($player_id);
         $removed_aliases = array_diff(array_column($current_aliases, 'id', 'name'), $alias_ids);
@@ -389,6 +397,7 @@ class Additional_data extends CI_Model
                 foreach ($removed_aliases as $rname => $rid) {
                     $this->db->where('player_id', $player_id);
                     $this->db->where('name', $rname);
+                    $this->db->where('uid', null);
                     if (!$this->db->update('entities', ['player_id' => $rid])) {
                         $errors[] = 'Failed to restore player IDs of entity. (' . $rid . ' => ' . html_escape($rname) . ')';
                     }
@@ -400,6 +409,11 @@ class Additional_data extends CI_Model
             $this->db->where_in('id', $alias_ids);
             if (!$this->db->update('players', ['alias_of' => $player_id])) {
                 $errors[] = 'Failed to add selected aliases. (' . implode(', ', $alias_ids) . ')';
+            }
+
+            $this->db->where_in('alias_of', $alias_ids);
+            if (!$this->db->update('players', ['alias_of' => $player_id])) {
+                $errors[] = 'Failed to update inherited aliases. (' . implode(', ', $alias_ids) . ')';
             }
 
             $this->db->where_in('player_id', $alias_ids);
@@ -544,7 +558,7 @@ class Additional_data extends CI_Model
                 'entities.side',
                 'entities.group_name',
                 'entities.role',
-                'entities.ignore'
+                'entities.invalid'
             ])
             ->from('entities')
             ->join('players', 'players.id = entities.player_id')

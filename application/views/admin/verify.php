@@ -320,7 +320,7 @@ foreach ($op_player_entities as $e) {
                                                             echo '<optgroup label="' . html_escape($g) . '">';
                                                             foreach ($ents as $c) {
                                                                 $extra_attr = '';
-                                                                if (intval($c['ignore']) === 1) {
+                                                                if (intval($c['invalid']) === 1) {
                                                                     $extra_attr = ' disabled';
                                                                 } elseif ($c['entity_id'] === $curr) {
                                                                     $extra_attr = ' selected';

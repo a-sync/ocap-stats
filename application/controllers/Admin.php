@@ -252,7 +252,7 @@ class Admin extends CI_Controller
 
                                             if (file_exists(JSONPATH . $operation['filename'])) {
                                                 $opdata = $this->_parse_operation_json($operation);
-                                                $err = $this->operations->process_op_data($opdata['details'], $opdata['entities'], $opdata['events'], $opdata['markers']);
+                                                $err = $this->operations->process_op_data($opdata['details'], $opdata['entities'], $opdata['events'], $opdata['markers'], $opdata['times']);
                                                 $opdata = null;
 
                                                 if (count($err) === 0 && !defined('MANAGE_DATA_JSON_FILES')) {
@@ -363,56 +363,59 @@ class Admin extends CI_Controller
             $operation['tag'] = '';
         }
 
+        $decoder = new JsonMachine\JsonDecoder\ExtJsonDecoder(true, 512, JSON_BIGINT_AS_STRING);
+
         try {
-            $markers = $this->operations->parse_markers(\JsonMachine\JsonMachine::fromFile(JSONPATH . $operation['filename'], '/Markers'));
+            $markers = $this->operations->parse_markers(\JsonMachine\JsonMachine::fromFile(JSONPATH . $operation['filename'], '/Markers', $decoder));
         } catch (exception $e) {
             $markers = [];
         }
 
         try {
-            $addon_version = iterator_to_array(\JsonMachine\JsonMachine::fromFile(JSONPATH . $operation['filename'], '/addonVersion'));
+            $addon_version = iterator_to_array(\JsonMachine\JsonMachine::fromFile(JSONPATH . $operation['filename'], '/addonVersion', $decoder));
             $operation['addon_version'] = isset($addon_version[0]) ? $addon_version[0] : '';
         } catch (exception $e) {
             $operation['addon_version'] = '';
         }
 
         try {
-            $capture_delay = iterator_to_array(\JsonMachine\JsonMachine::fromFile(JSONPATH . $operation['filename'], '/captureDelay'));
+            $capture_delay = iterator_to_array(\JsonMachine\JsonMachine::fromFile(JSONPATH . $operation['filename'], '/captureDelay', $decoder));
             $operation['capture_delay'] = isset($capture_delay[0]) ? $capture_delay[0] : '';
         } catch (exception $e) {
             $operation['capture_delay'] = '';
         }
 
         try {
-            $extension_build = iterator_to_array(\JsonMachine\JsonMachine::fromFile(JSONPATH . $operation['filename'], '/extensionBuild'));
+            $extension_build = iterator_to_array(\JsonMachine\JsonMachine::fromFile(JSONPATH . $operation['filename'], '/extensionBuild', $decoder));
             $operation['extension_build'] = isset($extension_build[0]) ? $extension_build[0] : '';
         } catch (exception $e) {
             $operation['extension_build'] = '';
         }
 
         try {
-            $extension_version = iterator_to_array(\JsonMachine\JsonMachine::fromFile(JSONPATH . $operation['filename'], '/extensionVersion'));
+            $extension_version = iterator_to_array(\JsonMachine\JsonMachine::fromFile(JSONPATH . $operation['filename'], '/extensionVersion', $decoder));
             $operation['extension_version'] = isset($extension_version[0]) ? $extension_version[0] : '';
         } catch (exception $e) {
             $operation['extension_version'] = '';
         }
 
         try {
-            $mission_author = iterator_to_array(\JsonMachine\JsonMachine::fromFile(JSONPATH . $operation['filename'], '/missionAuthor'));
+            $mission_author = iterator_to_array(\JsonMachine\JsonMachine::fromFile(JSONPATH . $operation['filename'], '/missionAuthor', $decoder));
             $operation['mission_author'] = isset($mission_author[0]) ? $mission_author[0] : '';
         } catch (exception $e) {
             $operation['mission_author'] = '';
         }
 
+        $times = null;
         try {
-            $start_time = iterator_to_array(\JsonMachine\JsonMachine::fromFile(JSONPATH . $operation['filename'], '/times'));
-            $operation['start_time'] = isset($start_time[0]) ? $start_time[0]['systemTimeUTC'] : '';
+            $times = iterator_to_array(\JsonMachine\JsonMachine::fromFile(JSONPATH . $operation['filename'], '/times', $decoder));
+            $operation['start_time'] = isset($times[0]) ? $times[0]['systemTimeUTC'] : '';
         } catch (exception $e) {
             $operation['start_time'] = '';
         }
 
-        $entities = $this->operations->parse_entities(\JsonMachine\JsonMachine::fromFile(JSONPATH . $operation['filename'], '/entities'));
-        $events = $this->operations->parse_events(\JsonMachine\JsonMachine::fromFile(JSONPATH . $operation['filename'], '/events'));
+        $entities = $this->operations->parse_entities(\JsonMachine\JsonMachine::fromFile(JSONPATH . $operation['filename'], '/entities', $decoder));
+        $events = $this->operations->parse_events(\JsonMachine\JsonMachine::fromFile(JSONPATH . $operation['filename'], '/events', $decoder));
 
         $operation['end_winner'] = $events['end_winner'];
         $operation['end_message'] = $events['end_message'];
@@ -421,7 +424,8 @@ class Admin extends CI_Controller
             'markers' => $markers,
             'details' => $operation,
             'entities' => $entities['entities'],
-            'events' => array_merge($events['events'], $entities['events'])
+            'events' => array_merge($events['events'], $entities['events']),
+            'times' => is_array($times) ? $times : []
         );
     }
 }

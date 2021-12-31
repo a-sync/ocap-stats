@@ -39,9 +39,9 @@ $deduped_items = array_reduce($items, function ($acc, $next) {
                         <thead>
                             <tr class="mdc-data-table__header-row">
                                 <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="ascending" data-column-id="time">Time</th>
-                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="attacker" title="Player name">Attacker</th>
+                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="attacker" title="Player name / Entity ID">Attacker</th>
                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="event">Event</th>
-                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="victim" title="Player name">Victim</th>
+                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="victim" title="Player name / Entity ID">Victim</th>
                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="weapon">Weapon</th>
                                 <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="distance">Distance</th>
                             </tr>
@@ -59,6 +59,8 @@ $deduped_items = array_reduce($items, function ($acc, $next) {
                                     if ($attacker_player_name !== '' && $i['attacker_name'] !== $attacker_player_name) {
                                         $attacker_title = ' title="' . html_escape($attacker_player_name) . '"';
                                     }
+                                } elseif ($i['attacker_id'] !== null) {
+                                    $attacker_name = '<span title="#' . $i['attacker_id'] . '">' . $attacker_name . '</span>';
                                 }
                                 $attacker_medal = '';
                                 if (isset($op_commanders[$i['attacker_side']]) && $op_commanders[$i['attacker_side']]['entity_id'] === $i['attacker_id']) {
@@ -74,6 +76,8 @@ $deduped_items = array_reduce($items, function ($acc, $next) {
                                     if ($victim_player_name !== '' && $i['victim_name'] !== $victim_player_name) {
                                         $victim_title = ' title="' . html_escape($victim_player_name) . '"';
                                     }
+                                } elseif ($i['victim_id'] !== null) {
+                                    $victim_name = '<span title="#' . $i['victim_id'] . '">' . $victim_name . '</span>';
                                 }
                                 $victim_medal = '';
                                 if (isset($op_commanders[$i['victim_side']]) && $op_commanders[$i['victim_side']]['entity_id'] === $i['victim_id']) {

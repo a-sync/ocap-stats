@@ -106,7 +106,7 @@
         allowDeselect: true,
         addToBody: true,
         data: players.reduce((res, p) => {
-            if (null !== player_id && p.id !== player_id && (parseInt(p.alias_of, 2) === 0 || p.alias_of === player_id)) {
+            if (null !== player_id && p.id !== player_id && (p.alias_of === undefined || p.alias_of === player_id) && p.uid === undefined) {
                 res.push({
                     text: p.name,
                     value: p.id,
@@ -139,7 +139,7 @@
                 .then(response => response.json())
                 .then(current_aliases => {
                     const aliases_opts = players.reduce((res, p) => {
-                        if (p.id !== sel.value && (parseInt(p.alias_of, 2) === 0 || p.alias_of === sel.value)) {
+                        if (p.id !== sel.value && (p.alias_of === undefined || p.alias_of === sel.value) && p.uid === undefined) {
                             res.push({
                                 text: p.name,
                                 value: p.id,
@@ -158,7 +158,7 @@
         },
         addToBody: true,
         data: players.reduce((res, p) => {
-            if (parseInt(p.alias_of, 2) === 0) {
+            if (p.alias_of === undefined) {
                 res.push({
                     text: p.name,
                     value: p.id,

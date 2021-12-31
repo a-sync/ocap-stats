@@ -7,7 +7,6 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8 */;
 
 
-DROP TABLE IF EXISTS `entities`;
 CREATE TABLE IF NOT EXISTS `entities` (
   `operation_id` int(10) unsigned NOT NULL,
   `id` int(10) unsigned NOT NULL,
@@ -28,8 +27,10 @@ CREATE TABLE IF NOT EXISTS `entities` (
   `fkills` int(10) unsigned NOT NULL DEFAULT '0',
   `vkills` int(10) unsigned NOT NULL DEFAULT '0',
   `deaths` int(10) unsigned NOT NULL DEFAULT '0',
-  `ignore` TINYINT(1) unsigned DEFAULT NULL,
+  `distance_traveled` int(10) unsigned NOT NULL DEFAULT '0',
+  `invalid` TINYINT(1) unsigned DEFAULT NULL,
   `cmd` TINYINT(1) unsigned DEFAULT NULL,
+  `uid` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`operation_id`,`id`),
   KEY `player_id` (`player_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -39,10 +40,11 @@ CREATE TABLE IF NOT EXISTS `entities` (
 --       `operations` -> `id`
 --   `player_id`
 --       `players` -> `id`
+--   `uid`
+--       `players` -> `uid`
 --
 
 
-DROP TABLE IF EXISTS `events`;
 CREATE TABLE IF NOT EXISTS `events` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `operation_id` int(10) unsigned NOT NULL,
@@ -55,7 +57,7 @@ CREATE TABLE IF NOT EXISTS `events` (
   `data` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `operation_id` (`operation_id`,`attacker_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=1 ;
 --
 -- RELATIONS FOR TABLE `events`:
 --   `operation_id`
@@ -67,7 +69,6 @@ CREATE TABLE IF NOT EXISTS `events` (
 --
 
 
-DROP TABLE IF EXISTS `operations`;
 CREATE TABLE IF NOT EXISTS `operations` (
   `id` int(10) unsigned NOT NULL,
   `world_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -91,7 +92,6 @@ CREATE TABLE IF NOT EXISTS `operations` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-DROP TABLE IF EXISTS `players`;
 CREATE TABLE IF NOT EXISTS `players` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -101,11 +101,28 @@ CREATE TABLE IF NOT EXISTS `players` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uid` (`uid`),
   KEY `alias_of` (`alias_of`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=11 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=11 ;
 --
 -- RELATIONS FOR TABLE `players`:
 --   `alias_of`
 --       `players` -> `id`
+--
+
+
+CREATE TABLE IF NOT EXISTS `timestamps` (
+  `operation_id` int(10) unsigned NOT NULL,
+  `id` int(10) unsigned NOT NULL,
+  `date` DATETIME NOT NULL,
+  `frame_num` int(10) unsigned NOT NULL,
+  `sys_time_utc` DATETIME NOT NULL,
+  `time` decimal(10,3) unsigned NOT NULL,
+  `time_multiplier` decimal(4,2) unsigned NOT NULL,
+  PRIMARY KEY (`operation_id`,`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+--
+-- RELATIONS FOR TABLE `entities`:
+--   `operation_id`
+--       `operations` -> `id`
 --
 
 

@@ -61,6 +61,37 @@ class Operations extends CI_Model
         ]);
     }
 
+    public function insert_time($data)
+    {
+        /*
+        "times":[
+            {
+                "date":"2022-01-26T20:28:00",
+                "frameNum":0,
+                "systemTimeUTC":"2021-12-26T20:14:50.22",
+                "time":0.0,
+                "timeMultiplier":1.0
+            },
+            {
+                "date":"2022-01-26T20:28:00",
+                "frameNum":10,
+                "systemTimeUTC":"2021-12-26T20:20:08.71",
+                "time":10.006,
+                "timeMultiplier":1.0
+            }
+        ]
+        */
+        return $this->db->insert('timestamps', [
+            'operation_id' => $data['operation_id'],
+            'id' => $data['id'],
+            'date' => $data['date'],
+            'frame_num' => $data['frameNum'],
+            'sys_time_utc' => $data['systemTimeUTC'],
+            'time' => $data['time'],
+            'time_multiplier' => $data['timeMultiplier']
+        ]);
+    }
+
     public function parse_entities($data)
     {
         $entities = [];
@@ -76,6 +107,7 @@ class Operations extends CI_Model
                 'role' => element('role', $e, ''),
                 'side' => element('side', $e, ''),
                 'start_frame_num' => $e['startFrameNum'],
+                'last_frame_num' => null,
                 'type' => $e['type'],
                 'class' => element('class', $e, ''),
                 'shots' => isset($e['framesFired']) ? count($e['framesFired']) : 0,
@@ -85,26 +117,45 @@ class Operations extends CI_Model
                 'fkills' => 0,
                 'vkills' => 0,
                 'deaths' => 0,
-                '_deaths' => 0
+                '_deaths' => 0,
+                'distance_traveled' => 0,
+                'uid' => element('uid', $e, null)
             ];
 
-            /* :UPDATE:UNIT: aka position: https://github.com/OCAP2/addon/blob/main/addons/%40ocap/addons/ocap/functions/fn_startCaptureLoop.sqf#L146
-            [
-                [281.652,696.751,-2.23139], // pos.x, pos.y, pos.z
-                109, // direction
-                1, // 0: dead, 1: awake, 2: unconscious
-                0, // is_vehicle
-                "PFC Arkor", // name
-                1, // is_player
-                "Leader" // role
-            ],
-            */
+            $last_xyz = null;
+            $last_crew = [];
+            $last_state = 1; // starting state is awake, skip this one
+            foreach ($e['positions'] as $f => $p) {
+                $current_frame = $e['startFrameNum'] + $f;
+                if ($entities[$e['id']]['last_frame_num'] === null || $current_frame > $entities[$e['id']]['last_frame_num']) {
+                    $entities[$e['id']]['last_frame_num'] = $current_frame;
+                }
 
-            if ($e['type'] === 'unit' && in_array($e['side'], ['WEST', 'EAST', 'GUER', 'CIV'])) {
-                $last_state = 1; // starting state is awake, skip this one
-                foreach ($e['positions'] as $f => $p) {
+                // skip frame if empty
+                if (empty($p)) {
+                    continue;
+                }
+
+                if ($last_xyz !== null) {
+                    $distance = sqrt(pow($last_xyz[0] - $p[0][0], 2) + pow($last_xyz[1] - $p[0][1], 2) + pow(element(2, $last_xyz, 0) - element(2, $p[0], 0), 2));
+                    $entities[$e['id']]['distance_traveled'] += $distance;
+                }
+                $last_xyz = $p[0];
+
+                if ($e['type'] === 'unit' && in_array($e['side'], ['WEST', 'EAST', 'GUER', 'CIV'])) {
+                    /* :UPDATE:UNIT: (https://github.com/OCAP2/addon/blob/main/addons/%40ocap/addons/ocap/functions/fn_startCaptureLoop.sqf#L146)
+                    [
+                        [281.652,696.751,-2.23139], // pos.x, pos.y, pos.z
+                        109, // direction
+                        1, // 0: dead, 1: awake, 2: unconscious
+                        0, // in vehicle
+                        "PFC Arkor", // name
+                        1, // is player
+                        "Leader" // role
+                    ]
+                    */
                     if (isset($p[5])) {
-                        // not a player, not a vehicle, is a player, name field is empty and position name field is not empty
+                        // not a player, not in a vehicle, is a player, name field is empty and position name field is not empty
                         if (
                             $entities[$e['id']]['is_player'] === 0
                             && $p[3] === 0
@@ -117,38 +168,81 @@ class Operations extends CI_Model
                             $entities[$e['id']]['name'] = $p[4];
                         }
                     }
+                } elseif ($e['type'] === 'vehicle') {
+                    /* :UPDATE:VEH: (https://github.com/OCAP2/addon/blob/main/addons/%40ocap/addons/ocap/functions/fn_startCaptureLoop.sqf#L198)
+                    [
+                        [281.652,696.751,-2.23139], // pos.x, pos.y, pos.z
+                        109, // direction
+                        1, // 0: dead, 1: awake, 2: unconscious
+                        [], // crew IDs (driver, gunner, commander, turrets, cargo)
+                        [30,30], // from frame, until frame
+                    ]
+                    */
+                    if (isset($p[4]) && is_array($p[4])) {
+                        $current_frame = $p[4][0];
+                        $entities[$e['id']]['last_frame_num'] = $p[4][1];
+                    }
 
-                    if ($last_state !== $p[2]) {
-                        $last_state = $p[2];
+                    $entered = array_diff($p[3], $last_crew);
+                    $exited = array_diff($last_crew, $p[3]);
 
-                        $event_name = '';
-                        if ($last_state === 0) {
-                            $event_name = '_dead';
-                            $entities[$e['id']]['_deaths']++;
-                        } elseif ($last_state === 1) {
-                            $event_name = '_awake';
-                        } elseif ($last_state === 2) {
-                            $event_name = '_uncon';
-                        }
-
+                    foreach ($entered as $eid) {
                         $events[] = [
-                            'frame' => $e['startFrameNum'] + $f,
-                            'event' => $event_name,
+                            'frame' => $current_frame,
+                            'event' => '_enter_vehicle',
                             'victim_id' => $e['id'],
-                            'attacker_id' => null,
+                            'attacker_id' => $eid,
                             'weapon' => null,
                             'distance' => 0,
                             'data' => null
                         ];
                     }
+
+                    foreach ($exited as $eid) {
+                        $events[] = [
+                            'frame' => $current_frame,
+                            'event' => '_exit_vehicle',
+                            'victim_id' => $e['id'],
+                            'attacker_id' => $eid,
+                            'weapon' => null,
+                            'distance' => 0,
+                            'data' => null
+                        ];
+                    }
+
+                    $last_crew = $p[3];
                 }
 
-                /*
-                {"framesFired":[],"group":"B1","id":108,"isPlayer":1,"name":"","positions":[[[13687.6,17835.8],76,1,0,"",1]],"side":"GUER","startFrameNum":428,"type":"unit"}
-                */
-                if ($entities[$e['id']]['name'] === '') {
-                    $entities[$e['id']]['is_player'] = 0;
+                if ($last_state !== $p[2]) {
+                    $last_state = $p[2];
+
+                    $event_name = '';
+                    if ($last_state === 0) {
+                        $event_name = '_dead';
+                        $entities[$e['id']]['_deaths']++;
+                    } elseif ($last_state === 1) {
+                        $event_name = '_awake';
+                    } elseif ($last_state === 2) {
+                        $event_name = '_uncon';
+                    }
+
+                    $events[] = [
+                        'frame' => $current_frame,
+                        'event' => $event_name,
+                        'victim_id' => $e['id'],
+                        'attacker_id' => null,
+                        'weapon' => null,
+                        'distance' => 0,
+                        'data' => null
+                    ];
                 }
+            }
+
+            /*
+            {"framesFired":[],"group":"B1","id":108,"isPlayer":1,"name":"","positions":[[[13687.6,17835.8],76,1,0,"",1]],"side":"GUER","startFrameNum":428,"type":"unit"}
+            */
+            if ($entities[$e['id']]['name'] === '') {
+                $entities[$e['id']]['is_player'] = 0;
             }
         }
 
@@ -325,7 +419,7 @@ class Operations extends CI_Model
         return $re;
     }
 
-    public function process_op_data($details, $entities, $events, $markers)
+    public function process_op_data($details, $entities, $events, $markers, $times)
     {
         $errors = [];
 
@@ -335,6 +429,14 @@ class Operations extends CI_Model
 
         if (!$details['start_time']) {
             $details['start_time'] = gmdate('Y-m-d H:i:s', strtotime($details['date']));
+        }
+
+        foreach ($times as $ti => $t) {
+            $t['operation_id'] = $details['id'];
+            $t['id'] = $ti;
+            if (!$this->insert_time($t)) {
+                $errors[] = 'Failed to save timestamp. #' . $ti;
+            }
         }
 
         if ($this->insert($details)) {
@@ -348,7 +450,7 @@ class Operations extends CI_Model
                     $entities[$vid]['deaths']++;
                 }
 
-                if (!is_null($aid) && !is_null($vid) && $aid !== $vid && isset($entities[$aid])) {
+                if (in_array($e['event'], ['hit', 'killed']) && !is_null($aid) && !is_null($vid) && $aid !== $vid) {
                     $ff = ($entities[$aid]['side'] === $entities[$vid]['side']) ? true : false;
 
                     if ($e['event'] === 'hit') {
@@ -381,7 +483,6 @@ class Operations extends CI_Model
                 $events = null;
 
                 $players = $this->get_all_players();
-                $player_names = array_column($players, 'name');
 
                 $new_players = [];
                 foreach ($entities as $i => $e) {
@@ -391,22 +492,46 @@ class Operations extends CI_Model
                     unset($entities[$i]['_deaths']);
 
                     if ($e['is_player']) {
-                        $pi = array_search($e['name'], $player_names);
-                        if ($pi === false) {
-                            $new_player_names = array_column($new_players, 'name');
-                            $npi = array_search($e['name'], $new_player_names);
+                        if ($e['uid'] !== null) {
+                            $player_uids = array_column($players, 'uid');
+                            $pi = array_search($e['uid'], $player_uids);
+                            if ($pi === false) {
+                                $new_player_uids = array_column($new_players, 'uid');
+                                $npi = array_search($e['uid'], $new_player_uids);
 
-                            if ($npi === false) {
-                                $new_players[] = [
-                                    'entity_ids' => [$i],
-                                    'name' => $e['name']
-                                ];
+                                if ($npi === false) {
+                                    $new_players[] = [
+                                        'entity_ids' => [$i],
+                                        'name' => $e['name'],
+                                        'uid' => $e['uid']
+                                    ];
+                                } else {
+                                    $new_players[$npi]['entity_ids'][] = $i;
+                                }
                             } else {
-                                $new_players[$npi]['entity_ids'][] = $i;
+                                // Note: a player with a uid can never be an alias
+                                $entities[$i]['player_id'] = $players[$pi]['id'];
                             }
                         } else {
-                            $p = $players[$pi];
-                            $entities[$i]['player_id'] = $p['alias_of'] ? $p['alias_of'] : $p['id'];
+                            $player_names = array_column($players, 'name');
+                            $pi = array_search(strtolower($e['name']), array_map('strtolower', $player_names));
+                            if ($pi === false) {
+                                $new_player_names = array_column($new_players, 'name');
+                                $npi = array_search(strtolower($e['name']), array_map('strtolower', $new_player_names));
+
+                                if ($npi === false) {
+                                    $new_players[] = [
+                                        'entity_ids' => [$i],
+                                        'name' => $e['name'],
+                                        'uid' => null
+                                    ];
+                                } else {
+                                    $new_players[$npi]['entity_ids'][] = $i;
+                                }
+                            } else {
+                                $p = $players[$pi];
+                                $entities[$i]['player_id'] = $p['alias_of'] ? $p['alias_of'] : $p['id'];
+                            }
                         }
                     }
                 }
@@ -462,7 +587,7 @@ class Operations extends CI_Model
     private function get_all_players()
     {
         return $this->db
-            ->select(['id', 'name', 'alias_of'])
+            ->select(['id', 'name', 'alias_of', 'uid'])
             ->from('players')
             ->get()
             ->result_array();

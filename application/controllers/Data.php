@@ -50,9 +50,9 @@ class Data extends CI_Controller
         $add_new_player = $this->input->post('add_new_player');
         $new_player_name = $this->input->post('new_player_name', true);
         $player_id = $this->input->post('player_id');
-        $aliases = $this->input->post('aliases');
-        if (!is_array($aliases)) {
-            $aliases = [];
+        $alias_ids = $this->input->post('aliases');
+        if (!is_array($alias_ids)) {
+            $alias_ids = [];
         }
 
         if (!is_null($alias_of)) {
@@ -60,22 +60,11 @@ class Data extends CI_Controller
 
             return $this->_ajax(array_column($current_aliases, 'id'));
         } elseif ($add_alias) {
-            log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] updating aliases of ' . $player_id . ' (' . implode(', ', $aliases) . ')');
+            log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] updating aliases of ' . $player_id . ' (' . implode(', ', $alias_ids) . ')');
 
             if (filter_var($player_id, FILTER_VALIDATE_INT)) {
-                $player_exists = $this->additional_data->player_exists($player_id);
-
-                if ($player_exists) {
-                    $aliases_valid = $this->additional_data->validate_aliases($player_id, $aliases);
-                    if ($aliases_valid) {
-                        $err = $this->additional_data->update_aliases($player_id, $aliases);
-                        $errors = array_merge($errors, $err);
-                    } else {
-                        $errors[] = 'Invalid aliases selected!';
-                    }
-                } else {
-                    $errors[] = 'Unknown player ID given.';
-                }
+                $err = $this->additional_data->update_aliases($player_id, $alias_ids);
+                $errors = array_merge($errors, $err);
             } else {
                 $errors[] = 'Invalid player ID given!';
             }
@@ -85,15 +74,23 @@ class Data extends CI_Controller
             if (!is_null($new_player_name) && $new_player_name !== '') {
                 $re = $this->additional_data->add_new_player($new_player_name);
                 $errors = array_merge($errors, $re['errors']);
-                if ($re['player_id'] > 0) {
-                    $player_id = $re['alias_of'] > 0 ? strval($re['alias_of']) : strval($re['player_id']);
+                if ($re['player_id']) {
+                    $player_id = $re['alias_of'] ? strval($re['alias_of']) : strval($re['player_id']);
                 }
             } else {
                 $errors[] = 'Player name can not be empty!';
             }
         }
 
-        $players = $this->additional_data->get_players_names();
+        $players = array_map(function ($p) {
+            if ($p['uid'] === null) {
+                unset($p['uid']);
+            }
+            if ($p['alias_of'] === '0') {
+                unset($p['alias_of']);
+            }
+            return $p;
+        }, $this->additional_data->get_players_names());
 
         if (count($errors) > 0) {
             log_message('error', implode('; ', $errors));
