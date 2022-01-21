@@ -155,7 +155,7 @@ class Operations extends CI_Model
                     ]
                     */
                     if (isset($p[5])) {
-                        // not a player, not in a vehicle, is a player, name field is empty and position name field is not empty
+                        // entity not a player, not in a vehicle, is a player, name field is empty and position name field is not empty
                         if (
                             $entities[$e['id']]['is_player'] === 0
                             && $p[3] === 0
@@ -391,7 +391,8 @@ class Operations extends CI_Model
 
     public function parse_markers($data)
     {
-        $re = [];
+        $shots = [];
+        $events = [];
 
         /** marker: projectile
          * [0] icon magIcons/*
@@ -407,16 +408,41 @@ class Operations extends CI_Model
          * [10] marker_brush (SolidBorder, SolidFull, solid, Solid, border)
          */
         foreach ($data as $m) {
-            if ($m[0] && substr($m[0], 0, 9) === 'magIcons/') {
-                if (!isset($re[$m[4]])) {
-                    $re[$m[4]] = 1;
+            // ["magIcons/rhs_vog25p_ca.paa","PBG40 - HE-T Grenade",981,992,54,"FFFFFF",-1,[[981,[4590.9,7109.79,201.889],238.414,1],[982,[4589.02,7108.63,204.324],238.414,1]],[1,1],"ICON","Solid"]
+            if ($m[0] && (substr($m[0], 0, 9) === 'magIcons/' || $m[0] === 'Minefield')) {
+                if (!isset($shots[$m[4]])) {
+                    $shots[$m[4]] = 1;
                 } else {
-                    $re[$m[4]]++;
+                    $shots[$m[4]]++;
                 }
+
+                $distance = 0;
+                if (isset($m[7]) && is_array($m[7])) {
+                    $last_xyz = null;
+                    foreach ($m[7] as $p) {
+                        if ($last_xyz !== null) {
+                            $distance += sqrt(pow($p[1][0] - $last_xyz[0], 2) + pow($p[1][1] - $last_xyz[1], 2) + pow(element(2, $p[1], 0) - element(2, $last_xyz, 0), 2));
+                        }
+                        $last_xyz = $p[1];
+                    }
+                }
+
+                $events[] = [
+                    'frame' => $m[2],
+                    'event' => '_projectile',
+                    'victim_id' => null,
+                    'attacker_id' => $m[4],
+                    'weapon' => $m[1],
+                    'distance' => $distance,
+                    'data' => json_encode(array_slice($m, 0, 7))
+                ];
             }
         }
 
-        return $re;
+        return [
+            'shots' => $shots,
+            'events' => $events
+        ];
     }
 
     public function process_op_data($details, $entities, $events, $markers, $times)
@@ -436,6 +462,12 @@ class Operations extends CI_Model
             $t['id'] = $ti;
             if (!$this->insert_time($t)) {
                 $errors[] = 'Failed to save timestamp. #' . $ti;
+            }
+        }
+
+        foreach ($markers['shots'] as $eid => $n) {
+            if (isset($entities[$eid])) {
+                $entities[$eid]['shots'] += $n;
             }
         }
 
@@ -471,12 +503,6 @@ class Operations extends CI_Model
                 }
             }
 
-            foreach ($markers as $eid => $shots) {
-                if (isset($entities[$eid])) {
-                    $entities[$eid]['shots'] += $shots;
-                }
-            }
-
             if ($this->db->insert_batch('events', $events) === false) {
                 $errors[] = 'Failed to save events.';
             } else {
@@ -485,6 +511,7 @@ class Operations extends CI_Model
                 $players = $this->get_all_players();
 
                 $new_players = [];
+                $players_updates = [];
                 foreach ($entities as $i => $e) {
                     $entities[$i]['operation_id'] = $details['id'];
 
@@ -492,7 +519,7 @@ class Operations extends CI_Model
                     unset($entities[$i]['_deaths']);
 
                     if ($e['is_player']) {
-                        if ($e['uid'] !== null) {
+                        if ($e['uid'] !== null && $e['uid'] !== 0 && $e['uid'] !== '') {
                             $player_uids = array_column($players, 'uid');
                             $pi = array_search($e['uid'], $player_uids);
                             if ($pi === false) {
@@ -507,13 +534,25 @@ class Operations extends CI_Model
                                     ];
                                 } else {
                                     $new_players[$npi]['entity_ids'][] = $i;
+                                    if ($e['name'] !== $new_players[$npi]['name']) {
+                                        $new_players[$npi]['name'] = $e['name'];
+                                    }
                                 }
                             } else {
                                 // Note: a player with a uid can never be an alias
-                                $entities[$i]['player_id'] = $players[$pi]['id'];
+                                $p = $players[$pi];
+                                $entities[$i]['player_id'] = $p['id'];
+                                if ($e['name'] !== $p['name']) {
+                                    $players_updates[$p['id']] = [
+                                        'id' => $p['id'],
+                                        'name' => $e['name']
+                                    ];
+                                }
                             }
                         } else {
-                            $player_names = array_column($players, 'name');
+                            $player_names = array_column(array_filter($players, function ($v) {
+                                return $v['uid'] === null;
+                            }), 'name');
                             $pi = array_search(strtolower($e['name']), array_map('strtolower', $player_names));
                             if ($pi === false) {
                                 $new_player_names = array_column($new_players, 'name');
@@ -552,6 +591,11 @@ class Operations extends CI_Model
                     }
                 }
                 $entities = null;
+
+                if (count($players_updates) > 0) {
+                    $err = $this->update_players($players_updates);
+                    $errors = array_merge($errors, $err);
+                }
             }
         } else {
             $errors[] = 'Failed to save operation.';
@@ -562,6 +606,7 @@ class Operations extends CI_Model
 
     public function purge($id)
     {
+        $del_timestamps = $this->db->delete('timestamps', ['operation_id' => $id]);
         $del_events = $this->db->delete('events', ['operation_id' => $id]);
         $del_entities = $this->db->delete('entities', ['operation_id' => $id]);
         $del_operation = $this->db->delete('operations', ['id' => $id]);
@@ -570,6 +615,10 @@ class Operations extends CI_Model
             return false;
         } else {
             $errors = [];
+
+            if ($del_timestamps === false) {
+                $errors[] = 'Error when deleting from timestamps table. ';
+            }
             if ($del_events === false) {
                 $errors[] = 'Error when deleting from events table. ';
             }
@@ -596,9 +645,13 @@ class Operations extends CI_Model
     private function add_players($new_players)
     {
         $errors = [];
+
         foreach ($new_players as $i => $p) {
-            if ($this->db->insert('players', ['name' => $p['name']]) === false) {
-                $errors[] = 'Failed to create new player (' . $p['name'] . ')';
+            if ($this->db->insert('players', [
+                'name' => $p['name'],
+                'uid' => $p['uid']
+            ]) === false) {
+                $errors[] = 'Failed to create new player (' . $p['name'] . '/' . $p['uid'] . ')';
             } else {
                 $new_players[$i]['player_id'] = $this->db->insert_id();
             }
@@ -608,6 +661,19 @@ class Operations extends CI_Model
             'errors' => $errors,
             'new_players' => $new_players
         ];
+    }
+
+    private function update_players($players)
+    {
+        $errors = [];
+
+        if (count($players) > 0) {
+            if (false === $this->db->update_batch('players', $players, 'id')) {
+                $errors[] = 'Failed to update player names.';
+            }
+        }
+
+        return $errors;
     }
 
     public function get_ops($events_filter, $id = false)

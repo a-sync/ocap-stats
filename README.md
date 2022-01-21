@@ -36,7 +36,7 @@
 ## Stats collected  
   * **Shots**  
     nr. of framesFired events (only counts main weapon and sidearm rounds afaik.)  
-  \+ nr. of projectile markes tied to a _unit_ (grenades, rockets, etc.)  
+  \+ nr. of projectile markers tied to a _unit_ (grenades, rockets, mines, etc.)  
   * **Hits**  
     nr. of `hit` events as attacker, where victim is any _unit_ or _vehicle_ (asset)  
   * **Kills**  
@@ -63,3 +63,4 @@ CTRL+F
   1. player profile tabs:
      * rivals (enemy commanders)
   1. ui to edit entities player assignment
+  1. support `capture_delay` properly

@@ -35,6 +35,7 @@ $sides = $this->config->item('sides');
                                     <td class="mdc-data-table__cell">Start time</td>
                                     <td class="mdc-data-table__cell"><?php echo $op['start_time']; ?></td>
                                 </tr>
+                                <?php // TODO: in game time / timestamps ?>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Tag</td>
                                     <td class="mdc-data-table__cell"><?php echo html_escape($op['tag']); ?></td>

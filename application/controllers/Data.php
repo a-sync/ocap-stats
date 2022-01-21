@@ -196,7 +196,7 @@ class Data extends CI_Controller
 
                             if ($op_verified === 0) {
                                 $start_time = $this->input->post('start_time');
-                                if (preg_match('/^[0-2][0-9]{3}-[0-1][0-9]-[0-3][0-9]\ [0-2][0-9]:[0-5][0-9]:[0-5][0-9]$/', $start_time) && strtotime($start_time) !== false) {
+                                if (preg_match('/^[0-2][0-9]{3}-[0-1][0-9]-[0-3][0-9] [0-2][0-9]:[0-5][0-9]:[0-5][0-9]$/', $start_time) && strtotime($start_time) !== false) {
                                     $op_upd['start_time'] = gmdate('Y-m-d H:i:s', strtotime($start_time));
                                 } else {
                                     $errors[] = 'Invalid start time format!';

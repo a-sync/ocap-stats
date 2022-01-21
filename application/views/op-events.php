@@ -10,6 +10,7 @@ if (count($items) === 0) {
 $deduped_items = array_reduce($items, function ($acc, $next) {
     if ($acc === null) {
         $next['_count'] = 1;
+
         return [$next];
     } else {
         $last_key = key(array_slice($acc, -1, 1, true));

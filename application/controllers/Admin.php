@@ -368,7 +368,10 @@ class Admin extends CI_Controller
         try {
             $markers = $this->operations->parse_markers(\JsonMachine\JsonMachine::fromFile(JSONPATH . $operation['filename'], '/Markers', $decoder));
         } catch (exception $e) {
-            $markers = [];
+            $markers = [
+                'shots' => [],
+                'events' => []
+            ];
         }
 
         try {
@@ -421,10 +424,12 @@ class Admin extends CI_Controller
         $operation['end_message'] = $events['end_message'];
 
         return array(
-            'markers' => $markers,
+            'markers' => [
+                'shots' => $markers['shots']
+            ],
             'details' => $operation,
             'entities' => $entities['entities'],
-            'events' => array_merge($events['events'], $entities['events']),
+            'events' => array_merge($events['events'], $markers['events'], $entities['events']),
             'times' => is_array($times) ? $times : []
         );
     }
