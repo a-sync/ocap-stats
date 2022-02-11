@@ -32,6 +32,8 @@ class Players extends CI_Model
             ->select_sum('entities.fkills')
             ->select_sum('entities.vkills')
             ->select_sum('entities.deaths')
+            ->select_sum('entities.distance_traveled')
+            ->select('SUM((entities.last_frame_num - entities.start_frame_num) * operations.capture_delay) AS seconds_in_game')
             ->select('COUNT(DISTINCT entities.operation_id) AS attendance')
             ->from('players')
             ->join('entities', 'entities.player_id = players.id')
@@ -105,6 +107,21 @@ class Players extends CI_Model
         }
     }
 
+    public function get_alias_of_by_id($id) {
+        $re = $this->db
+            ->select('alias_of')
+            ->from('players')
+            ->where('id', $id)
+            ->get()
+            ->result_array();
+
+        if (count($re) === 0) {
+            return null;
+        } else {
+            return $re[0]['alias_of'];
+        }
+    }
+
     public function get_ops_by_id($id)
     {
         $this->db
@@ -116,6 +133,16 @@ class Players extends CI_Model
                 'entities.name',
                 'entities.role',
                 'entities.side',
+                'entities.shots',
+                'entities.hits',
+                'entities.fhits',
+                'entities.kills',
+                'entities.fkills',
+                'entities.vkills',
+                'entities.deaths',
+                'entities.distance_traveled',
+                'entities.cmd',
+                '((entities.last_frame_num - entities.start_frame_num) * operations.capture_delay) AS seconds_in_game',
                 'operations.mission_name',
                 'operations.mission_duration',
                 'operations.world_name',
@@ -128,13 +155,6 @@ class Players extends CI_Model
                 'operations.end_message',
                 '(SELECT COUNT(DISTINCT ents.player_id) FROM entities AS ents WHERE ents.operation_id = operations.id) AS players_total'
             ])
-            ->select_sum('shots')
-            ->select_sum('hits')
-            ->select_sum('fhits')
-            ->select_sum('kills')
-            ->select_sum('fkills')
-            ->select_sum('vkills')
-            ->select_sum('deaths')
             ->from('operations')
             ->join('entities', 'entities.operation_id = operations.id', 'RIGHT')
             ->join('players', 'players.id = entities.player_id')

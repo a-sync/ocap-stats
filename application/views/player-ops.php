@@ -23,7 +23,7 @@ $sides = $this->config->item('sides');
                     <table class="mdc-data-table__table sortable">
                         <thead>
                             <tr class="mdc-data-table__header-row">
-                                <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="descending" data-column-id="op_id" title="Alias">ID</th>
+                                <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="descending" data-column-id="op_id" title="Alias / Distance traveled / Time in game">ID</th>
                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="date" title="Start time">Date</th>
                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="event" title="Tag">Event</th>
                                 <th class="mdc-data-table__header-cell cell__title" role="columnheader" scope="col" aria-sort="none" data-column-id="op_info" title="Map, Duration, Players">
@@ -69,6 +69,11 @@ $sides = $this->config->item('sides');
                                         $i['fkills'] += $next_i['fkills'];
                                         $i['vkills'] += $next_i['vkills'];
                                         $i['deaths'] += $next_i['deaths'];
+                                        $i['distance_traveled'] += $next_i['distance_traveled'];
+                                        $i['seconds_in_game'] += $next_i['seconds_in_game'];
+                                        if(intval($i['cmd']) + intval($next_i['cmd']) > 0) {
+                                            $i['cmd'] = 1;
+                                        }
 
                                         $merged_indexes[] = $next_index;
                                     }
@@ -89,6 +94,11 @@ $sides = $this->config->item('sides');
                                     }
                                 }
 
+                                $medal = '';
+                                if ($i['cmd']) {
+                                    $medal = '<span class="side__' . html_escape(strtolower($i['side'])) . '">🎖</span>';
+                                }
+
                                 $hits = $i['hits'];
                                 if (defined('ADJUST_HIT_DATA') && $i['operation_id'] < ADJUST_HIT_DATA) {
                                     $hits = '';
@@ -99,8 +109,18 @@ $sides = $this->config->item('sides');
                                     $fhits = '';
                                 }
 
-                                $new_op_row = ($prev_op_id !== $i['operation_id']);
-                                $alias_title = ' title="' . html_escape($i['name']) . '"';
+                                $distance = 'n/a';
+                                if ($i['distance_traveled'] > 1000) {
+                                    $distance = number_format($i['distance_traveled'] / 1000, 3) . ' km';
+                                } elseif ($i['distance_traveled'] > 0) {
+                                    $distance = number_format($i['distance_traveled']) . ' meters';
+                                }
+
+                                $time = 'n/a';
+                                if ($i['seconds_in_game'] > 0) {
+                                    $time = strtolower(timespan(0, intval($i['seconds_in_game'])));
+                                }
+                                $alias_title = ' title="' . html_escape($i['name']) . ' / ' . $distance . ' / ' . $time . '"';
                             ?>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell mdc-data-table__cell--numeric">
@@ -114,7 +134,7 @@ $sides = $this->config->item('sides');
                                         </span>
                                     </td>
                                     <td class="mdc-data-table__cell side__<?php echo html_escape(strtolower($i['side'])); ?>"><?php echo html_escape($group); ?></td>
-                                    <td class="mdc-data-table__cell"><?php echo html_escape($role); ?></td>
+                                    <td class="mdc-data-table__cell"><?php echo html_escape($role); ?><?php echo $medal; ?></td>
                                     <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['shots']; ?></td>
                                     <?php if ($show_hit_data) : ?>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $hits; ?></td>

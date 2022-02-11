@@ -191,6 +191,7 @@ class App extends CI_Controller
 
             if ($player) {
                 $player_aliases = $this->additional_data->get_aliases($id);
+                // TODO: get aliases from entities if player has a uid
 
                 if ($tab === 'roles') {
                     $player_roles = $this->players->get_roles_by_id($id);
@@ -204,6 +205,11 @@ class App extends CI_Controller
                     $player_ops = $this->players->get_ops_by_id($id);
                 }
             } else {
+                $alias_of = $this->players->get_alias_of_by_id($id);
+                if ($alias_of) {
+                    return redirect(base_url('player/' . $alias_of));
+                }
+
                 $errors[] = 'Unknown player ID given.';
             }
         } else {

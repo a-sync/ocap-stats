@@ -385,7 +385,7 @@ class Admin extends CI_Controller
             $capture_delay = iterator_to_array(\JsonMachine\JsonMachine::fromFile(JSONPATH . $operation['filename'], '/captureDelay', $decoder));
             $operation['capture_delay'] = isset($capture_delay[0]) ? $capture_delay[0] : '';
         } catch (exception $e) {
-            $operation['capture_delay'] = '';
+            $operation['capture_delay'] = 1;
         }
 
         try {

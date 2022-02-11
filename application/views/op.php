@@ -7,7 +7,6 @@ $sides = $this->config->item('sides');
 <div class="mdc-layout-grid">
     <div class="mdc-layout-grid__inner">
 
-
         <?php if (count($errors) > 0) : ?>
             <div class="errors mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
                 <h3>⚠️ Errors</h3>
@@ -64,7 +63,7 @@ $sides = $this->config->item('sides');
                                 </tr>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Duration</td>
-                                    <td class="mdc-data-table__cell"><?php echo $duration_min; ?>m</td>
+                                    <td class="mdc-data-table__cell"><?php echo $duration_min; ?> minutes</td>
                                 </tr>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Players</td>

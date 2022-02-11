@@ -512,6 +512,7 @@ class Operations extends CI_Model
 
                 $new_players = [];
                 $players_updates = [];
+                $alias_reassignments = [];
                 foreach ($entities as $i => $e) {
                     $entities[$i]['operation_id'] = $details['id'];
 
@@ -569,7 +570,13 @@ class Operations extends CI_Model
                                 }
                             } else {
                                 $p = $players[$pi];
-                                $entities[$i]['player_id'] = $p['alias_of'] ? $p['alias_of'] : $p['id'];
+
+                                if ($p['alias_of']) {
+                                    $entities[$i]['player_id'] = $p['alias_of'];
+                                    $alias_reassignments[$p['alias_of']] = $p['id'];
+                                } else {
+                                    $entities[$i]['player_id'] = $p['id'];
+                                }
                             }
                         }
                     }
@@ -594,6 +601,11 @@ class Operations extends CI_Model
 
                 if (count($players_updates) > 0) {
                     $err = $this->update_players($players_updates);
+                    $errors = array_merge($errors, $err);
+                }
+
+                if (count($alias_reassignments) > 0) {
+                    $err = $this->reassign_aliases($alias_reassignments);
                     $errors = array_merge($errors, $err);
                 }
             }
@@ -670,6 +682,32 @@ class Operations extends CI_Model
         if (count($players) > 0) {
             if (false === $this->db->update_batch('players', $players, 'id')) {
                 $errors[] = 'Failed to update player names.';
+            }
+        }
+
+        return $errors;
+    }
+
+    private function reassign_aliases($alias_reassignments)
+    {
+        $errors = [];
+
+        if (count($alias_reassignments) > 0) {
+            foreach ($alias_reassignments as $new_alias_id => $player_id) {
+                $this->db->where('id', $player_id);
+                if ($this->db->update('players', ['alias_of' => 0])) {
+                    $this->db->where('player_id', $new_alias_id);
+                    if ($this->db->update('entities', ['player_id' => $player_id])) {
+                        $this->db->where('id', $new_alias_id);
+                        if (!$this->db->update('players', ['alias_of' => $player_id])) {
+                            $errors[] = 'Failed to update player alias. (' . $new_alias_id . ')';
+                        }
+                    } else {
+                        $errors[] = 'Failed to update player ID of entities. (' . $player_id . ')';
+                    }
+                } else {
+                    $errors[] = 'Failed to update player alias. (' . $player_id . ')';
+                }
             }
         }
 

@@ -167,7 +167,7 @@ $sides = $this->config->item('sides');
                                             <p>
                                                 <?php echo gmdate('Y-m-d H:i:s', $op['updated']); ?>
                                                 <br>
-                                                <?php echo timespan($op['updated'], '', 2); ?> ago
+                                                <?php echo strtolower(timespan($op['updated'], '', 2)); ?> ago
                                             </p>
                                         </td>
                                     </tr>
