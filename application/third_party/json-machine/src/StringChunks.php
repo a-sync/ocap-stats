@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace JsonMachine;
 
 class StringChunks implements \IteratorAggregate
@@ -12,7 +14,7 @@ class StringChunks implements \IteratorAggregate
 
     /**
      * @param string $string
-     * @param int $chunkSize
+     * @param int    $chunkSize
      */
     public function __construct($string, $chunkSize = 1024 * 8)
     {
@@ -23,10 +25,11 @@ class StringChunks implements \IteratorAggregate
     /**
      * @return \Generator
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         $len = strlen($this->string);
-        for ($i=0; $i<$len; $i += $this->chunkSize) {
+        for ($i = 0; $i < $len; $i += $this->chunkSize) {
             yield substr($this->string, $i, $this->chunkSize);
         }
     }

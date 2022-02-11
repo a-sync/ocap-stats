@@ -1,8 +1,8 @@
 <?php
 
+declare(strict_types=1);
 
 namespace JsonMachine\JsonDecoder;
-
 
 class DecodingError
 {
@@ -10,7 +10,6 @@ class DecodingError
     private $errorMessage;
 
     /**
-     * DecodingError constructor.
      * @param string $malformedJson
      * @param string $errorMessage
      */

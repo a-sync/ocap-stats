@@ -1,8 +1,8 @@
 <?php
 
-namespace JsonMachine;
+declare(strict_types=1);
 
-use JsonMachine\Exception\InvalidArgumentException;
+namespace JsonMachine;
 
 class FileChunks implements \IteratorAggregate
 {
@@ -14,7 +14,7 @@ class FileChunks implements \IteratorAggregate
 
     /**
      * @param string $fileName
-     * @param int $chunkSize
+     * @param int    $chunkSize
      */
     public function __construct($fileName, $chunkSize = 1024 * 8)
     {
@@ -25,15 +25,12 @@ class FileChunks implements \IteratorAggregate
     /**
      * @return \Generator
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         $fileHandle = fopen($this->fileName, 'r');
         try {
-            $streamChunks = new StreamChunks($fileHandle, $this->chunkSize);
-            foreach ($streamChunks as $chunk) {
-                // todo 'yield from $streamChunks' on php 7
-                yield $chunk;
-            }
+            yield from new StreamChunks($fileHandle, $this->chunkSize);
         } finally {
             fclose($fileHandle);
         }
