@@ -49,6 +49,11 @@
     nr. of `killed` events as attacker, where victim is any _unit_ on the same side  
   * **Destroyed assets**  
     nr. of `killed` events as attacker, where victim is a _vehicle_ (asset)  
+  * **Distance traveled**  
+    the delta sum of all the position coordinates of an entity 
+  * **Time in game**  
+    the nr. of frames recorded of an entity in game (including spectator), adjusted by the ops capture delay configuration  
+
 
 Self inflicted and environmental hits / kills (_something_) are omitted! (except for deaths)  
 

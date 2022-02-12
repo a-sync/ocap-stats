@@ -23,7 +23,7 @@ $sides = $this->config->item('sides');
                     <table class="mdc-data-table__table sortable">
                         <thead>
                             <tr class="mdc-data-table__header-row">
-                                <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="descending" data-column-id="op_id" title="Alias / Distance traveled / Time in game">ID</th>
+                                <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="descending" data-column-id="op_id" title="Alias, Distance traveled, Time in game">ID</th>
                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="date" title="Start time">Date</th>
                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="event" title="Tag">Event</th>
                                 <th class="mdc-data-table__header-cell cell__title" role="columnheader" scope="col" aria-sort="none" data-column-id="op_info" title="Map, Duration, Players">
@@ -120,11 +120,11 @@ $sides = $this->config->item('sides');
                                 if ($i['seconds_in_game'] > 0) {
                                     $time = strtolower(timespan(0, intval($i['seconds_in_game'])));
                                 }
-                                $alias_title = ' title="' . html_escape($i['name']) . ' / ' . $distance . ' / ' . $time . '"';
+                                $op_id_title = $i['name'] . ', ' . $distance . ', ' . $time;
                             ?>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell mdc-data-table__cell--numeric">
-                                        <a href="<?php echo base_url('op/') . $i['operation_id']; ?>" <?php echo $alias_title; ?>><?php echo $i['operation_id']; ?></a>
+                                        <a href="<?php echo base_url('op/') . $i['operation_id']; ?>" title="<?php echo html_escape($op_id_title); ?>"><?php echo $i['operation_id']; ?></a>
                                     </td>
                                     <td class="mdc-data-table__cell"><span title="<?php echo $i['start_time']; ?>"><?php echo html_escape($i['date']); ?></span></td>
                                     <td class="mdc-data-table__cell"><span title="<?php echo html_escape($i['tag']); ?>"><?php echo $event_types[$i['event']]; ?></span></td>

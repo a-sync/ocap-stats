@@ -22,7 +22,7 @@ $sides = $this->config->item('sides');
                         <thead>
                             <tr class="mdc-data-table__header-row">
                                 <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="entity_id">ID</th>
-                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="name" title="Player name / Asset class">Name</th>
+                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="name" title="Player name / Asset class, Distance traveled, Time in game">Name</th>
                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="group">Group</th>
                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="role">Role</th>
 
@@ -41,7 +41,6 @@ $sides = $this->config->item('sides');
                         </thead>
                         <tbody class="mdc-data-table__content">
                             <?php foreach ($items as $index => $i) :
-
                                 $role = $i['role'];
                                 $group = $i['group_name'] === '' ? $sides[$i['side']] : $i['group_name'];
                                 if (strpos($role, '@') !== false) {
@@ -54,17 +53,27 @@ $sides = $this->config->item('sides');
                                     }
                                 }
 
-                                $player_name = is_null($i['player_name']) ? '' : $i['player_name'];
                                 $name = html_escape($i['name']);
-                                $name_title = '';
+                                $pname_or_class = 'n/a';
                                 if ($i['player_id']) {
                                     $name = '<a href="' . base_url('player/') . $i['player_id'] . '">' . $name . '</a>';
-                                    if ($player_name !== '' && $i['name'] !== $player_name) {
-                                        $name_title = ' title="' . html_escape($player_name) . '"';
-                                    }
+                                    $pname_or_class = $i['player_name'];
                                 } elseif ($i['class']) {
-                                    $name_title = ' title="' . html_escape($i['class']) . '"';
+                                    $pname_or_class = $i['class'];
                                 }
+
+                                $distance = 'n/a';
+                                if ($i['distance_traveled'] > 1000) {
+                                    $distance = number_format($i['distance_traveled'] / 1000, 3) . ' km';
+                                } elseif ($i['distance_traveled'] > 0) {
+                                    $distance = number_format($i['distance_traveled']) . ' meters';
+                                }
+
+                                $time = 'n/a';
+                                if ($i['seconds_in_game'] > 0) {
+                                    $time = strtolower(timespan(0, intval($i['seconds_in_game'])));
+                                }
+                                $name_title = $pname_or_class . ', ' . $distance . ', ' . $time;
 
                                 $hits = $i['hits'];
                                 if (defined('ADJUST_HIT_DATA') && $i['operation_id'] < ADJUST_HIT_DATA) {
@@ -84,7 +93,7 @@ $sides = $this->config->item('sides');
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['id']; ?></td>
                                     <td class="mdc-data-table__cell cell__title">
-                                        <span<?php echo $name_title; ?>><?php echo $name; ?></span><?php echo $medal; ?>
+                                        <span title="<?php echo html_escape($name_title); ?>"><?php echo $name; ?></span><?php echo $medal; ?>
                                     </td>
                                     <td class="mdc-data-table__cell side__<?php echo html_escape(strtolower($i['side'])); ?>"><?php echo html_escape($group); ?></td>
                                     <td class="mdc-data-table__cell"><?php echo html_escape($role); ?></td>

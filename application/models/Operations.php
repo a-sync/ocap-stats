@@ -741,6 +741,7 @@ class Operations extends CI_Model
                 'operations.tag',
                 'operations.event',
                 'UNIX_TIMESTAMP(operations.updated) AS updated',
+                'operations.capture_delay',
                 'operations.mission_author',
                 'operations.start_time',
                 'operations.end_winner',
@@ -784,6 +785,8 @@ class Operations extends CI_Model
                 'entities.start_frame_num',
                 'entities.type',
                 'entities.class',
+                'entities.distance_traveled',
+                '(entities.last_frame_num - entities.start_frame_num) * operations.capture_delay AS seconds_in_game',
                 'players.name AS player_name'
             ])
             ->select_sum('shots')
@@ -794,6 +797,7 @@ class Operations extends CI_Model
             ->select_sum('vkills')
             ->select_sum('deaths')
             ->from('entities')
+            ->join('operations', 'operations.id = entities.operation_id')
             ->join('players', 'players.id = entities.player_id', 'LEFT')
             ->where('entities.operation_id', $id)
             ->group_by('entities.id')
@@ -813,12 +817,10 @@ class Operations extends CI_Model
                 'events.data',
                 'events.victim_id',
                 'events.attacker_id',
-
                 'victim.name AS victim_name',
                 'victim.side AS victim_side',
                 'attacker.name AS attacker_name',
                 'attacker.side AS attacker_side',
-
                 'victim_player.name AS victim_player_name',
                 'victim_player.id AS victim_player_id',
                 'attacker_player.name AS attacker_player_name',

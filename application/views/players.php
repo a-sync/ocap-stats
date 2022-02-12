@@ -38,6 +38,7 @@ else :
                             <tbody class="mdc-data-table__content">
                                 <?php
                                 foreach ($items as $index => $i) :
+                                    $hits_shots_ratio_raw = 0;
                                     $hits_shots_ratio = '0.00%';
                                     $kills_shots_ratio = '0.00%';
                                     $shots_kills_ratio = '0.0';
@@ -46,7 +47,6 @@ else :
                                     $fhits = '';
                                     $kills_deaths_ratio = '';
 
-                                    $hits_shots_ratio_raw = 0;
                                     if ($i['adj_shots'] === false) {
                                         $hits_shots_ratio = '';
                                     } elseif ($i['adj_shots'] > 0) {

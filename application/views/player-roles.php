@@ -22,7 +22,7 @@ $sides = $this->config->item('sides');
                         <thead>
                             <tr class="mdc-data-table__header-row">
 
-                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="role">Role</th>
+                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="role" title="Distance traveled, Time in game">Role</th>
                                 <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="shots" title="Shots">S</th>
                                 <?php /*<th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="adj_shots" title="Adjusted shots">S*</th>
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="hits" title="Hits">H</th>
@@ -48,6 +48,7 @@ $sides = $this->config->item('sides');
                         <tbody class="mdc-data-table__content">
                             <?php
                             foreach ($items as $index => $i) :
+                                $hits_shots_ratio_raw = 0;
                                 $hits_shots_ratio = '0.00%';
                                 $kills_shots_ratio = '0.00%';
                                 $shots_kills_ratio = '0.0';
@@ -56,7 +57,19 @@ $sides = $this->config->item('sides');
                                 $fhits = '';
                                 $kills_deaths_ratio = '';
 
-                                $hits_shots_ratio_raw = 0;
+                                $distance = 'n/a';
+                                if ($i['distance_traveled'] > 1000) {
+                                    $distance = number_format($i['distance_traveled'] / 1000, 3) . ' km';
+                                } elseif ($i['distance_traveled'] > 0) {
+                                    $distance = number_format($i['distance_traveled']) . ' meters';
+                                }
+
+                                $time = 'n/a';
+                                if ($i['seconds_in_game'] > 0) {
+                                    $time = strtolower(timespan(0, intval($i['seconds_in_game'])));
+                                }
+                                $role_title = $distance . ', ' . $time;
+
                                 if ($i['adj_shots'] === false) {
                                     $hits_shots_ratio = '';
                                 } elseif ($i['adj_shots'] > 0) {
@@ -92,7 +105,7 @@ $sides = $this->config->item('sides');
                                 }
                             ?>
                                 <tr class="mdc-data-table__row">
-                                    <td class="mdc-data-table__cell"><?php echo html_escape($i['role_name']); ?></td>
+                                    <td class="mdc-data-table__cell"><span title="<?php echo html_escape($role_title); ?>"><?php echo html_escape($i['role_name']); ?></span></td>
                                     <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['shots']; ?></td>
                                     <?php /* <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['adj_shots']; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['hits']; ?></td>

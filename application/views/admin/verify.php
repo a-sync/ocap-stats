@@ -46,6 +46,7 @@ foreach ($op_player_entities as $e) {
         <?php if ($op) :
             $duration_min = floor(intval($op['mission_duration']) / 60);
             $duration_sec = floor(intval($op['mission_duration']) % 60);
+
             $verified = boolval(intval($op['verified']));
             $verified_attr = $verified ? ' disabled' : '';
             $verified_class = $verified ? ' mdc-text-field--disabled' : '';
@@ -195,8 +196,8 @@ foreach ($op_player_entities as $e) {
                                     </td>
                                 </tr>
                                 <tr class="mdc-data-table__row">
-                                    <td class="mdc-data-table__cell">Duration</td>
-                                    <td class="mdc-data-table__cell"><?php echo $duration_min; ?>m <?php echo $duration_sec; ?>s</td>
+                                    <td class="mdc-data-table__cell"><span title="Capture delay">Duration</span></td>
+                                    <td class="mdc-data-table__cell"><span title="<?php echo $op['capture_delay']; ?>"><?php echo $duration_min; ?>m <?php echo $duration_sec; ?>s</span></td>
                                 </tr>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Players</td>
