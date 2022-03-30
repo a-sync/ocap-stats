@@ -75,7 +75,7 @@ if (!function_exists('should_op_be_ignored')) {
             'FNF_MissionTemplate',
             'FNF King of the Fort',
             'FNF Mission Template'
-        ]))) {
+        ])) || stripos($op['mission_name'], 'FNF_SustainedAssault') === 0) {
             return true;
         }
 

@@ -25,6 +25,7 @@
      * this affects role data since there is no explicit way to tell which entity was actually playing
      * in a few cases two entities of the same player have `killed` events in a single op (dc/spectator bug/_something_?)
   1. vehicle kills are not always registered (not sure why)  
+  1. some hits / kills are registered to the weapon or item selected by the attacker at the time of the event  
   1. some ops have no winner announced (endMission[1]: Mission ended automatically)  
      * affects all ops recorded before using OCAP2 v1.0.0
      * nobody wins or loses the op (maybe the ending can be assumed or it's just omitted, not sure...)
