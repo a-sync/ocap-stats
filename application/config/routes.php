@@ -75,6 +75,7 @@ $route['player/(:num)/roles'] = 'app/player/$1/roles';
 $route['player/(:num)/weapons'] = 'app/player/$1/weapons';
 $route['player/(:num)/attackers'] = 'app/player/$1/attackers';
 $route['player/(:num)/victims'] = 'app/player/$1/victims';
+$route['player/(:num)/rivals'] = 'app/player/$1/rivals';
 
 $route['ops'] = 'app/ops';
 $route['op/(:num)'] = 'app/op/$1';

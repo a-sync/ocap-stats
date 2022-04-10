@@ -71,9 +71,6 @@ $sides = $this->config->item('sides');
                                         $i['deaths'] += $next_i['deaths'];
                                         $i['distance_traveled'] += $next_i['distance_traveled'];
                                         $i['seconds_in_game'] += $next_i['seconds_in_game'];
-                                        if(intval($i['cmd']) + intval($next_i['cmd']) > 0) {
-                                            $i['cmd'] = 1;
-                                        }
 
                                         $merged_indexes[] = $next_index;
                                     }
@@ -95,7 +92,7 @@ $sides = $this->config->item('sides');
                                 }
 
                                 $medal = '';
-                                if ($i['cmd']) {
+                                if (isset($commanded_ops[$i['operation_id']])) {
                                     $medal = '<span class="side__' . html_escape(strtolower($i['side'])) . '">🎖</span>';
                                 }
 

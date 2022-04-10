@@ -149,7 +149,7 @@ class Additional_data extends CI_Model
                          * if the highest ranking entity considered for cmd is 
                          * not unique the commander can not be determined 
                          * unambiguously
-                         * (we bail out here and _return_commander() will 
+                         * (we bail out here to make sure _return_commander() will 
                          * never have to compare entities by ID numbers)
                          */
                         $ambiguous_op_leads[$op_id][$side] = [$op_leads[$op_id][$side], $l];
@@ -211,12 +211,14 @@ class Additional_data extends CI_Model
                         'entity_name' => $l['entity_name'],
                         'player_id' => $id,
                         'win_total' => 0,
-                        'loss_total' => 0
+                        'loss_total' => 0,
+                        'draw_total' => 0
                     ];
                     foreach ($matching_sides as $s => $v) {
                         $commanders[$id][$s] = [
                             'win' => 0,
-                            'loss' => 0
+                            'loss' => 0,
+                            'draw' => 0
                         ];
                     }
                 }
@@ -230,16 +232,112 @@ class Additional_data extends CI_Model
                         $commanders[$id][$l['side']]['loss']++;
                         $commanders[$id]['loss_total']++;
                     }
+                } else {
+                    $commanders[$id][$l['side']]['draw']++;
+                    $commanders[$id]['draw_total']++;
                 }
             }
         }
 
         $wins = array_column($commanders, 'win_total');
         $losses = array_column($commanders, 'loss_total');
+        //$draws = array_column($commanders, 'draw_total');
+        $totals = array_map(function ($c) {
+            return $c['win_total'] + $c['loss_total'] + $c['draw_total'];
+        }, $commanders);
 
-        array_multisort($wins, SORT_DESC, SORT_NUMERIC, $losses, SORT_ASC, SORT_NUMERIC, $commanders);
+        array_multisort($totals, SORT_DESC, SORT_NUMERIC, $wins, SORT_DESC, SORT_NUMERIC, $losses, SORT_ASC, SORT_NUMERIC, $commanders);
 
         return $commanders;
+    }
+
+    public function get_player_cmd_stats($player_id) {
+        $op_commanders_data = $this->get_commanders(true, false, true);
+        $matching_sides = [];
+
+        $commanded_ops = [];
+        $commanded_sides = [];
+        foreach ($op_commanders_data['resolved'] as $op_id => $op_cmds) {
+            $sides = [];
+            foreach ($op_cmds as $s => $e) {
+                $sides[] = $s; 
+                if ($e['player_id'] === $player_id) {
+                    $commanded_ops[$op_id] = $op_cmds;
+                    $commanded_sides[$op_id] = $s;
+                }
+            }
+
+            if (isset($commanded_ops[$op_id])) {
+                foreach ($sides as $s) {
+                    if (!isset($matching_sides[$s])) {
+                        $matching_sides[$s] = true;
+                    }
+                }
+            }
+        }
+        $op_commanders_data = null;
+
+        $rivals = [];
+        foreach ($commanded_ops as $op_id => $op_cmds) {
+            foreach ($op_cmds as $s => $e) {
+                $id = $e['player_id'];
+
+                if ($id !== $player_id) {
+                    if (!isset($rivals[$id])) {
+                        $rivals[$id] = [
+                            'name' => $e['name'],
+                            'player_id' => $id,
+                            'win_total' => 0,
+                            'loss_total' => 0,
+                            'draw_total' => 0
+                        ];
+                        foreach ($matching_sides as $s => $v) {
+                            $rivals[$id][$s] = [
+                                'win' => 0,
+                                'loss' => 0,
+                                'draw' => 0
+                            ];
+                        }
+                    }
+
+                    if ($e['end_winner'] !== '') {
+                        $winner_sides = explode('/', $e['end_winner']);
+                        if (in_array($e['side'], $winner_sides)) {
+                            if (!in_array($commanded_sides[$op_id], $winner_sides)) {
+                                $rivals[$id][$e['side']]['loss']++;
+                                $rivals[$id]['loss_total']++;
+                            }
+                        } else {
+                            if (in_array($commanded_sides[$op_id], $winner_sides)) {
+                                $rivals[$id][$e['side']]['win']++;
+                                $rivals[$id]['win_total']++;
+                            }
+                        }
+                    } else {
+                        // Note: alliances can not be resolved without end_winner
+                        if (count($op_cmds) < 3) {
+                            $rivals[$id][$e['side']]['draw']++;
+                            $rivals[$id]['draw_total']++;
+                        }
+                    }
+                }
+            }
+        }
+
+        $rivals = array_values($rivals);
+        $wins = array_column($rivals, 'win_total');
+        $losses = array_column($rivals, 'loss_total');
+        //$draws = array_column($rivals, 'draw_total');
+        $totals = array_map(function ($c) {
+            return $c['win_total'] + $c['loss_total'] + $c['draw_total'];
+        }, $rivals);
+
+        array_multisort($totals, SORT_DESC, SORT_NUMERIC, $wins, SORT_DESC, SORT_NUMERIC, $losses, SORT_ASC, SORT_NUMERIC, $rivals);
+
+        return [
+            'rivals' => $rivals,
+            'commanded_ops' => $commanded_ops
+        ];
     }
 
     /**

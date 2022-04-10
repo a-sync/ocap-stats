@@ -70,3 +70,5 @@ CTRL+F
      * rivals (enemy commanders)
   1. ui to edit entities player assignment
   1. support `capture_delay` properly
+  1. track friendly fire on assets by checking the side of the asset's crew  
+     (preprocess and track asset entities crews via positions)

@@ -87,6 +87,12 @@ $show_hit_data = (!defined('ADJUST_HIT_DATA') || ADJUST_HIT_DATA >= 0) ? true : 
                                         </td>
                                     </tr>
                                 <?php endif; ?>
+                                <?php if (count($commanded_ops) > 0) : ?>
+                                    <tr class="mdc-data-table__row">
+                                        <td class="mdc-data-table__cell">Commander</td>
+                                        <td class="mdc-data-table__cell">x<?php echo count($commanded_ops); ?></td>
+                                    </tr>
+                                <?php endif; ?>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Shots</td>
                                     <td class="mdc-data-table__cell"><?php echo $player['shots']; ?></td>

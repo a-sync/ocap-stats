@@ -186,12 +186,14 @@ class App extends CI_Controller
         $player_weapons = [];
         $player_attackers = [];
         $player_victims = [];
+        $player_cmd_stats = [];
         if (filter_var($id, FILTER_VALIDATE_INT)) {
             $player = $this->players->get_by_id($id);
 
             if ($player) {
                 $player_aliases = $this->additional_data->get_aliases($id);
                 // TODO: get aliases from entities if player has a uid
+                $player_cmd_stats = $this->additional_data->get_player_cmd_stats($player['id']);
 
                 if ($tab === 'roles') {
                     $player_roles = $this->players->get_roles_by_id($id);
@@ -221,16 +223,20 @@ class App extends CI_Controller
         $this->load->view('player', [
             'player' => $player,
             'errors' => $errors,
-            'aliases' => $player_aliases
+            'aliases' => $player_aliases,
+            'commanded_ops' => $player_cmd_stats['commanded_ops']
         ]);
 
         if ($player) {
+            $show_rivals = boolval(count($player_cmd_stats['rivals']));
+
             if ($tab === 'roles') {
                 $this->load->view('player-roles', [
                     'items' => $player_roles,
                     'player_menu' => $this->load->view('player-menu', [
                         'active' => 'roles',
-                        'player_url' => base_url('player/' . $player['id'])
+                        'player_url' => base_url('player/' . $player['id']),
+                        'show_rivals' => $show_rivals
                     ], true)
                 ]);
             } elseif ($tab === 'weapons') {
@@ -238,7 +244,8 @@ class App extends CI_Controller
                     'items' => $player_weapons,
                     'player_menu' => $this->load->view('player-menu', [
                         'active' => 'weapons',
-                        'player_url' => base_url('player/' . $player['id'])
+                        'player_url' => base_url('player/' . $player['id']),
+                        'show_rivals' => $show_rivals
                     ], true)
                 ]);
             } elseif ($tab === 'attackers') {
@@ -246,7 +253,8 @@ class App extends CI_Controller
                     'items' => $player_attackers,
                     'player_menu' => $this->load->view('player-menu', [
                         'active' => 'attackers',
-                        'player_url' => base_url('player/' . $player['id'])
+                        'player_url' => base_url('player/' . $player['id']),
+                        'show_rivals' => $show_rivals
                     ], true),
                     'tab' => 'attackers'
                 ]);
@@ -255,7 +263,18 @@ class App extends CI_Controller
                     'items' => $player_victims,
                     'player_menu' => $this->load->view('player-menu', [
                         'active' => 'victims',
-                        'player_url' => base_url('player/' . $player['id'])
+                        'player_url' => base_url('player/' . $player['id']),
+                        'show_rivals' => $show_rivals
+                    ], true),
+                    'tab' => 'victims'
+                ]);
+            } elseif ($tab === 'rivals') {
+                $this->load->view('player-rivals', [
+                    'items' => $player_cmd_stats['rivals'],
+                    'player_menu' => $this->load->view('player-menu', [
+                        'active' => 'rivals',
+                        'player_url' => base_url('player/' . $player['id']),
+                        'show_rivals' => $show_rivals
                     ], true),
                     'tab' => 'victims'
                 ]);
@@ -264,8 +283,10 @@ class App extends CI_Controller
                     'items' => $player_ops,
                     'player_menu' => $this->load->view('player-menu', [
                         'active' => 'ops',
-                        'player_url' => base_url('player/' . $player['id'])
-                    ], true)
+                        'player_url' => base_url('player/' . $player['id']),
+                        'show_rivals' => $show_rivals
+                    ], true),
+                    'commanded_ops' => $player_cmd_stats['commanded_ops']
                 ]);
             }
         }

@@ -51,15 +51,18 @@
                     </span>
                     <span class="mdc-tab__ripple"></span>
                 </a>
-                <!-- <a href="<?php echo $player_url; ?>/rivals" class="mdc-tab<?php if ($active === 'rivals') echo ' mdc-tab--active';  ?>" role="tab" aria-selected="false" tabindex="9">
-                    <span class="mdc-tab__content">
-                        <span class="mdc-tab__text-label">Rivals</span>
-                    </span>
-                    <span class="mdc-tab-indicator<?php if ($active === 'rivals') echo ' mdc-tab-indicator--active';  ?>">
-                        <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
-                    </span>
-                    <span class="mdc-tab__ripple"></span>
-                </a> -->
+                <?php if($show_rivals): ?>
+                    <a href="<?php echo $player_url; ?>/rivals" class="mdc-tab<?php if ($active === 'rivals') echo ' mdc-tab--active';  ?>" role="tab" aria-selected="false" tabindex="9">
+                        <span class="mdc-tab__content">
+                            <span class="mdc-tab__icon material-icons" aria-hidden="true">military_tech</span>
+                            <span class="mdc-tab__text-label">Rivals</span>
+                        </span>
+                        <span class="mdc-tab-indicator<?php if ($active === 'rivals') echo ' mdc-tab-indicator--active';  ?>">
+                            <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
+                        </span>
+                        <span class="mdc-tab__ripple"></span>
+                    </a>
+                <?php endif; ?>
             </div>
         </div>
     </div>
