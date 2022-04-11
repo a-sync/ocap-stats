@@ -4,7 +4,7 @@
 [OCAP](https://github.com/OCAP2/OCAP) data spread out on tables.  
 
 
-## Demo sites 
+## Demo sites
 [fnf-stats.devs.space](https://fnf-stats.devs.space)  
  &nbsp; &rdca; based on [OCAP2](http://aar.fridaynightfight.org) data from [FNF](https://www.fridaynightfight.org)  
 [ofcra-stats.devs.space](https://ofcra-stats.devs.space)  
@@ -23,7 +23,7 @@
      * Hits / Shots percent and Shots / Hits must be adjusted accordingly
   1. players can have multiple entities in the same op (rejoins/role switch)  
      * this affects role data since there is no explicit way to tell which entity was actually playing
-     * in a few cases two entities of the same player have `killed` events in a single op (dc/spectator bug/_something_?)
+     * players can have `killed` events as spectator sometimes in relation to this
   1. vehicle kills are not always registered (not sure why)  
   1. some hits / kills are registered to the weapon or item selected by the attacker at the time of the event  
   1. some ops have no winner announced (endMission[1]: Mission ended automatically)  
@@ -34,7 +34,7 @@
   1. timestamps are all UTC (or should be) and depend on the arma3 server  
 
 
-## Stats collected  
+## Stats collected
   * **Shots**  
     nr. of framesFired events (only counts main weapon and sidearm rounds afaik.)  
   \+ nr. of projectile markers tied to a _unit_ (grenades, rockets, mines, etc.)  
@@ -66,8 +66,6 @@ CTRL+F
 ## TODO:
   1. format timestamps to local TZ
   1. filter op events visibility by type
-  1. player profile tabs:
-     * rivals (enemy commanders)
   1. ui to edit entities player assignment
   1. support `capture_delay` properly
   1. track friendly fire on assets by checking the side of the asset's crew  
