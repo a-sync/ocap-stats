@@ -99,6 +99,14 @@ $deduped_items = array_reduce($items, function ($acc, $next) {
                                 } elseif ($i['event'] === 'terminalHackStarted' || $i['event'] === 'terminalHackUpdate' || $i['event'] === 'terminalHackCanceled') {
                                     $d = json_decode($i['data']);
                                     $event = $event . ' by ' . html_escape($d[0]);
+                                } elseif ($i['event'] === 'generalEvent') {
+                                    $event = html_escape($i['data']);
+                                } elseif ($i['event'] === 'respawnTickets') {
+                                    $event = html_escape($i['data']); // TODO: format
+                                } elseif ($i['event'] === 'counterInit') {
+                                    $event = html_escape($i['data']); // TODO: format
+                                } elseif ($i['event'] === 'counterSet') {
+                                    $event = html_escape($i['data']); // TODO: format
                                 }
                             ?>
                                 <tr class="mdc-data-table__row event__<?php echo html_escape($i['event']); ?>">

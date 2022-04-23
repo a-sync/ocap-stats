@@ -23,10 +23,10 @@ $sides = $this->config->item('sides');
                         <thead>
                             <tr class="mdc-data-table__header-row">
 
-                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="name" title="Asset class">Enemy commander</th>
+                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="name">Enemy commander</th>
                                 <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="descending" data-column-id="win" title="Victories vs enemy commander">W</th>
                                 <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="ascending" data-column-id="loss" title="Defeats vs enemy commander">L</th>
-                                <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="draw">T</th>
+                                <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="draw" title="Ties vs enemy commander">T</th>
                                 <?php if (isset($item0['WEST'])) : ?>
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="wl_west" title="Wins / Losses"><?php echo $sides['WEST']; ?></th>
                                 <?php endif; ?>
@@ -62,21 +62,21 @@ $sides = $this->config->item('sides');
                             ?>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell"><?php echo $name; ?></td>
-                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['win_total']; ?></td>
-                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['loss_total']; ?></td>
-                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['draw_total']; ?></td>
-                                        <?php if (isset($i['WEST'])) : ?>
-                                            <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo $side_ratios['WEST']; ?>"><?php echo $i['WEST']['win']; ?> / <?php echo $i['WEST']['loss']; ?></td>
-                                        <?php endif; ?>
-                                        <?php if (isset($i['EAST'])) : ?>
-                                            <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo $side_ratios['EAST']; ?>"><?php echo $i['EAST']['win']; ?> / <?php echo $i['EAST']['loss']; ?></td>
-                                        <?php endif; ?>
-                                        <?php if (isset($i['GUER'])) : ?>
-                                            <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo $side_ratios['GUER']; ?>"><?php echo $i['GUER']['win']; ?> / <?php echo $i['GUER']['loss']; ?></td>
-                                        <?php endif; ?>
-                                        <?php if (isset($i['CIV'])) : ?>
-                                            <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo $side_ratios['CIV']; ?>"><?php echo $i['CIV']['win']; ?> / <?php echo $i['CIV']['loss']; ?></td>
-                                        <?php endif; ?>
+                                    <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['win_total']; ?></td>
+                                    <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['loss_total']; ?></td>
+                                    <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['draw_total']; ?></td>
+                                    <?php if (isset($i['WEST'])) : ?>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo $side_ratios['WEST']; ?>"><?php echo $i['WEST']['win']; ?> / <?php echo $i['WEST']['loss']; ?></td>
+                                    <?php endif; ?>
+                                    <?php if (isset($i['EAST'])) : ?>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo $side_ratios['EAST']; ?>"><?php echo $i['EAST']['win']; ?> / <?php echo $i['EAST']['loss']; ?></td>
+                                    <?php endif; ?>
+                                    <?php if (isset($i['GUER'])) : ?>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo $side_ratios['GUER']; ?>"><?php echo $i['GUER']['win']; ?> / <?php echo $i['GUER']['loss']; ?></td>
+                                    <?php endif; ?>
+                                    <?php if (isset($i['CIV'])) : ?>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo $side_ratios['CIV']; ?>"><?php echo $i['CIV']['win']; ?> / <?php echo $i['CIV']['loss']; ?></td>
+                                    <?php endif; ?>
 
                                 </tr>
                             <?php endforeach; ?>

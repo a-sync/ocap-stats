@@ -324,7 +324,11 @@ class Additional_data extends CI_Model
             }
         }
 
+        $rivals = array_filter($rivals, function ($r) {
+            return boolval($r['win_total'] + $r['loss_total'] + $r['draw_total']);
+        });
         $rivals = array_values($rivals);
+
         $wins = array_column($rivals, 'win_total');
         $losses = array_column($rivals, 'loss_total');
         //$draws = array_column($rivals, 'draw_total');

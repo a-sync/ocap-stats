@@ -379,6 +379,70 @@ class Operations extends CI_Model
                     'data' => json_encode($e[2])
                 ];
             }
+            /** event: generalEvent
+             * [0] frame nr.
+             * [1] event
+             * [2] message
+             */
+            elseif ($e[1] === 'generalEvent') {
+                $re['events'][] = [
+                    'frame' => $e[0],
+                    'event' => $e[1],
+                    'victim_id' => null,
+                    'attacker_id' => null,
+                    'weapon' => null,
+                    'distance' => 0,
+                    'data' => $e[2]
+                ];
+            }
+            /** event: respawnTickets
+             * [0] frame nr.
+             * [1] event
+             * [2] ?tickets
+             */
+            elseif ($e[1] === 'respawnTickets') {
+                $re['events'][] = [
+                    'frame' => $e[0],
+                    'event' => $e[1],
+                    'victim_id' => null,
+                    'attacker_id' => null,
+                    'weapon' => null,
+                    'distance' => 0,
+                    'data' => json_encode($e[2])
+                ];
+            }
+            /** event: counterInit
+             * [0] frame nr.
+             * [1] event
+             * [2] ?counter, sides
+             */
+            elseif ($e[1] === 'counterInit') {
+                $re['events'][] = [
+                    'frame' => $e[0],
+                    'event' => $e[1],
+                    'victim_id' => null,
+                    'attacker_id' => null,
+                    'weapon' => null,
+                    'distance' => 0,
+                    'data' => json_encode($e[2])
+                ];
+            }
+            /** event: counterSet
+             * [0] frame nr.
+             * [1] event
+             * [2] ?scores
+             */
+            elseif ($e[1] === 'counterSet') {
+                $re['events'][] = [
+                    'frame' => $e[0],
+                    'event' => $e[1],
+                    'victim_id' => null,
+                    'attacker_id' => null,
+                    'weapon' => null,
+                    'distance' => 0,
+                    'data' => json_encode($e[2])
+                ];
+            }
             /** show what needs to be implemented
              */
             else {
@@ -409,7 +473,7 @@ class Operations extends CI_Model
          */
         foreach ($data as $m) {
             // ["magIcons/rhs_vog25p_ca.paa","PBG40 - HE-T Grenade",981,992,54,"FFFFFF",-1,[[981,[4590.9,7109.79,201.889],238.414,1],[982,[4589.02,7108.63,204.324],238.414,1]],[1,1],"ICON","Solid"]
-            if ($m[0] && (substr($m[0], 0, 9) === 'magIcons/' || $m[0] === 'Minefield')) {
+            if ($m[0] && (substr($m[0], 0, 9) === 'magIcons/' || $m[0] === 'Minefield' || $m[0] === 'mil_triangle')) {
                 if (!isset($shots[$m[4]])) {
                     $shots[$m[4]] = 1;
                 } else {
@@ -418,13 +482,9 @@ class Operations extends CI_Model
 
                 $distance = 0;
                 if (isset($m[7]) && is_array($m[7])) {
-                    $last_xyz = null;
-                    foreach ($m[7] as $p) {
-                        if ($last_xyz !== null) {
-                            $distance += sqrt(pow($p[1][0] - $last_xyz[0], 2) + pow($p[1][1] - $last_xyz[1], 2) + pow(element(2, $p[1], 0) - element(2, $last_xyz, 0), 2));
-                        }
-                        $last_xyz = $p[1];
-                    }
+                    $first_pos = reset($m[7]);
+                    $last_pos = end($m[7]);
+                    $distance = sqrt(pow($first_pos[1][0] - $last_pos[1][0], 2) + pow($first_pos[1][1] - $last_pos[1][1], 2) + pow(element(2, $first_pos[1], 0) - element(2, $last_pos[1], 0), 2));
                 }
 
                 $events[] = [
@@ -555,6 +615,8 @@ class Operations extends CI_Model
                                 return $v['uid'] === null;
                             }), 'name');
                             $pi = array_search(strtolower($e['name']), array_map('strtolower', $player_names));
+                            // Note: dupes can still occur after the entity name is inserted into the db and whitespaces get trimmed
+                            // SELECT * FROM players WHERE name IN (SELECT name FROM players GROUP BY name HAVING COUNT(*) > 1) ORDER BY name, id
                             if ($pi === false) {
                                 $new_player_names = array_column($new_players, 'name');
                                 $npi = array_search(strtolower($e['name']), array_map('strtolower', $new_player_names));
