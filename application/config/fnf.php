@@ -32,6 +32,7 @@ $config['tag_event_types'] = [
 // Keep these ordered by rank
 $config['cmd_group_names'] = [
     'CMD',
+    'PLHQ',
     'PLTHQ',
     'OPF PLT HQ',
     'IND PLT HQ',
