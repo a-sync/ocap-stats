@@ -580,7 +580,7 @@ class Operations extends CI_Model
                     unset($entities[$i]['_deaths']);
 
                     if ($e['is_player']) {
-                        if ($e['uid'] !== null && $e['uid'] !== 0 && $e['uid'] !== '') {
+                        if ($e['uid'] !== null && $e['uid'] !== '' && $e['uid'] !== 0) {
                             $player_uids = array_column($players, 'uid');
                             $pi = array_search($e['uid'], $player_uids);
                             if ($pi === false) {
@@ -756,13 +756,17 @@ class Operations extends CI_Model
 
         if (count($alias_reassignments) > 0) {
             foreach ($alias_reassignments as $new_alias_id => $player_id) {
+
                 $this->db->where('id', $player_id);
                 if ($this->db->update('players', ['alias_of' => 0])) {
+
                     $this->db->where('player_id', $new_alias_id);
                     if ($this->db->update('entities', ['player_id' => $player_id])) {
+
                         $this->db->where('id', $new_alias_id);
+                        $this->db->or_where('alias_of', $new_alias_id);
                         if (!$this->db->update('players', ['alias_of' => $player_id])) {
-                            $errors[] = 'Failed to update player alias. (' . $new_alias_id . ')';
+                            $errors[] = 'Failed to update player aliases. (' . $new_alias_id . ')';
                         }
                     } else {
                         $errors[] = 'Failed to update player ID of entities. (' . $player_id . ')';
