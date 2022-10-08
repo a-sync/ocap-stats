@@ -34,6 +34,7 @@ $config['cmd_group_names'] = [
     'CMD',
     'PLHQ',
     'PLTHQ',
+    'BLU PLT HQ',
     'OPF PLT HQ',
     'IND PLT HQ',
     'P1HQ',
