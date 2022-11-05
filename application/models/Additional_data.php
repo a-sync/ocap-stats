@@ -279,20 +279,20 @@ class Additional_data extends CI_Model
 
         $rivals = [];
         foreach ($commanded_ops as $op_id => $op_cmds) {
-            foreach ($op_cmds as $s => $e) {
-                $id = $e['player_id'];
+            foreach ($op_cmds as $s => $r) {
+                $rid = $r['player_id'];
 
-                if ($id !== $player_id) {
-                    if (!isset($rivals[$id])) {
-                        $rivals[$id] = [
-                            'name' => $e['name'],
-                            'player_id' => $id,
+                if ($rid !== $player_id) {
+                    if (!isset($rivals[$rid])) {
+                        $rivals[$rid] = [
+                            'name' => $r['name'],
+                            'player_id' => $rid,
                             'win_total' => 0,
                             'loss_total' => 0,
                             'draw_total' => 0
                         ];
                         foreach ($matching_sides as $s => $v) {
-                            $rivals[$id][$s] = [
+                            $rivals[$rid][$s] = [
                                 'win' => 0,
                                 'loss' => 0,
                                 'draw' => 0
@@ -300,24 +300,31 @@ class Additional_data extends CI_Model
                         }
                     }
 
-                    if ($e['end_winner'] !== '') {
-                        $winner_sides = explode('/', $e['end_winner']);
-                        if (in_array($e['side'], $winner_sides)) {
+                    if ($r['end_winner'] !== '') {
+                        $winner_sides = explode('/', $r['end_winner']);
+                        if (in_array($r['side'], $winner_sides)) {
                             if (!in_array($commanded_sides[$op_id], $winner_sides)) {
-                                $rivals[$id][$e['side']]['loss']++;
-                                $rivals[$id]['loss_total']++;
+                                // rival won and player did not
+                                $rivals[$rid][$r['side']]['loss']++;
+                                $rivals[$rid]['loss_total']++;
                             }
                         } else {
                             if (in_array($commanded_sides[$op_id], $winner_sides)) {
-                                $rivals[$id][$e['side']]['win']++;
-                                $rivals[$id]['win_total']++;
+                                // player won and rival did not
+                                $rivals[$rid][$r['side']]['win']++;
+                                $rivals[$rid]['win_total']++;
+                            } else {
+                                // third side won
+                                // Note: counting a draw automatically is skipped since we can not determine alliances
+                                // $rivals[$rid][$r['side']]['draw']++;
+                                // $rivals[$rid]['draw_total']++;
                             }
                         }
                     } else {
                         // Note: alliances can not be resolved without end_winner
                         if (count($op_cmds) < 3) {
-                            $rivals[$id][$e['side']]['draw']++;
-                            $rivals[$id]['draw_total']++;
+                            $rivals[$rid][$r['side']]['draw']++;
+                            $rivals[$rid]['draw_total']++;
                         }
                     }
                 }
