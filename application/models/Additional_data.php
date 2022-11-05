@@ -315,9 +315,11 @@ class Additional_data extends CI_Model
                                 $rivals[$rid]['win_total']++;
                             } else {
                                 // third side won
-                                // Note: counting a draw automatically is skipped since we can not determine alliances
-                                // $rivals[$rid][$r['side']]['draw']++;
-                                // $rivals[$rid]['draw_total']++;
+                                // Note: counting a draw automatically with more then two commanders is skipped since we can not determine alliances
+                                if (count($op_cmds) < 3) {
+                                    $rivals[$rid][$r['side']]['draw']++;
+                                    $rivals[$rid]['draw_total']++;
+                                }
                             }
                         }
                     } else {
