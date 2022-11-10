@@ -203,6 +203,7 @@ class Additional_data extends CI_Model
 
         $commanders = [];
         foreach ($op_leads as $ol) {
+            $commanded_sides = array_keys($ol);
             foreach ($ol as $l) {
                 $id = $l['player_id'];
                 if (!isset($commanders[$id])) {
@@ -226,11 +227,19 @@ class Additional_data extends CI_Model
                 if ($l['end_winner'] !== '') {
                     $winner_sides = explode('/', $l['end_winner']);
                     if (in_array($l['side'], $winner_sides)) {
+                        // leader of a winning side
                         $commanders[$id][$l['side']]['win']++;
                         $commanders[$id]['win_total']++;
                     } else {
-                        $commanders[$id][$l['side']]['loss']++;
-                        $commanders[$id]['loss_total']++;
+                        if (count(array_intersect($winner_sides, $commanded_sides)) > 0) {
+                            // other commander is the leader of a winning side
+                            $commanders[$id][$l['side']]['loss']++;
+                            $commanders[$id]['loss_total']++;
+                        } else {
+                            // no commander on winning side
+                            $commanders[$id][$l['side']]['draw']++;
+                            $commanders[$id]['draw_total']++;
+                        }
                     }
                 } else {
                     $commanders[$id][$l['side']]['draw']++;
@@ -315,7 +324,9 @@ class Additional_data extends CI_Model
                                 $rivals[$rid]['win_total']++;
                             } else {
                                 // third side won
-                                // Note: counting a draw automatically with more then two commanders is skipped since we can not determine alliances
+                                // Note: counting a draw automatically with more
+                                // then two commanders is skipped since we can
+                                // not determine alliances
                                 if (count($op_cmds) < 3) {
                                     $rivals[$rid][$r['side']]['draw']++;
                                     $rivals[$rid]['draw_total']++;

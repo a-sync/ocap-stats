@@ -6,7 +6,7 @@ class App extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->output->set_header('X-Powered-By: 💖');
+        $this->output->set_header('X-Powered-By: 🐹🐹');
     }
 
     public function zerosec($my_name = '', $my_hash = '')
@@ -26,6 +26,7 @@ class App extends CI_Controller
         );
 
         if ($my_hash === $this->config->item('admin_key')) {
+            log_message('error', 'EVENT --> Admin key used for [' . $name . '] @ ' . $this->input->ip_address());
             exit(base_url('login/' . $name . '/' . $secret_hash));
         }
 
@@ -136,7 +137,7 @@ class App extends CI_Controller
 
         $players = $this->players->get_players($events_filter);
 
-        $this->_head('players');
+        $this->_head('players', 'Players');
 
         $this->load->view('filters', [
             'events_filter' => $events_filter
@@ -385,7 +386,7 @@ class App extends CI_Controller
 
         $commanders = $this->additional_data->get_commanders($events_filter);
 
-        $this->_head('commanders');
+        $this->_head('commanders', 'Commanders');
 
         $this->load->view('filters', [
             'events_filter' => $events_filter
