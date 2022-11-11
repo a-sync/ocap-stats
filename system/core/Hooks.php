@@ -6,7 +6,7 @@
  *
  * This content is released under the MIT License (MIT)
  *
- * Copyright (c) 2014 - 2019, British Columbia Institute of Technology
+ * Copyright (c) 2019 - 2022, CodeIgniter Foundation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,7 @@
  * @author	EllisLab Dev Team
  * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
  * @copyright	Copyright (c) 2014 - 2019, British Columbia Institute of Technology (https://bcit.ca/)
+ * @copyright	Copyright (c) 2019 - 2022, CodeIgniter Foundation (https://codeigniter.com/)
  * @license	https://opensource.org/licenses/MIT	MIT License
  * @link	https://codeigniter.com
  * @since	Version 1.0.0
@@ -83,16 +84,16 @@ class CI_Hooks {
 	/**
 	 * Class constructor
 	 *
-	 * @param	CI_Config	$config
 	 * @return	void
 	 */
-	public function __construct(CI_Config $config)
+	public function __construct()
 	{
+		$CFG =& load_class('Config', 'core');
 		log_message('info', 'Hooks Class Initialized');
 
 		// If hooks are not enabled in the config file
 		// there is nothing else to do
-		if ($config->item('enable_hooks') === FALSE)
+		if ($CFG->item('enable_hooks') === FALSE)
 		{
 			return;
 		}

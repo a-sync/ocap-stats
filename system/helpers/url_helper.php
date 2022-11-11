@@ -6,7 +6,7 @@
  *
  * This content is released under the MIT License (MIT)
  *
- * Copyright (c) 2014 - 2019, British Columbia Institute of Technology
+ * Copyright (c) 2019 - 2022, CodeIgniter Foundation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,7 @@
  * @author	EllisLab Dev Team
  * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
  * @copyright	Copyright (c) 2014 - 2019, British Columbia Institute of Technology (https://bcit.ca/)
+ * @copyright	Copyright (c) 2019 - 2022, CodeIgniter Foundation (https://codeigniter.com/)
  * @license	https://opensource.org/licenses/MIT	MIT License
  * @link	https://codeigniter.com
  * @since	Version 1.0.0
@@ -211,7 +212,7 @@ if ( ! function_exists('anchor_popup'))
 		{
 			$attributes = array($attributes);
 
-			// Ref: https://www.w3schools.com/jsref/met_win_open.asp
+			// Ref: http://www.w3schools.com/jsref/met_win_open.asp
 			$window_name = '_blank';
 		}
 		elseif ( ! empty($attributes['window_name']))
@@ -443,7 +444,7 @@ if ( ! function_exists('prep_url'))
 	 */
 	function prep_url($str = '')
 	{
-		if ($str === '')
+		if ($str === 'http://' OR $str === '')
 		{
 			return '';
 		}
@@ -546,7 +547,7 @@ if ( ! function_exists('redirect'))
 			if (isset($_SERVER['SERVER_PROTOCOL'], $_SERVER['REQUEST_METHOD']) && $_SERVER['SERVER_PROTOCOL'] === 'HTTP/1.1')
 			{
 				$code = ($_SERVER['REQUEST_METHOD'] !== 'GET')
-					? 303	// reference: https://en.wikipedia.org/wiki/Post/Redirect/Get
+					? 303	// reference: http://en.wikipedia.org/wiki/Post/Redirect/Get
 					: 307;
 			}
 			else

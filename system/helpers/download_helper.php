@@ -6,7 +6,7 @@
  *
  * This content is released under the MIT License (MIT)
  *
- * Copyright (c) 2014 - 2019, British Columbia Institute of Technology
+ * Copyright (c) 2019 - 2022, CodeIgniter Foundation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,7 @@
  * @author	EllisLab Dev Team
  * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
  * @copyright	Copyright (c) 2014 - 2019, British Columbia Institute of Technology (https://bcit.ca/)
+ * @copyright	Copyright (c) 2019 - 2022, CodeIgniter Foundation (https://codeigniter.com/)
  * @license	https://opensource.org/licenses/MIT	MIT License
  * @link	https://codeigniter.com
  * @since	Version 1.0.0
@@ -56,7 +57,7 @@ if ( ! function_exists('force_download'))
 	 *
 	 * Generates headers that force a download to happen
 	 *
-	 * @param	mixed	filename (or an array of local file path => destination filename)
+	 * @param	string	filename
 	 * @param	mixed	the data to be downloaded
 	 * @param	bool	whether to try and send the actual file MIME type
 	 * @return	void
@@ -69,34 +70,14 @@ if ( ! function_exists('force_download'))
 		}
 		elseif ($data === NULL)
 		{
-			// Is $filename an array as ['local source path' => 'destination filename']?
-			if (is_array($filename))
-			{
-				if (count($filename) !== 1)
-				{
-					return;
-				}
-
-				reset($filename);
-				$filepath = key($filename);
-				$filename = current($filename);
-
-				if (is_int($filepath))
-				{
-					return;
-				}
-			}
-			else
-			{
-				$filepath = $filename;
-				$filename = explode('/', str_replace(DIRECTORY_SEPARATOR, '/', $filename));
-				$filename = end($filename);
-			}
-
-			if ( ! @is_file($filepath) OR ($filesize = @filesize($filepath)) === FALSE)
+			if ( ! @is_file($filename) OR ($filesize = @filesize($filename)) === FALSE)
 			{
 				return;
 			}
+
+			$filepath = $filename;
+			$filename = explode('/', str_replace(DIRECTORY_SEPARATOR, '/', $filename));
+			$filename = end($filename);
 		}
 		else
 		{
@@ -141,23 +122,20 @@ if ( ! function_exists('force_download'))
 			$filename = implode('.', $x);
 		}
 
+		if ($data === NULL && ($fp = @fopen($filepath, 'rb')) === FALSE)
+		{
+			return;
+		}
+
 		// Clean output buffer
 		if (ob_get_level() !== 0 && @ob_end_clean() === FALSE)
 		{
 			@ob_clean();
 		}
 
-		// RFC 6266 allows for multibyte filenames, but only in UTF-8,
-		// so we have to make it conditional ...
-		$charset = strtoupper(config_item('charset'));
-		$utf8_filename = ($charset !== 'UTF-8')
-			? get_instance()->utf8->convert_to_utf8($filename, $charset)
-			: $filename;
-		isset($utf8_filename[0]) && $utf8_filename = " filename*=UTF-8''".rawurlencode($utf8_filename);
-
 		// Generate the server headers
 		header('Content-Type: '.$mime);
-		header('Content-Disposition: attachment; filename="'.$filename.'";'.$utf8_filename);
+		header('Content-Disposition: attachment; filename="'.$filename.'"');
 		header('Expires: 0');
 		header('Content-Transfer-Encoding: binary');
 		header('Content-Length: '.$filesize);
@@ -169,12 +147,13 @@ if ( ! function_exists('force_download'))
 			exit($data);
 		}
 
-		// Flush the file
-		if (@readfile($filepath) === FALSE)
+		// Flush 1MB chunks of data
+		while ( ! feof($fp) && ($data = fread($fp, 1048576)) !== FALSE)
 		{
-			return;
+			echo $data;
 		}
 
+		fclose($fp);
 		exit;
 	}
 }

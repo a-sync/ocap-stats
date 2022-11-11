@@ -6,7 +6,7 @@
  *
  * This content is released under the MIT License (MIT)
  *
- * Copyright (c) 2014 - 2019, British Columbia Institute of Technology
+ * Copyright (c) 2019 - 2022, CodeIgniter Foundation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,7 @@
  * @author	EllisLab Dev Team
  * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
  * @copyright	Copyright (c) 2014 - 2019, British Columbia Institute of Technology (https://bcit.ca/)
+ * @copyright	Copyright (c) 2019 - 2022, CodeIgniter Foundation (https://codeigniter.com/)
  * @license	https://opensource.org/licenses/MIT	MIT License
  * @link	https://codeigniter.com
  * @since	Version 1.3.0
@@ -108,7 +109,6 @@ class CI_DB_mssql_driver extends CI_DB {
 	 */
 	public function db_connect($persistent = FALSE)
 	{
-		ini_set('mssql.charset', $this->char_set);
 		$this->conn_id = ($persistent)
 				? mssql_pconnect($this->hostname, $this->username, $this->password)
 				: mssql_connect($this->hostname, $this->username, $this->password);
@@ -245,6 +245,19 @@ class CI_DB_mssql_driver extends CI_DB {
 		$query = $this->query($query);
 		$query = $query->row();
 		return $query->last_id;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Set client character set
+	 *
+	 * @param	string	$charset
+	 * @return	bool
+	 */
+	protected function _db_set_charset($charset)
+	{
+		return (ini_set('mssql.charset', $charset) !== FALSE);
 	}
 
 	// --------------------------------------------------------------------
