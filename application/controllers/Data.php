@@ -8,7 +8,7 @@ class Data extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->output->set_header('X-Powered-By: 💖');
+        $this->output->set_header('X-Powered-By: 🐹🐹');
 
         $this->load->library('session');
 
