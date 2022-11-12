@@ -187,7 +187,10 @@ class App extends CI_Controller
         $player_weapons = [];
         $player_attackers = [];
         $player_victims = [];
-        $player_cmd_stats = [];
+        $player_cmd_stats = [
+            'rivals' => [],
+            'commanded_ops' => []
+        ];
         if (filter_var($id, FILTER_VALIDATE_INT)) {
             $player = $this->players->get_by_id($id);
 
