@@ -23,6 +23,7 @@ $config['tag_event_types'] = [
     'fnfeu1' => 'eu',
     'fnfeu2' => 'eu',
     'fnfna' => 'na',
+    'fnfna1' => 'na',
     'fnftitans' => 'titans',
     'fnftnt' => 'tnt',
     'fnfvofcra' => 'vsofcra',
