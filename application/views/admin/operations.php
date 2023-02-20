@@ -115,13 +115,13 @@ $event_types = $this->config->item('event_types');
                                                 'redirect' => 'list'
                                             ];
 
-                                            if ($vet_count === 1) {
+                                            if ($vet_count > 0) {
                                                 $hidden['event'] = $op_valid_event_types[0];
                                             }
                                         ?>
                                             <td class="mdc-data-table__cell" colspan="2">
                                                 <?php echo form_open(base_url('manage/' . $op['id']), '', $hidden);
-                                                if ($vet_count === 1 && !defined('MANAGE_DATA_JSON_FILES')) : ?>
+                                                if ($vet_count > 0 && !defined('MANAGE_DATA_JSON_FILES')) : ?>
                                                     <button type="submit" name="action" value="parse" class="mdc-button mdc-button--raised mdc-button--leading">
                                                         <span class="mdc-button__ripple"></span>
                                                         <i class="material-icons mdc-button__icon" aria-hidden="true">publish</i>

@@ -20,10 +20,10 @@ $config['default_selected_event_types'] = ['eu', 'na'];
 
 $config['tag_event_types'] = [
     'fnfeu' => 'eu',
-    'fnfeu1' => 'eu',
+    'fnfeu1' => ['eu','tnt'],
     'fnfeu2' => 'eu',
     'fnfna' => 'na',
-    'fnfna1' => 'na',
+    'fnfna1' => ['na','tnt'],
     'fnftitans' => 'titans',
     'fnftnt' => 'tnt',
     'fnfvofcra' => 'vsofcra',
