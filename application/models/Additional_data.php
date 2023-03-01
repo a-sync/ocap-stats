@@ -601,10 +601,10 @@ class Additional_data extends CI_Model
             ])
             ->from('operations')
             ->where('operations.event !=', '')
-            ->where('IFNULL(operations.verified, 0) ==', $verified ? 1 : 0)
+            ->where('IFNULL(operations.verified, 0) =', $verified ? 1 : 0)
             ->order_by('operations.id DESC');
 
-        if (!$missing_data) {
+        if ($missing_data) {
             $this->db->group_start();
 
             $this->db->or_where('operations.mission_author', '')

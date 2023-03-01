@@ -67,6 +67,7 @@ $route['manage/(:num)/verify'] = 'data/verify/$1';
 $route['add-alias'] = 'data/add_alias';
 $route['fix-data'] = 'data/fix_data';
 $route['fix-data/unverified'] = 'data/fix_data/unverified';
+$route['fix-data/verified'] = 'data/fix_data/verified';
 
 $route['players'] = 'app/players';
 $route['player/(:num)'] = 'app/player/$1';

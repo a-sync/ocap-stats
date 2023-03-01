@@ -25,7 +25,9 @@ $fixed_icon = '<span class="material-icons">check</span>';
 
         <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center">
             <?php
-            if ($tab === 'unverified') {
+            if ($tab === 'verified') {
+                $items_type = ' verified ops';
+            } elseif ($tab === 'unverified') {
                 $items_type = ' unverified ops';
             } else { // missing
                 $items_type = ' ops missing data';
