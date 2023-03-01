@@ -2,9 +2,9 @@ name: Deploy demo sites
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches:
-  #     - master
+  push:
+    branches:
+      - master
 
 jobs:
   # pre-deploy:
@@ -48,10 +48,10 @@ jobs:
 
     steps:
       - name: 🚚 Get latest code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: ✏️ Replace config[base_url]
-        uses: jacobtomlinson/gha-find-replace@v2
+        uses: jacobtomlinson/gha-find-replace@v3
         with:
           include: "application/config/config.php"
           regex: false
@@ -59,7 +59,7 @@ jobs:
           replace: "$config['base_url'] = 'https://${{ matrix.config }}-stats.devs.space/';"
 
       - name: ✏️ Replace autoload[config]
-        uses: jacobtomlinson/gha-find-replace@v2
+        uses: jacobtomlinson/gha-find-replace@v3
         with:
           include: "application/config/autoload.php"
           regex: false
@@ -67,7 +67,7 @@ jobs:
           replace: "$autoload['config'] = array('${{ matrix.config }}');"
 
       - name: ✏️ Replace db[default][hostname]
-        uses: jacobtomlinson/gha-find-replace@v2
+        uses: jacobtomlinson/gha-find-replace@v3
         with:
           include: "application/config/database.php"
           regex: false
@@ -75,7 +75,7 @@ jobs:
           replace: "'hostname' => 'localhost',"
 
       - name: ✏️ Replace db[default][username]
-        uses: jacobtomlinson/gha-find-replace@v2
+        uses: jacobtomlinson/gha-find-replace@v3
         with:
           include: "application/config/database.php"
           regex: false
@@ -83,7 +83,7 @@ jobs:
           replace: "'username' => '${{ secrets[matrix.uname_secret] }}',"
 
       - name: ✏️ Replace db[default][password]
-        uses: jacobtomlinson/gha-find-replace@v2
+        uses: jacobtomlinson/gha-find-replace@v3
         with:
           include: "application/config/database.php"
           regex: false
@@ -91,7 +91,7 @@ jobs:
           replace: "'password' => '${{ secrets[matrix.pword_secret] }}',"
 
       - name: ✏️ Replace db[default][database]
-        uses: jacobtomlinson/gha-find-replace@v2
+        uses: jacobtomlinson/gha-find-replace@v3
         with:
           include: "application/config/database.php"
           regex: false
@@ -99,7 +99,7 @@ jobs:
           replace: "'database' => '${{ secrets[matrix.uname_secret] }}',"
 
       - name: ✏️ Replace CI_ENV
-        uses: jacobtomlinson/gha-find-replace@v2
+        uses: jacobtomlinson/gha-find-replace@v3
         with:
           include: ".htaccess"
           regex: false
@@ -107,18 +107,15 @@ jobs:
           replace: "SetEnv CI_ENV production"
 
       - name: 📂 Sync files
-        uses: SamKirkland/FTP-Deploy-Action@4.1.0
+        uses: SamKirkland/FTP-Deploy-Action@4.3.3
         with:
           server: "${{ secrets.FTP_HOSTNAME }}"
           username: "${{ secrets.FTP_USERNAME }}"
           password: "${{ secrets.FTP_PASSWORD }}"
           server-dir: "${{ matrix.config }}-stats/"
-          exclude: "[**/.git*, **/.git*/**, .sql/**, .dev/**, docker-compose.yml]"
-          ##v4.2.0 format:
-          # exclude: |
-          #   **/.git*
-          #   **/.git*/**
-          #   .sql/**
-          #   .dev/**
-          #   docker-compose.yml
-          # dry-run: true
+          exclude: |
+            **/.git*
+            **/.git*/**
+            .sql/**
+            .dev/**
+            docker-compose.yml
