@@ -76,24 +76,27 @@ $sides = $this->config->item('sides');
                                 $name_title = $pname_or_class . ', ' . $distance . ', ' . $time;
 
                                 $hits = $i['hits'];
-                                if (defined('ADJUST_HIT_DATA') && $i['operation_id'] < ADJUST_HIT_DATA) {
+                                if (defined('ADJUST_HIT_DATA') && $op_id < ADJUST_HIT_DATA) {
                                     $hits = '';
                                 }
 
                                 $fhits = $i['fhits'];
-                                if (defined('ADJUST_HIT_DATA') && $i['operation_id'] < ADJUST_HIT_DATA) {
+                                if (defined('ADJUST_HIT_DATA') && $op_id < ADJUST_HIT_DATA) {
                                     $fhits = '';
                                 }
 
-                                $medal = '';
+                                $medals = [];
+                                if (isset($players_first_op[$i['player_id']]) && $players_first_op[$i['player_id']] === $op_id) {
+                                    $medals[] = '<span>👶</span>';
+                                }
                                 if (isset($op_commanders[$i['side']]) && $op_commanders[$i['side']]['entity_id'] === $i['id']) {
-                                    $medal = '<span class="side__' . html_escape(strtolower($i['side'])) . '">🎖</span>';
+                                    $medals[] = '<span class="side__' . html_escape(strtolower($i['side'])) . '">🎖</span>';
                                 }
                             ?>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['id']; ?></td>
                                     <td class="mdc-data-table__cell cell__title">
-                                        <span title="<?php echo html_escape($name_title); ?>"><?php echo $name; ?></span><?php echo $medal; ?>
+                                        <span title="<?php echo html_escape($name_title); ?>"><?php echo $name; ?></span><?php echo implode(' ', $medals); ?>
                                     </td>
                                     <td class="mdc-data-table__cell side__<?php echo html_escape(strtolower($i['side'])); ?>"><?php echo html_escape($group); ?></td>
                                     <td class="mdc-data-table__cell"><?php echo html_escape($role); ?></td>

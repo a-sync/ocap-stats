@@ -312,6 +312,7 @@ class App extends CI_Controller
         $op_events = [];
         $op_weapons = [];
         $op_entities = [];
+        $players_first_op = [];
         if (filter_var($id, FILTER_VALIDATE_INT) || filter_var($id, FILTER_VALIDATE_INT) === 0) {
             $op = $this->operations->get_by_id($id);
 
@@ -323,13 +324,24 @@ class App extends CI_Controller
 
                 $op_sides = $this->additional_data->get_op_sides($op['id']);
 
+                $op_player_ids = [];
                 if ($tab === 'events') {
                     $op_events = $this->operations->get_events_by_id($op['id']);
+                    if (count($op_events) > 0) {
+                        $attacker_player_ids = array_column($op_events, 'attacker_player_id', 'attacker_player_id');
+                        $victim_player_ids = array_column($op_events, 'victim_player_id', 'victim_player_id');
+                        $op_player_ids = array_unique(array_merge($attacker_player_ids, $victim_player_ids), SORT_NUMERIC);
+                    }
                 } elseif ($tab === 'weapons') {
                     $op_weapons = $this->operations->get_weapons_by_id($op['id']);
                 } else { // entities
                     $op_entities = $this->operations->get_entities_by_id($op['id']);
+                    if (count($op_entities) > 0) {
+                        $op_player_ids = array_unique(array_column($op_entities, 'player_id'), SORT_NUMERIC);
+                    }
                 }
+
+                $players_first_op = $this->additional_data->get_first_ops_of_players($op_player_ids);
             } else {
                 $errors[] = 'Unknown op ID given.';
             }
@@ -354,7 +366,9 @@ class App extends CI_Controller
                         'active' => 'events',
                         'op_url' => base_url('op/' . $op['id'])
                     ], true),
-                    'op_commanders' => $op_commanders
+                    'op_commanders' => $op_commanders,
+                    'op_id' => $op['id'],
+                    'players_first_op' => $players_first_op
                 ]);
             } elseif ($tab === 'weapons') {
                 $this->load->view('op-weapons', [
@@ -371,7 +385,9 @@ class App extends CI_Controller
                         'active' => 'entities',
                         'op_url' => base_url('op/' . $op['id'])
                     ], true),
-                    'op_commanders' => $op_commanders
+                    'op_commanders' => $op_commanders,
+                    'op_id' => $op['id'],
+                    'players_first_op' => $players_first_op
                 ]);
             }
         }

@@ -840,7 +840,6 @@ class Operations extends CI_Model
     {
         $this->db
             ->select([
-                'entities.operation_id',
                 'entities.id',
                 'entities.player_id',
                 'entities.group_name',

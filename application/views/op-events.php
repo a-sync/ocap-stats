@@ -63,9 +63,12 @@ $deduped_items = array_reduce($items, function ($acc, $next) {
                                 } elseif ($i['attacker_id'] !== null) {
                                     $attacker_name = '<span title="#' . $i['attacker_id'] . '">' . $attacker_name . '</span>';
                                 }
-                                $attacker_medal = '';
+                                $attacker_medals = [];
+                                if (isset($players_first_op[$i['attacker_player_id']]) && $players_first_op[$i['attacker_player_id']] === $op_id) {
+                                    $attacker_medals[] = '<span>👶</span>';
+                                }
                                 if (isset($op_commanders[$i['attacker_side']]) && $op_commanders[$i['attacker_side']]['entity_id'] === $i['attacker_id']) {
-                                    $attacker_medal = '<span class="side__' . html_escape(strtolower($i['attacker_side'])) . '">🎖</span>';
+                                    $attacker_medals[] = '<span class="side__' . html_escape(strtolower($i['attacker_side'])) . '">🎖</span>';
                                 }
 
                                 $victim_player_name = is_null($i['victim_player_name']) ? '' : $i['victim_player_name'];
@@ -80,9 +83,12 @@ $deduped_items = array_reduce($items, function ($acc, $next) {
                                 } elseif ($i['victim_id'] !== null) {
                                     $victim_name = '<span title="#' . $i['victim_id'] . '">' . $victim_name . '</span>';
                                 }
-                                $victim_medal = '';
+                                $victim_medals = [];
+                                if (isset($players_first_op[$i['victim_player_id']]) && $players_first_op[$i['victim_player_id']] === $op_id) {
+                                    $victim_medals[] = '<span>👶</span>';
+                                }
                                 if (isset($op_commanders[$i['victim_side']]) && $op_commanders[$i['victim_side']]['entity_id'] === $i['victim_id']) {
-                                    $victim_medal = '<span class="side__' . html_escape(strtolower($i['victim_side'])) . '">🎖</span>';
+                                    $victim_medals[] = '<span class="side__' . html_escape(strtolower($i['victim_side'])) . '">🎖</span>';
                                 }
 
                                 $distance = '';
@@ -112,7 +118,7 @@ $deduped_items = array_reduce($items, function ($acc, $next) {
                                 <tr class="mdc-data-table__row event__<?php echo html_escape($i['event']); ?>">
                                     <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $time; ?></td>
                                     <td class="mdc-data-table__cell cell__title <?php echo $attacker_side_class; ?>">
-                                        <span<?php echo $attacker_title; ?>><?php echo $attacker_name; ?></span><?php echo $attacker_medal; ?>
+                                        <span<?php echo $attacker_title; ?>><?php echo $attacker_name; ?></span><?php echo implode(' ', $attacker_medals); ?>
                                     </td>
                                     <td class="mdc-data-table__cell" data-sort="<?php echo html_escape($i['event']); ?>">
                                         <?php echo $event; ?>
@@ -123,7 +129,7 @@ $deduped_items = array_reduce($items, function ($acc, $next) {
                                         ?>
                                     </td>
                                     <td class="mdc-data-table__cell cell__title <?php echo $victim_side_class; ?>">
-                                        <span<?php echo $victim_title; ?>><?php echo $victim_name; ?></span><?php echo $victim_medal; ?>
+                                        <span<?php echo $victim_title; ?>><?php echo $victim_name; ?></span><?php echo implode(' ', $victim_medals); ?>
                                     </td>
                                     <td class="mdc-data-table__cell"><?php echo html_escape($i['weapon']); ?></td>
                                     <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo html_escape($i['distance']); ?>"><?php echo $distance; ?></td>

@@ -712,4 +712,19 @@ class Additional_data extends CI_Model
 
         return $errors;
     }
+
+    public function get_first_ops_of_players($ids)
+    {
+        $this->db
+            ->select([
+                'players.id',
+                'MIN(entities.operation_id) AS operation_id'
+            ])
+            ->from('players')
+            ->join('entities', 'entities.player_id = players.id')
+            ->where_in('players.id', $ids)
+            ->group_by('players.id');
+
+        return array_column($this->db->get()->result_array(), 'operation_id', 'id');
+    }
 }
