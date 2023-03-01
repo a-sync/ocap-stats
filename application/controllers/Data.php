@@ -139,7 +139,13 @@ class Data extends CI_Controller
             return count($v) > 1;
         }));
 
-        $ops = $this->additional_data->get_ops_with_missing_data(false, $op_ids_with_resolved_cmd, ($tab === 'unverified' ? true : false));
+        if ($tab === 'verified') {
+            $ops = $this->additional_data->get_ops_to_fix_data(true);
+        } else if ($tab === 'unverified') {
+            $ops = $this->additional_data->get_ops_to_fix_data(false);
+        } else { // missing
+            $ops = $this->additional_data->get_ops_to_fix_data(false, true, $op_ids_with_resolved_cmd);
+        }
 
         $last_cache_update = 0;
         $homepage_cache_file = get_cache_file('');

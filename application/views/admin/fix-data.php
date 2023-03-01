@@ -62,17 +62,15 @@ $fixed_icon = '<span class="material-icons">check</span>';
                                         </span>
                                         <span class="mdc-tab__ripple"></span>
                                     </a>
-                                    <?php /*
-                                    <a href="<?php echo base_url('fix-data/orphan'); ?>" class="mdc-tab<?php if ($tab === 'orphan') echo ' mdc-tab--active';  ?>" role="tab" aria-selected="false" tabindex="7">
+                                    <a href="<?php echo base_url('fix-data/verified'); ?>" class="mdc-tab<?php if ($tab === 'verified') echo ' mdc-tab--active';  ?>" role="tab" aria-selected="false" tabindex="7">
                                         <span class="mdc-tab__content">
-                                            <span class="mdc-tab__text-label">Orphan data</span>
+                                            <span class="mdc-tab__text-label">Verified</span>
                                         </span>
-                                        <span class="mdc-tab-indicator<?php if ($tab === 'orphan') echo ' mdc-tab-indicator--active';  ?>">
+                                        <span class="mdc-tab-indicator<?php if ($tab === 'verified') echo ' mdc-tab-indicator--active';  ?>">
                                             <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
                                         </span>
                                         <span class="mdc-tab__ripple"></span>
                                     </a>
-                                    */ ?>
                                 </div>
                             </div>
                         </div>

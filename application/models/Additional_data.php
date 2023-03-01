@@ -580,20 +580,8 @@ class Additional_data extends CI_Model
         ];
     }
 
-    public function get_ops_with_missing_data($id = false, $op_ids_with_unambiguous_cmd = [], $all_unverified = false)
+    public function get_ops_to_fix_data($verified = false, $missing_data = false, $op_ids_with_unambiguous_cmd = [])
     {
-        if ($id !== false) {
-            if (!is_array($id)) {
-                $id = [$id];
-            }
-
-            $this->db->where_in('operations.id', $id);
-        }
-
-        if (count($op_ids_with_unambiguous_cmd) === 0) {
-            $op_ids_with_unambiguous_cmd = [0];
-        }
-
         $this->db
             ->select([
                 'operations.id',
@@ -613,17 +601,21 @@ class Additional_data extends CI_Model
             ])
             ->from('operations')
             ->where('operations.event !=', '')
-            ->where('IFNULL(operations.verified, 0) !=', 1)
+            ->where('IFNULL(operations.verified, 0) ==', $verified ? 1 : 0)
             ->order_by('operations.id DESC');
 
-        if (!$all_unverified) {
-            $this->db
-                ->group_start()
-                ->or_where('operations.mission_author', '')
+        if (!$missing_data) {
+            $this->db->group_start();
+
+            $this->db->or_where('operations.mission_author', '')
                 ->or_where('operations.start_time LIKE', '%00:00:00')
-                ->or_where('operations.end_winner', '')
-                ->or_where_not_in('operations.id', $op_ids_with_unambiguous_cmd)
-                ->group_end();
+                ->or_where('operations.end_winner', '');
+
+            if (count($op_ids_with_unambiguous_cmd) !== 0) {
+                $this->db->or_where_not_in('operations.id', $op_ids_with_unambiguous_cmd);
+            }
+
+            $this->db->group_end();
         }
 
         return $this->db
