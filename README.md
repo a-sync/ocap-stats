@@ -11,8 +11,6 @@
  &nbsp; &rdca; based on [OCAP](https://game.ofcra.org/ocap) data from [OFCRA](https://ofcrav2.org)  
 [3cb-stats.devs.space](https://3cb-stats.devs.space)  
  &nbsp; &rdca; based on [OCAP2](https://ocap.3commandobrigade.com) data from [3CB](https://www.3commandobrigade.com)  
-[242ns-stats.devs.space](https://242ns-stats.devs.space)  
- &nbsp; &rdca; based on [OCAP2](http://server.242nightstalkers.com:5000) data from [242NS](https://steamcommunity.com/groups/242NS)  
 [rb-stats.devs.space](https://rb-stats.devs.space)  
  &nbsp; &rdca; based on [OCAP](https://ocap.red-bear.ru) data from [RED-BEAR](https://www.red-bear.ru)  
 

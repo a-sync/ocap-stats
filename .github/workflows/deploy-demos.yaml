@@ -1,9 +1,10 @@
 name: Deploy demo sites
 
 on:
-  push:
-    branches:
-      - master
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - master
 
 jobs:
   # pre-deploy:
@@ -30,7 +31,7 @@ jobs:
       fail-fast: false
       max-parallel: 1
       matrix:
-        config: [fnf, ofcra, 3cb, 242ns, rb]
+        config: [fnf, ofcra, 3cb, rb]
         include:
           - config: fnf
             uname_secret: DB_USERNAME_FNF
@@ -41,9 +42,6 @@ jobs:
           - config: 3cb
             uname_secret: DB_USERNAME_3CB
             pword_secret: DB_PASSWORD_3CB
-          - config: 242ns
-            uname_secret: DB_USERNAME_242NS
-            pword_secret: DB_PASSWORD_242NS
           - config: rb
             uname_secret: DB_USERNAME_RB
             pword_secret: DB_PASSWORD_RB
@@ -116,4 +114,11 @@ jobs:
           password: "${{ secrets.FTP_PASSWORD }}"
           server-dir: "${{ matrix.config }}-stats/"
           exclude: "[**/.git*, **/.git*/**, .sql/**, .dev/**, docker-compose.yml]"
+          ##v4.2.0 format:
+          # exclude: |
+          #   **/.git*
+          #   **/.git*/**
+          #   .sql/**
+          #   .dev/**
+          #   docker-compose.yml
           # dry-run: true
