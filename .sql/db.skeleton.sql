@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `entities` (
   `uid` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `aid` int(10) unsigned NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`aid`),
-  UNIQUE KEY `operation_id_id` (`operation_id`,`id`)
+  UNIQUE KEY `operation_id_id` (`operation_id`,`id`),
   KEY `player_id` (`player_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 --
@@ -124,7 +124,7 @@ CREATE TABLE IF NOT EXISTS `timestamps` (
   UNIQUE KEY `operation_id_id` (`operation_id`,`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 --
--- RELATIONS FOR TABLE `entities`:
+-- RELATIONS FOR TABLE `timestamps`:
 --   `operation_id`
 --       `operations` -> `id`
 --

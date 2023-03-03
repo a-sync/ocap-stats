@@ -26,3 +26,12 @@ CREATE TABLE IF NOT EXISTS `timestamps` (
   `time_multiplier` decimal(4,2) unsigned NOT NULL,
   PRIMARY KEY (`operation_id`,`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- 2023-03-03
+--
+ALTER TABLE `events` DROP INDEX `operation_id`, ADD INDEX `operation_id` (`operation_id`);
+
+ALTER TABLE `timestamps` DROP PRIMARY KEY, ADD `aid` INT UNSIGNED NOT NULL AUTO_INCREMENT, ADD PRIMARY KEY (`aid`), ADD UNIQUE `operation_id_id` (`operation_id`, `id`);
+
+ALTER TABLE `entities` DROP PRIMARY KEY, ADD `aid` INT UNSIGNED NOT NULL AUTO_INCREMENT, ADD PRIMARY KEY (`aid`), ADD UNIQUE `operation_id_id` (`operation_id`, `id`);
