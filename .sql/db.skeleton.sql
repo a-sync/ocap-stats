@@ -31,7 +31,9 @@ CREATE TABLE IF NOT EXISTS `entities` (
   `invalid` TINYINT(1) unsigned DEFAULT NULL,
   `cmd` TINYINT(1) unsigned DEFAULT NULL,
   `uid` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`operation_id`,`id`),
+  `aid` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`aid`),
+  UNIQUE KEY `operation_id_id` (`operation_id`,`id`)
   KEY `player_id` (`player_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 --
@@ -56,7 +58,7 @@ CREATE TABLE IF NOT EXISTS `events` (
   `distance` int(10) NOT NULL,
   `data` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `operation_id` (`operation_id`,`attacker_id`)
+  KEY `operation_id` (`operation_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=1 ;
 --
 -- RELATIONS FOR TABLE `events`:
@@ -117,7 +119,9 @@ CREATE TABLE IF NOT EXISTS `timestamps` (
   `sys_time_utc` DATETIME NOT NULL,
   `time` decimal(10,3) unsigned NOT NULL,
   `time_multiplier` decimal(4,2) unsigned NOT NULL,
-  PRIMARY KEY (`operation_id`,`id`)
+  `aid` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`aid`),
+  UNIQUE KEY `operation_id_id` (`operation_id`,`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 --
 -- RELATIONS FOR TABLE `entities`:
