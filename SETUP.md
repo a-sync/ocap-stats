@@ -10,7 +10,8 @@ Configure the [`autoload[config]`](application/config/autoload.php#L106) value t
 ## Database
 The table structure is in the [db.skeleton.sql](.sql/db.skeleton.sql) file. (MySQL/MariaDB format)  
 
-Import the skeleton first, and then a seed if you want to.
+Import the skeleton first, and then a seed if you want to.  
+The latest FNF seed is loaded in the adminer service container, and available under _[Import](http://localhost:8080/?server=db&username=root&db=ocapstats&import=) / From server_ via the _Run file_ button.
 
 
 ## Admin access

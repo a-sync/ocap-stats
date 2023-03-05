@@ -1,7 +1,12 @@
 # ocap-stats
 
 ## What is this?
-[OCAP](https://github.com/OCAP2/OCAP) data spread out on tables.  
+[OCAP](https://github.com/OCAP2/OCAP) JSON data parser/editor/viewer web service.  
+
+Provides a handy UI to parse OCAP JSON files, then store and edit the data in a database.  
+The data is presented on a simple spreadsheet like web frontend.  
+
+_OCAP web server » [JSON] » ocap-stats (parser) » [SQL] » ocap-stats (editor/viewer) » [HTML]_  
 
 
 ## Demo sites
@@ -19,24 +24,11 @@
  &nbsp; &rdca; based on [OCAP2](http://tbdevent.eu:5000) data from [TBD](https://tbdevent.eu)  
 
 
-## Known issues
-  1. player stats are collected based on name only (aliases must be set manually to mitigate this)  
-  1. ops recorded before using OCAP2 v1.1.0 had no proper tracking for hit events where the victim is a player  
-     * Hits / Shots percent and Shots / Hits must be adjusted accordingly
-  1. players can have multiple entities in the same op (rejoins/role switch)  
-     * this affects role data since there is no explicit way to tell which entity was actually playing
-     * players can have `killed` events as spectator sometimes in relation to this
-  1. vehicle kills are not always registered (not sure why)  
-  1. some hits / kills are registered to the weapon or item selected by the attacker at the time of the event  
-  1. some ops have no winner announced (endMission[1]: Mission ended automatically)  
-     * affects all ops recorded before using OCAP2 v1.0.0
-     * nobody wins or loses the op (maybe the ending can be assumed or it's just omitted, not sure...)
-  1. ops recorded before using OCAP2 v1.0.0 are missing the role info  
-  1. commanders can not always be determined automatically and must be fixed manually  
-  1. timestamps are all UTC (or should be) and depend on the arma3 server  
+## Search
+CTRL+F
 
 
-## Stats collected
+## Aggregated data
   * **Shots**  
     nr. of framesFired events (only counts main weapon and sidearm rounds afaik.)  
   \+ nr. of projectile markers tied to a _unit_ (grenades, rockets, mines, etc.)  
@@ -57,12 +49,32 @@
   * **Time in game**  
     the nr. of frames recorded of an entity in game (including spectator), adjusted by the ops capture delay configuration  
 
-
 Self inflicted and environmental hits / kills (_something_) are omitted! (except for deaths)  
 
 
-## Search
-CTRL+F
+## Aggregated events
+ * **_enter_vehicle**
+ * **_exit_vehicle**
+ * **_awake**
+ * **_unco**
+ * **_dead**
+ * **_projectile**
+
+
+## Known issues
+  1. player stats are collected based on name only (aliases must be set manually to mitigate this)  
+  1. ops recorded before using OCAP2 v1.1.0 had no proper tracking for hit events where the victim is a player  
+     * Hits / Shots percent and Shots / Hits are adjusted accordingly
+  1. players can have multiple entities in the same op (rejoins/role switch)  
+     * this affects role data since there is no explicit way to tell which entity was actually playing
+     * players can have `killed` events as spectator sometimes in relation to this
+  1. vehicle kills are not always registered  
+  1. some hits / kills are registered to the weapon or item selected by the attacker at the time of the event  
+  1. some ops have no winner announced (endMission[1]: Mission ended automatically)  
+     * affects all ops recorded before using OCAP2 v1.0.0
+  1. ops recorded before using OCAP2 v1.0.0 are missing the role info  
+  1. commanders can not always be determined automatically and must be set manually  
+  1. timestamps depend on the arma3 server config  
 
 
 ## TODO:
