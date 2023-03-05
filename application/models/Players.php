@@ -171,7 +171,7 @@ class Players extends CI_Model
     {
         $this->db
             ->select([
-                "SUBSTRING_INDEX(entities.role, '@', 1) AS role_name",
+                "TRIM(SUBSTRING_INDEX(entities.role, '@', 1)) AS role_name",
                 'COUNT(entities.role) AS total_count'
             ])
             ->select_sum("CASE WHEN side = 'WEST' THEN 1 ELSE 0 END", 'west_count')
@@ -200,7 +200,7 @@ class Players extends CI_Model
             // Get adjusted hit stats for roles
             $this->db
                 ->select([
-                    "SUBSTRING_INDEX(entities.role, '@', 1) AS role_name",
+                    "TRIM(SUBSTRING_INDEX(entities.role, '@', 1)) AS role_name",
                     'COUNT(entities.role) AS total_count',
                 ])
                 ->select_sum('shots')

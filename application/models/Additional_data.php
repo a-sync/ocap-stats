@@ -39,7 +39,7 @@ class Additional_data extends CI_Model
             'entities.side',
             'entities.group_name',
             'entities.role',
-            "SUBSTRING_INDEX(entities.role, '@', 1) AS role_name",
+            "TRIM(SUBSTRING_INDEX(entities.role, '@', 1)) AS role_name",
             'entities.invalid',
             'entities.cmd',
             'operations.end_winner'
@@ -88,7 +88,7 @@ class Additional_data extends CI_Model
             'entities.side',
             'entities.group_name',
             'entities.role',
-            "SUBSTRING_INDEX(entities.role, '@', 1) AS role_name",
+            "TRIM(SUBSTRING_INDEX(entities.role, '@', 1)) AS role_name",
             'entities.invalid',
             'entities.cmd',
             'operations.end_winner'
@@ -415,6 +415,10 @@ class Additional_data extends CI_Model
 
     private function _array_search_prefix($prefix, array $haystack)
     {
+        if ($prefix === '') {
+            return false;
+        }
+
         foreach ($haystack as $i => $item) {
             if (0 === stripos($item, $prefix)) {
                 return $i;

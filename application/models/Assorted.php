@@ -81,7 +81,7 @@ class Assorted extends CI_Model
     {
         $this->db
             ->select([
-                "SUBSTRING_INDEX(role, '@', 1) AS role_name",
+                "TRIM(SUBSTRING_INDEX(role, '@', 1)) AS role_name",
                 'COUNT(role) AS count',
             ])
             ->from('entities')
