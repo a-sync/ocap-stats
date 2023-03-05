@@ -9,10 +9,14 @@
  &nbsp; &rdca; based on [OCAP2](http://aar.fridaynightfight.org) data from [FNF](https://www.fridaynightfight.org)  
 [ofcra-stats.devs.space](https://ofcra-stats.devs.space)  
  &nbsp; &rdca; based on [OCAP](https://game.ofcra.org/ocap) data from [OFCRA](https://ofcrav2.org)  
+[ofcra2-stats.devs.space](https://ofcra2-stats.devs.space)  
+ &nbsp; &rdca; based on [OCAP2](http://game.ofcra.org:5000) data from [OFCRA](https://ofcrav2.org)  
 [3cb-stats.devs.space](https://3cb-stats.devs.space)  
  &nbsp; &rdca; based on [OCAP2](https://ocap.3commandobrigade.com) data from [3CB](https://www.3commandobrigade.com)  
 [rb-stats.devs.space](https://rb-stats.devs.space)  
  &nbsp; &rdca; based on [OCAP](https://ocap.red-bear.ru) data from [RED-BEAR](https://www.red-bear.ru)  
+[tbd-stats.devs.space](https://tbd-stats.devs.space)  
+ &nbsp; &rdca; based on [OCAP2](http://tbdevent.eu:5000) data from [TBD](https://tbdevent.eu)  
 
 
 ## Known issues

@@ -31,7 +31,7 @@ jobs:
       fail-fast: false
       max-parallel: 1
       matrix:
-        config: [fnf, ofcra, 3cb, rb]
+        config: [fnf, ofcra, ofcra2, 3cb, rb, tbd]
         include:
           - config: fnf
             uname_secret: DB_USERNAME_FNF
@@ -39,12 +39,18 @@ jobs:
           - config: ofcra
             uname_secret: DB_USERNAME_OFCRA
             pword_secret: DB_PASSWORD_OFCRA
+          - config: ofcra2
+            uname_secret: DB_USERNAME_OFCRA2
+            pword_secret: DB_PASSWORD_OFCRA2
           - config: 3cb
             uname_secret: DB_USERNAME_3CB
             pword_secret: DB_PASSWORD_3CB
           - config: rb
             uname_secret: DB_USERNAME_RB
             pword_secret: DB_PASSWORD_RB
+          - config: tbd
+            uname_secret: DB_USERNAME_TBD
+            pword_secret: DB_PASSWORD_TBD
 
     steps:
       - name: 🚚 Get latest code
