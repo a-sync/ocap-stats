@@ -30,8 +30,14 @@ CREATE TABLE IF NOT EXISTS `timestamps` (
 --
 -- 2023-03-03
 --
-ALTER TABLE `events` DROP INDEX `operation_id`, ADD INDEX `operation_id` (`operation_id`);
+ALTER TABLE `events` DROP INDEX `operation_id`, ADD INDEX `operation_id` (`operation_id`) ;
 
-ALTER TABLE `timestamps` DROP PRIMARY KEY, ADD `aid` INT UNSIGNED NOT NULL AUTO_INCREMENT, ADD PRIMARY KEY (`aid`), ADD UNIQUE `operation_id_id` (`operation_id`, `id`);
+ALTER TABLE `timestamps` DROP PRIMARY KEY, ADD `aid` INT UNSIGNED NOT NULL AUTO_INCREMENT, ADD PRIMARY KEY (`aid`), ADD UNIQUE `operation_id_id` (`operation_id`, `id`) ;
 
-ALTER TABLE `entities` DROP PRIMARY KEY, ADD `aid` INT UNSIGNED NOT NULL AUTO_INCREMENT, ADD PRIMARY KEY (`aid`), ADD UNIQUE `operation_id_id` (`operation_id`, `id`);
+ALTER TABLE `entities` DROP PRIMARY KEY, ADD `aid` INT UNSIGNED NOT NULL AUTO_INCREMENT, ADD PRIMARY KEY (`aid`), ADD UNIQUE `operation_id_id` (`operation_id`, `id`) ;
+
+ALTER TABLE `events` ADD `victim_aid` INT(10) UNSIGNED NULL DEFAULT NULL, ADD `attacker_aid` INT(10) UNSIGNED NULL DEFAULT NULL ;
+
+UPDATE `events` JOIN `entities` AS `victim` ON `victim`.`id` = `events`.`victim_id` AND `victim`.`operation_id` = `events`.`operation_id` SET `events`.`victim_aid` = `victim`.`aid` WHERE `events`.`victim_aid` IS NULL AND `events`.`victim_id` IS NOT NULL ;
+
+UPDATE `events` JOIN `entities` AS `attacker` ON `attacker`.`id` = `events`.`attacker_id` AND `attacker`.`operation_id` = `events`.`operation_id` SET `events`.`attacker_aid` = `attacker`.`aid` WHERE `events`.`attacker_aid` IS NULL AND `events`.`attacker_id` IS NOT NULL ;

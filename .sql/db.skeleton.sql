@@ -57,6 +57,8 @@ CREATE TABLE IF NOT EXISTS `events` (
   `weapon` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `distance` int(10) NOT NULL,
   `data` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `victim_aid` int(10) unsigned DEFAULT NULL,
+  `attacker_aid` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `operation_id` (`operation_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=1 ;

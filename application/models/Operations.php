@@ -563,113 +563,129 @@ class Operations extends CI_Model
                 }
             }
 
-            if ($this->db->insert_batch('events', $events) === false) {
-                $errors[] = 'Failed to save events.';
-            } else {
-                $events = null;
+            $players = $this->get_all_players();
 
-                $players = $this->get_all_players();
+            $new_players = [];
+            $players_updates = [];
+            $alias_reassignments = [];
+            foreach ($entities as $i => $e) {
+                $entities[$i]['operation_id'] = $details['id'];
 
-                $new_players = [];
-                $players_updates = [];
-                $alias_reassignments = [];
-                foreach ($entities as $i => $e) {
-                    $entities[$i]['operation_id'] = $details['id'];
+                $entities[$i]['deaths'] = max($e['deaths'], $e['_deaths']);
+                unset($entities[$i]['_deaths']);
 
-                    $entities[$i]['deaths'] = max($e['deaths'], $e['_deaths']);
-                    unset($entities[$i]['_deaths']);
+                if ($e['is_player']) {
+                    if ($e['uid'] !== null && $e['uid'] !== '' && $e['uid'] !== 0) {
+                        $player_uids = array_column($players, 'uid');
+                        $pi = array_search($e['uid'], $player_uids);
+                        if ($pi === false) {
+                            $new_player_uids = array_column($new_players, 'uid');
+                            $npi = array_search($e['uid'], $new_player_uids);
 
-                    if ($e['is_player']) {
-                        if ($e['uid'] !== null && $e['uid'] !== '' && $e['uid'] !== 0) {
-                            $player_uids = array_column($players, 'uid');
-                            $pi = array_search($e['uid'], $player_uids);
-                            if ($pi === false) {
-                                $new_player_uids = array_column($new_players, 'uid');
-                                $npi = array_search($e['uid'], $new_player_uids);
-
-                                if ($npi === false) {
-                                    $new_players[] = [
-                                        'entity_ids' => [$i],
-                                        'name' => $e['name'],
-                                        'uid' => $e['uid']
-                                    ];
-                                } else {
-                                    $new_players[$npi]['entity_ids'][] = $i;
-                                    if ($e['name'] !== $new_players[$npi]['name']) {
-                                        $new_players[$npi]['name'] = $e['name'];
-                                    }
-                                }
+                            if ($npi === false) {
+                                $new_players[] = [
+                                    'entity_ids' => [$i],
+                                    'name' => $e['name'],
+                                    'uid' => $e['uid']
+                                ];
                             } else {
-                                // Note: a player with a uid can never be an alias
-                                $p = $players[$pi];
-                                $entities[$i]['player_id'] = $p['id'];
-                                if ($e['name'] !== $p['name']) {
-                                    $players_updates[$p['id']] = [
-                                        'id' => $p['id'],
-                                        'name' => $e['name']
-                                    ];
+                                $new_players[$npi]['entity_ids'][] = $i;
+                                if ($e['name'] !== $new_players[$npi]['name']) {
+                                    $new_players[$npi]['name'] = $e['name'];
                                 }
                             }
                         } else {
-                            $player_names = array_column(array_filter($players, function ($v) {
-                                return $v['uid'] === null;
-                            }), 'name');
-                            $pi = array_search(strtolower($e['name']), array_map('strtolower', $player_names));
-                            // Note: dupes can still occur after the entity name is inserted into the db and whitespaces get trimmed
-                            // SELECT * FROM players WHERE name IN (SELECT name FROM players GROUP BY name HAVING COUNT(*) > 1) ORDER BY name, id
-                            if ($pi === false) {
-                                $new_player_names = array_column($new_players, 'name');
-                                $npi = array_search(strtolower($e['name']), array_map('strtolower', $new_player_names));
+                            // Note: a player with a uid can never be an alias
+                            $p = $players[$pi];
+                            $entities[$i]['player_id'] = $p['id'];
+                            if ($e['name'] !== $p['name']) {
+                                $players_updates[$p['id']] = [
+                                    'id' => $p['id'],
+                                    'name' => $e['name']
+                                ];
+                            }
+                        }
+                    } else {
+                        $player_names = array_column(array_filter($players, function ($v) {
+                            return $v['uid'] === null;
+                        }), 'name');
+                        $pi = array_search(strtolower($e['name']), array_map('strtolower', $player_names));
+                        // Note: dupes can still occur after the entity name is inserted into the db and whitespaces get trimmed
+                        // SELECT * FROM players WHERE name IN (SELECT name FROM players GROUP BY name HAVING COUNT(*) > 1) ORDER BY name, id
+                        if ($pi === false) {
+                            $new_player_names = array_column($new_players, 'name');
+                            $npi = array_search(strtolower($e['name']), array_map('strtolower', $new_player_names));
 
-                                if ($npi === false) {
-                                    $new_players[] = [
-                                        'entity_ids' => [$i],
-                                        'name' => $e['name'],
-                                        'uid' => null
-                                    ];
-                                } else {
-                                    $new_players[$npi]['entity_ids'][] = $i;
-                                }
+                            if ($npi === false) {
+                                $new_players[] = [
+                                    'entity_ids' => [$i],
+                                    'name' => $e['name'],
+                                    'uid' => null
+                                ];
                             } else {
-                                $p = $players[$pi];
+                                $new_players[$npi]['entity_ids'][] = $i;
+                            }
+                        } else {
+                            $p = $players[$pi];
 
-                                if ($p['alias_of']) {
-                                    $entities[$i]['player_id'] = $p['alias_of'];
-                                    $alias_reassignments[$p['alias_of']] = $p['id'];
-                                } else {
-                                    $entities[$i]['player_id'] = $p['id'];
-                                }
+                            if ($p['alias_of']) {
+                                $entities[$i]['player_id'] = $p['alias_of'];
+                                $alias_reassignments[$p['alias_of']] = $p['id'];
+                            } else {
+                                $entities[$i]['player_id'] = $p['id'];
                             }
                         }
                     }
                 }
+            }
 
-                if (count($new_players) > 0) {
-                    $added_players = $this->add_players($new_players);
-                    $errors = array_merge($errors, $added_players['errors']);
-                    foreach ($added_players['new_players'] as $p) {
-                        foreach ($p['entity_ids'] as $eid) {
-                            $entities[$eid]['player_id'] = $p['player_id'];
-                        }
+            if (count($new_players) > 0) {
+                $added_players = $this->add_players($new_players);
+                $errors = array_merge($errors, $added_players['errors']);
+                foreach ($added_players['new_players'] as $p) {
+                    foreach ($p['entity_ids'] as $eid) {
+                        $entities[$eid]['player_id'] = $p['player_id'];
                     }
                 }
+            }
 
-                if (count($errors) === 0) {
-                    if ($this->db->insert_batch('entities', $entities) === false) {
-                        $errors[] = 'Failed to save entities.';
+            if (count($errors) === 0) {
+                if ($this->db->insert_batch('entities', $entities) === false) {
+                    $errors[] = 'Failed to save entities.';
+                } else {
+                    $entities = null;
+                    $entities_pks = $this->get_entities_pks_by_id($details['id']);
+
+                    foreach ($events as $i => $e) {
+                        if (is_null($e['victim_id'])) {
+                            $events[$i]['victim_aid'] = null;
+                        } else if (isset($entities_pks[$e['victim_id']])) {
+                            $events[$i]['victim_aid'] = $entities_pks[$e['victim_id']];
+                        } // else victim entity id not found for event
+
+                        if (is_null($e['attacker_id'])) {
+                            $events[$i]['attacker_aid'] = null;
+                        } else if (isset($entities_pks[$e['attacker_id']])) {
+                            $events[$i]['attacker_aid'] = $entities_pks[$e['attacker_id']];
+                        } // else attacker entity id not found for event
+                    }
+
+                    if ($this->db->insert_batch('events', $events) === false) {
+                        $errors[] = 'Failed to save events.';
                     }
                 }
-                $entities = null;
+            }
+            $entities = null;
+            $events = null;
 
-                if (count($players_updates) > 0) {
-                    $err = $this->update_players($players_updates);
-                    $errors = array_merge($errors, $err);
-                }
+            if (count($players_updates) > 0) {
+                $err = $this->update_players($players_updates);
+                $errors = array_merge($errors, $err);
+            }
 
-                if (count($alias_reassignments) > 0) {
-                    $err = $this->reassign_aliases($alias_reassignments);
-                    $errors = array_merge($errors, $err);
-                }
+            if (count($alias_reassignments) > 0) {
+                $err = $this->reassign_aliases($alias_reassignments);
+                $errors = array_merge($errors, $err);
             }
         } else {
             $errors[] = 'Failed to save operation.';
@@ -924,5 +940,18 @@ class Operations extends CI_Model
             ->order_by('kills DESC, hits DESC, fkills ASC, fhits ASC, events.weapon ASC');
 
         return $this->db->get()->result_array();
+    }
+
+    private function get_entities_pks_by_id($id)
+    {
+        $this->db
+            ->select([
+                'entities.id',
+                'entities.aid'
+            ])
+            ->from('entities')
+            ->where('entities.operation_id', $id);
+
+        return array_column($this->db->get()->result_array(), 'aid', 'id');
     }
 }
