@@ -47,9 +47,9 @@ $config['sides'] = [
     'UNKNOWN' => 'unknown'
 ];
 
-define('OPERATIONS_JSON_URL', 'http://game.ofcra.org:5000/api/v1/operations?tag=&name=&newer=2017-06-01&older=2099-12-12');
-define('OPERATION_DATA_JSON_URL_PATH', 'http://game.ofcra.org:5000/data/');
-define('OCAP_URL_PREFIX', 'http://game.ofcra.org:5000/?zoom=1.4&x=-100&y=100&file=');
+define('OPERATIONS_JSON_URL', 'http://aar.ofcra.org:5000/api/v1/operations?tag=&name=&newer=2017-06-01&older=2099-12-12');
+define('OPERATION_DATA_JSON_URL_PATH', 'http://aar.ofcra.org:5000/data/');
+define('OCAP_URL_PREFIX', 'http://aar.ofcra.org:5000/?zoom=1.4&x=-100&y=100&file=');
 
 if (!function_exists('should_op_be_ignored')) {
     function should_op_be_ignored($op)
