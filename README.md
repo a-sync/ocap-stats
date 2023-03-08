@@ -1,12 +1,10 @@
 # ocap-stats
-
 ## What is this?
 [OCAP](https://github.com/OCAP2/OCAP) JSON data parser/editor/viewer web service.  
 
 Provides a handy UI to parse OCAP JSON files, then store and edit the data in a database.  
 The data is presented on a simple spreadsheet like web frontend.  
-
-_OCAP web server » [JSON] » ocap-stats (parser) » [SQL] » ocap-stats (editor/viewer) » [HTML]_  
+> _OCAP web server » [JSON] » ocap-stats (parser) » [SQL] » ocap-stats (editor/viewer) » [HTML]_  
 
 
 ## Demo sites
@@ -15,7 +13,7 @@ _OCAP web server » [JSON] » ocap-stats (parser) » [SQL] » ocap-stats (editor
 [ofcra-stats.devs.space](https://ofcra-stats.devs.space)  
  &nbsp; &rdca; based on [OCAP](https://game.ofcra.org/ocap) data from [OFCRA](https://ofcrav2.org)  
 [ofcra2-stats.devs.space](https://ofcra2-stats.devs.space)  
- &nbsp; &rdca; based on [OCAP2](http://game.ofcra.org:5000) data from [OFCRA](https://ofcrav2.org)  
+ &nbsp; &rdca; based on [OCAP2](http://aar.ofcra.org:5000) data from [OFCRA](https://ofcrav2.org)  
 [3cb-stats.devs.space](https://3cb-stats.devs.space)  
  &nbsp; &rdca; based on [OCAP2](https://ocap.3commandobrigade.com) data from [3CB](https://www.3commandobrigade.com)  
 [rb-stats.devs.space](https://rb-stats.devs.space)  
@@ -56,7 +54,7 @@ Self inflicted and environmental hits / kills (_something_) are omitted! (except
  * **_enter_vehicle**
  * **_exit_vehicle**
  * **_awake**
- * **_unco**
+ * **_uncon**
  * **_dead**
  * **_projectile**
 
@@ -75,6 +73,14 @@ Self inflicted and environmental hits / kills (_something_) are omitted! (except
   1. ops recorded before using OCAP2 v1.0.0 are missing the role info  
   1. commanders can not always be determined automatically and must be set manually  
   1. timestamps depend on the arma3 server config  
+
+
+## Custom views, charts and live dashboards
+### OData
+[ocap-odata](https://github.com/a-sync/ocap-odata) is an open source web service _(and one day complete replacement of ocap-stats maybe)_ that provides OData, OpenAPI and other REST APIs to an existing OCAP (ocap-stats) database. The different endpoints can be consumed by a variety of analytics and business intelligence tools.
+
+### Direct database connection
+To create more complex views and charts directly from the database you can use tools like [Seal Report](https://sealreport.org/) or [Metabase](https://www.metabase.com/start/oss/).
 
 
 ## TODO:
