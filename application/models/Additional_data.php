@@ -260,7 +260,8 @@ class Additional_data extends CI_Model
         return $commanders;
     }
 
-    public function get_player_cmd_stats($player_id) {
+    public function get_player_cmd_stats($player_id)
+    {
         $op_commanders_data = $this->get_commanders(true, false, true);
         $matching_sides = [];
 
@@ -269,7 +270,7 @@ class Additional_data extends CI_Model
         foreach ($op_commanders_data['resolved'] as $op_id => $op_cmds) {
             $sides = [];
             foreach ($op_cmds as $s => $e) {
-                $sides[] = $s; 
+                $sides[] = $s;
                 if ($e['player_id'] === $player_id) {
                     $commanded_ops[$op_id] = $op_cmds;
                     $commanded_sides[$op_id] = $s;

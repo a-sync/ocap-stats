@@ -341,7 +341,9 @@ class App extends CI_Controller
                     }
                 }
 
-                $players_first_op = $this->additional_data->get_first_ops_of_players($op_player_ids);
+                if (count($op_player_ids) > 0) {
+                    $players_first_op = $this->additional_data->get_first_ops_of_players($op_player_ids);
+                }
             } else {
                 $errors[] = 'Unknown op ID given.';
             }
