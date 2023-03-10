@@ -72,6 +72,14 @@ Self inflicted and environmental hits / kills (_something_) are omitted! (except
  * **_projectile**
 
 
+## Custom views, charts and live dashboards
+### OData
+[ocap-odata](https://github.com/a-sync/ocap-odata) is an open source web service _(and one day complete replacement of ocap-stats maybe)_ that provides OData, OpenAPI and other REST APIs to an existing OCAP (ocap-stats) database. The different endpoints can be consumed by a variety of analytics and business intelligence tools.
+
+### Direct database connection
+To create more complex views and charts directly from the database you can use tools like [Seal Report](https://sealreport.org/) or [Metabase](https://www.metabase.com/start/oss/).
+
+
 ## Known issues
   1. player stats are collected based on name only (aliases must be set manually to mitigate this)  
   1. ops recorded before using OCAP2 v1.1.0 had no proper tracking for hit events where the victim is a player  
@@ -86,14 +94,6 @@ Self inflicted and environmental hits / kills (_something_) are omitted! (except
   1. ops recorded before using OCAP2 v1.0.0 are missing the role info  
   1. commanders can not always be determined automatically and must be set manually  
   1. timestamps depend on the arma3 server config  
-
-
-## Custom views, charts and live dashboards
-### OData
-[ocap-odata](https://github.com/a-sync/ocap-odata) is an open source web service _(and one day complete replacement of ocap-stats maybe)_ that provides OData, OpenAPI and other REST APIs to an existing OCAP (ocap-stats) database. The different endpoints can be consumed by a variety of analytics and business intelligence tools.
-
-### Direct database connection
-To create more complex views and charts directly from the database you can use tools like [Seal Report](https://sealreport.org/) or [Metabase](https://www.metabase.com/start/oss/).
 
 
 ## TODO:
