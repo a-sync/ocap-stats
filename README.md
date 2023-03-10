@@ -9,7 +9,7 @@ The data is presented on a simple spreadsheet like web frontend.
 
 ## Features
  * OCAP JSON data file parser that inserts the contents in an SQL database
-   * markers and framesFired data is only aggregated to create more entity data and events, not stored in its entirety
+   * `markers`, `framesFired` and `positions` entries are aggregated to create more entity data and events, not stored in their entirety
    * compatible with all OCAP versions (with limitations)
  * automatic corrections for known and detectable OCAP JSON data errors
  * commander detection based on group and role configuration
