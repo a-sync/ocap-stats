@@ -6,6 +6,8 @@ on:
     branches:
       - master
 
+concurrency: demo_environment
+
 jobs:
   # pre-deploy:
   #   name: 🚧 Pre deploy

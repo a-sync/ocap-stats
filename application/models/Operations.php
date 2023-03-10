@@ -473,6 +473,7 @@ class Operations extends CI_Model
          */
         foreach ($data as $m) {
             // ["magIcons/rhs_vog25p_ca.paa","PBG40 - HE-T Grenade",981,992,54,"FFFFFF",-1,[[981,[4590.9,7109.79,201.889],238.414,1],[982,[4589.02,7108.63,204.324],238.414,1]],[1,1],"ICON","Solid"]
+            // ["Minefield","M183 Demolition Charge Assembly",812,3474,162,"E60000",-1,[[812,[[13431.1,15928.6]],0,0]],[1,1],"ICON"]
             if ($m[0] && (substr($m[0], 0, 9) === 'magIcons/' || $m[0] === 'Minefield' || $m[0] === 'mil_triangle')) {
                 if (!isset($shots[$m[4]])) {
                     $shots[$m[4]] = 1;
@@ -481,10 +482,29 @@ class Operations extends CI_Model
                 }
 
                 $distance = 0;
-                if (isset($m[7]) && is_array($m[7])) {
+
+                if (isset($m[7]) && is_array($m[7]) && count($m[7]) > 1) {
                     $first_pos = reset($m[7]);
                     $last_pos = end($m[7]);
-                    $distance = sqrt(pow($first_pos[1][0] - $last_pos[1][0], 2) + pow($first_pos[1][1] - $last_pos[1][1], 2) + pow(element(2, $first_pos[1], 0) - element(2, $last_pos[1], 0), 2));
+
+                    $x_first = element(0, $first_pos[1], 0);
+                    $y_first = element(1, $first_pos[1], 0);
+                    $z_first = element(2, $first_pos[1], 0);
+                    if (is_array($x_first)) {
+                        $z_first = element(2, $x_first, 0);
+                        $y_first = element(1, $x_first, 0);
+                        $x_first = element(0, $x_first, 0);
+                    }
+                    $x_last = element(0, $last_pos[1], 0);
+                    $y_last = element(1, $last_pos[1], 0);
+                    $z_last = element(2, $last_pos[1], 0);
+                    if (is_array($x_last)) {
+                        $z_last = element(2, $x_last, 0);
+                        $y_last = element(1, $x_last, 0);
+                        $x_last = element(0, $x_last, 0);
+                    }
+
+                    $distance = sqrt(pow($x_first - $x_last, 2) + pow($y_first - $y_last, 2) + pow($z_first - $z_last, 2));
                 }
 
                 $events[] = [

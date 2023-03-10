@@ -2,9 +2,22 @@
 ## What is this?
 [OCAP](https://github.com/OCAP2/OCAP) JSON data parser/editor/viewer web service.  
 
-Provides a handy UI to parse OCAP JSON files, then store and edit the data in a database.  
+Provides a handy UI to parse OCAP JSON data files, then store and edit the data in a database.  
 The data is presented on a simple spreadsheet like web frontend.  
 > _OCAP web server » [JSON] » ocap-stats (parser) » [SQL] » ocap-stats (editor/viewer) » [HTML]_  
+
+
+## Features
+ * OCAP JSON data file parser that inserts the contents in an SQL database
+   * markers and framesFired data is only aggregated to create more entity data and events, not stored in its entirety
+   * compatible with all OCAP versions (with limitations)
+ * automatic corrections for known and detectable OCAP JSON data errors
+ * commander detection based on group and role configuration
+ * player tracking via the unit name or uid (not implemented in the official OCAP release)
+ * content manager interface
+   * select what OCAP entries get added to the stats as ops
+   * fix incorrect or missing op data (event type, mission info, commanders)
+   * assign player aliases
 
 
 ## Demo sites
@@ -85,11 +98,12 @@ To create more complex views and charts directly from the database you can use t
 
 ## TODO:
   1. format timestamps to local TZ (data-ts; Intl.DateTimeFormat().resolvedOptions().timeZone)
-  1. filter op events visibility by type
+  1. filter op events visibility by type, event links to OCAP with timecode
   1. ui to edit entities player assignment
   1. support `capture_delay` properly
   1. track friendly fire on assets by checking the side of the asset's crew  
      (preprocess and track asset entities crews via positions)
+  1. new player tab for kill/death log ☠💀
 
 
 ## Similar projects _(not open source)_
