@@ -11,7 +11,6 @@ Configure the [`autoload[config]`](application/config/autoload.php#L106) value t
 The table structure is in the [db.skeleton.sql](.sql/db.skeleton.sql) file. (MySQL/MariaDB format)  
 
 Import the skeleton first, and then a seed if you want to.  
-The latest FNF seed is loaded in the adminer service container, and available under _[Import](http://localhost:8080/?server=db&username=root&db=ocapstats&import=) / From server_ via the _Run file_ button.
 
 
 ## Admin access
@@ -25,7 +24,7 @@ _The admin_key is left at the default value for the demo sites for now. You're w
 ## Development
 Spin up a development environment by running `docker-compose up`.  
 The DB skeleton is loaded automatically into the `ocapstats` database.  
-
+The latest FNF seed is loaded in the adminer service container, and available under _[Import](http://localhost:8080/?server=db&username=root&db=ocapstats&import=) / From server_ via the _Run file_ button.
 
 ### Services
  * Web 
