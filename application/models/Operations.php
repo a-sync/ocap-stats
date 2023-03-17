@@ -155,17 +155,14 @@ class Operations extends CI_Model
                     ]
                     */
                     if (isset($p[5])) {
-                        // entity not a player, not in a vehicle, is a player, name field is empty and position name field is not empty
-                        if (
-                            $entities[$e['id']]['is_player'] === 0
-                            && $p[3] === 0
-                            && $p[5] === 1
-                            && $e['name'] === ''
-                            && $p[4] !== ''
-                        ) {
-                            // Note: this attempts to fix missing name and player flag for actual player units
-                            $entities[$e['id']]['is_player'] = 1;
-                            $entities[$e['id']]['name'] = $p[4];
+                        // entity not a player, pos. not in a vehicle, pos. is a player
+                        if ($entities[$e['id']]['is_player'] === 0 && $p[3] === 0 && $p[5] === 1) {
+                            // pos. name field is not empty, entity name field is different from pos. name
+                            if ($p[4] !== '' && $e['name'] !== $p[4]) {
+                                // Note: this attempts to fix missing/incorrect name and player flag for actual player entities
+                                $entities[$e['id']]['is_player'] = 1;
+                                $entities[$e['id']]['name'] = $p[4];
+                            }
                         }
                     }
                 } elseif ($e['type'] === 'vehicle') {
