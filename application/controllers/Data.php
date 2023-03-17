@@ -144,7 +144,7 @@ class Data extends CI_Controller
         } elseif ($tab === 'unverified') {
             $ops = $this->additional_data->get_ops_to_fix_data(false);
         } else { // missing
-            $ops = $this->additional_data->get_ops_to_fix_data(false, true, $op_ids_with_resolved_cmd);
+            $ops = $this->additional_data->get_ops_to_fix_data(false, $op_ids_with_resolved_cmd);
         }
 
         $last_cache_update = 0;

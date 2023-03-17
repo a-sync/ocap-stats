@@ -585,7 +585,7 @@ class Additional_data extends CI_Model
         ];
     }
 
-    public function get_ops_to_fix_data($verified = false, $missing_data = false, $op_ids_with_unambiguous_cmd = [])
+    public function get_ops_to_fix_data($verified = false, $op_ids_with_unambiguous_cmd = [])
     {
         $this->db
             ->select([
@@ -609,13 +609,13 @@ class Additional_data extends CI_Model
             ->where('IFNULL(operations.verified, 0) =', $verified ? 1 : 0)
             ->order_by('operations.id DESC');
 
-        if ($missing_data && count($op_ids_with_unambiguous_cmd) !== 0) {
-            $this->db->group_start();
-            $this->db->or_where('operations.mission_author', '')
+        if (count($op_ids_with_unambiguous_cmd) !== 0) {
+            $this->db->group_start()
+                ->or_where('operations.mission_author', '')
                 ->or_where('operations.start_time LIKE', '%00:00:00')
                 ->or_where('operations.end_winner', '')
-                ->or_where_not_in('operations.id', $op_ids_with_unambiguous_cmd);
-            $this->db->group_end();
+                ->or_where_not_in('operations.id', $op_ids_with_unambiguous_cmd)
+                ->group_end();
         }
 
         return $this->db
