@@ -247,6 +247,20 @@ img.ocap-link {
     }
 }
 
+/* TODO fix this via theme template: snackbar surface, error colors */
+@media (prefers-color-scheme: light) {
+    .mdc-snackbar__label a {
+        color: #9553f2;
+    }
+    .mdc-snackbar__label a:visited {
+        color: var(--mdc-theme-secondary) !important;
+    }
+}
+.mdc-snackbar__dismiss {
+    color: var(--mdc-theme-error);
+}
+/* /TODO */
+
 .side__, .side__ a:link, .mdc-data-table td.side__ a:visited {
 }
 .side__logic, .side__logic a:link, .mdc-data-table td.side__logic a:visited {

@@ -1,10 +1,36 @@
-<?php
-defined('BASEPATH') or exit('No direct script access allowed');
+<?php defined('BASEPATH') or exit('No direct script access allowed');
+
+$odata_link = '';
+if (defined('OCAP_ODATA_URL')) {
+    $odata_url_parts = explode('//', OCAP_ODATA_URL, 2);
+    $odata_short_url = $odata_url_parts[count($odata_url_parts)-1];
+    $odata_link ='<a href="' . OCAP_ODATA_URL . '">' . $odata_short_url . '</a>';
+}
+
 ?>
 </main>
 
+<?php if ($odata_link !== ''): ?>
+<aside class="mdc-snackbar" data-mdc-auto-init="MDCSnackbar">
+    <div class="mdc-snackbar__surface" role="status" aria-relevant="additions">
+    <div class="mdc-snackbar__label" aria-atomic="false">
+        You can tap into the database directly and create your own custom views and charts by using the OData service at <?php echo $odata_link; ?>.
+    </div>
+    <div class="mdc-snackbar__actions" aria-atomic="true">
+        <button class="mdc-icon-button mdc-snackbar__dismiss material-icons" title="Dismiss">close</button>
+    </div>
+    </div>
+</aside>
+<?php endif; ?>
+
 <footer class="mdc-typography--caption">
+    <a href="<?php echo base_url('about'); ?>">About</a>
+    &nbsp;&bull;&nbsp;
     <a href="<?php echo base_url('assorted-data'); ?>">Assorted data</a>
+    <?php if ($odata_link !== ''): ?>
+    &nbsp;&bull;&nbsp;
+    <a href="<?php echo OCAP_ODATA_URL; ?>">OData</a>
+    <?php endif; ?>
     <br>
     <br>
     <a href="https://github.com/a-sync/ocap-stats" class="github"><svg width="16" height="16" viewBox="0 0 16 16" version="1.1" aria-hidden="true">
@@ -17,6 +43,20 @@ defined('BASEPATH') or exit('No direct script access allowed');
 <script src="<?php echo base_url('public/sortable.min.js'); ?>"></script>
 <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
 <script type="text/javascript">
+    document.addEventListener('MDCAutoInit:End', () => {
+        console.log('🖼️');
+
+        const odata_snack_ok = localStorage.getItem('odata_snack');
+        if (!odata_snack_ok) {
+            const snackbar = document.querySelector('.mdc-snackbar').MDCSnackbar;
+            snackbar.timeoutMs = -1;
+            snackbar.foundation.open();
+            snackbar.listen("MDCSnackbar:closed", () => {
+                localStorage.setItem('odata_snack', Date.now());
+            });
+        }
+    });
+
     window.mdc.autoInit();
 </script>
 </body>

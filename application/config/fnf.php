@@ -67,6 +67,7 @@ define('OPERATIONS_JSON_URL', 'http://aar.fridaynightfight.org/api/v1/operations
 define('OPERATION_DATA_JSON_URL_PATH', 'http://aar.fridaynightfight.org/data/');
 define('OCAP_URL_PREFIX', 'http://aar.fridaynightfight.org/?zoom=1.4&x=-100&y=100&file=');
 define('ADJUST_HIT_DATA', 335);
+define('OCAP_ODATA_URL', 'https://fnf-odata.devs.space');
 
 if (!function_exists('should_op_be_ignored')) {
     function should_op_be_ignored($op)
