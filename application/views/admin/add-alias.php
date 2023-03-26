@@ -1,5 +1,4 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
-
 ?>
 
 <div class="mdc-layout-grid">
@@ -99,6 +98,13 @@
 <script>
     const player_id = <?php echo json_encode($player_id); ?>;
     const players = <?php echo json_encode($players); ?>;
+    const player_aliases = players.reduce((res, p) => {
+        if (p.alias_of !== undefined && p.uid === undefined) {
+            if (res[p.alias_of] === undefined) res[p.alias_of] = [];
+            res[p.alias_of].push({id: p.id, name: p.name});
+        }
+        return res;
+    }, {});
 
     const ss_aliases = new SlimSelect({
         select: '#aliases-select',
@@ -159,11 +165,30 @@
         addToBody: true,
         data: players.reduce((res, p) => {
             if (p.alias_of === undefined) {
-                res.push({
-                    text: p.name,
-                    value: p.id,
-                    selected: (p.id === player_id ? true : false)
-                });
+                const aliases = [];
+                if (player_aliases[p.id] !== undefined) {
+                    player_aliases[p.id].forEach(a => {
+                        aliases.push({
+                            text: a.name,
+                            value: a.id,
+                            disabled: true
+                        });
+                    });
+                    res.push({
+                        label: p.name,
+                        options: [{
+                            text: p.name,
+                            value: p.id,
+                            selected: Boolean(p.id === player_id)
+                        }, ...aliases]
+                    });
+                } else {
+                    res.push({
+                        text: p.name,
+                        value: p.id,
+                        selected: Boolean(p.id === player_id),
+                    });
+                }
             }
             return res;
         }, [{
