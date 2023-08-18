@@ -674,13 +674,15 @@ class Operations extends CI_Model
                     $entities_pks = $this->get_entities_pks_by_id($details['id']);
 
                     foreach ($events as $i => $e) {
-                        if (is_null($e['victim_id'])) {
+                        if (is_null($e['victim_id']) || intval($e['victim_id']) === -1) {
+                            $events[$i]['victim_id'] = null;
                             $events[$i]['victim_aid'] = null;
                         } else if (isset($entities_pks[$e['victim_id']])) {
                             $events[$i]['victim_aid'] = $entities_pks[$e['victim_id']];
                         } // else victim entity id not found for event
 
-                        if (is_null($e['attacker_id'])) {
+                        if (is_null($e['attacker_id']) || intval($e['attacker_id']) === -1) {
+                            $events[$i]['attacker_id'] = null;
                             $events[$i]['attacker_aid'] = null;
                         } else if (isset($entities_pks[$e['attacker_id']])) {
                             $events[$i]['attacker_aid'] = $entities_pks[$e['attacker_id']];

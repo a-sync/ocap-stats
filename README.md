@@ -22,7 +22,7 @@ The data is presented on a simple spreadsheet like web frontend.
 
 ## Demo sites
 [fnf-stats.devs.space](https://fnf-stats.devs.space)  
- &nbsp; &rdca; based on [OCAP2](http://aar.fridaynightfight.org) data from [FNF](https://www.fridaynightfight.org)  
+ &nbsp; &rdca; based on [OCAP2](http://aar.fridaynightfight.org) data from [FNF](http://fridaynightfight.org)  
 [ofcra-stats.devs.space](https://ofcra-stats.devs.space)  
  &nbsp; &rdca; based on [OCAP](https://game.ofcra.org/ocap) data from [OFCRA](https://ofcrav2.org)  
 [ofcra2-stats.devs.space](https://ofcra2-stats.devs.space)  
@@ -79,6 +79,8 @@ Self inflicted and environmental hits / kills (_something_) are omitted! (except
 ### Direct database connection
 To create more complex views and charts directly from the database you can use tools like [Seal Report](https://sealreport.org/) or [Metabase](https://www.metabase.com/start/oss/).
 
+### Deployment
+Check out [SETUP.md](./SETUP.md) for instructions on how to start your own stats page.
 
 ## Known issues
   1. player stats are collected based on name only (aliases must be set manually to mitigate this)  

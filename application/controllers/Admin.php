@@ -10,6 +10,7 @@ class Admin extends CI_Controller
     {
         parent::__construct();
         $this->output->set_header('X-Powered-By: 🐹🐹');
+        // $this->output->enable_profiler(TRUE); // DEBUG
 
         $this->load->library('session');
 

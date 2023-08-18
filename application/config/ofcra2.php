@@ -13,7 +13,7 @@ $config['event_types'] = [
     'small' => 'Small game'
 ];
 
-$config['default_selected_event_types'] = ['official', 'public'];
+$config['default_selected_event_types'] = ['official', 'public', 'small'];
 
 $config['tag_event_types'] = [];//only using TvT :(
 

@@ -16,7 +16,7 @@ $config['event_types'] = [
     'soon' => 'SOON'
 ];
 
-$config['default_selected_event_types'] = ['eu', 'na'];
+$config['default_selected_event_types'] = ['eu', 'na', 'titans', 'tnt', 'vsofcra', 'soon'];
 
 $config['tag_event_types'] = [
     'fnfeu' => 'eu',

@@ -15,10 +15,7 @@ $config['event_types'] = [
     'ltvt' => 'Light TvT'
 ];
 
-$config['default_selected_event_types'] = [
-    'tvt',
-    'tvt2'
-];
+$config['default_selected_event_types'] = ['tvt', 'tvt2', 'if', 'brutal', 'ltvt'];
 
 $config['tag_event_types'] = [
     'TvT' => 'tvt',
