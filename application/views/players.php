@@ -24,15 +24,15 @@ else :
                                     <?php if ($show_hit_data) : ?>
                                         <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="hits_shots_ratio" title="Hits / Shots (Shots / Hits)">Hit % (S/H)</th>
                                     <?php endif; ?>
-                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="descending" data-column-id="kills">Kills</th>
+                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="kills">Kills</th>
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="kills_shots_ratio" title="Kills / Shots (Shots / Kills)">Kill % (S/K)</th>
-                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="ascending" data-column-id="deaths" title="Deaths (Kills / Deaths)">Deaths (K/D)</th>
+                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="deaths" title="Deaths (Kills / Deaths)">Deaths (K/D)</th>
                                     <?php if ($show_hit_data) : ?>
                                         <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="fhits" title="Friendly fire">FF</th>
                                     <?php endif; ?>
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="fkills" title="Teamkills">Tk</th>
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="vkills" title="Destroyed asse<?php echo (mt_rand(0, 99) ? 't' : '') ?>s">DA</th>
-                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="attendance" title="Attendance (Kills / Attendance)">A (K/A)</th>
+                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="descending" data-column-id="attendance" title="Attendance (Kills / Attendance)">A (K/A)</th>
                                 </tr>
                             </thead>
                             <tbody class="mdc-data-table__content">
