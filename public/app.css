@@ -91,6 +91,10 @@ footer .render-stats {
     text-align: center;
 }
 
+.op-event-select {
+    min-width: 200px;
+}
+
 .errors.mdc-layout-grid__cell {
     text-align: center;
 }
