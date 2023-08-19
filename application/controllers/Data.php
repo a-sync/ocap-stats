@@ -82,6 +82,10 @@ class Data extends CI_Controller
             }
         }
 
+        if (count($errors) > 0) {
+            log_message('error', implode('; ', $errors));
+        }
+
         $players = array_map(function ($p) {
             if ($p['uid'] === null) {
                 unset($p['uid']);
@@ -92,9 +96,7 @@ class Data extends CI_Controller
             return $p;
         }, $this->additional_data->get_players_names());
 
-        if (count($errors) > 0) {
-            log_message('error', implode('; ', $errors));
-        }
+        $new_names = $this->additional_data->get_new_names();
 
         $last_cache_update = 0;
         $homepage_cache_file = get_cache_file('');
@@ -108,6 +110,7 @@ class Data extends CI_Controller
             'players' => $players,
             'errors' => $errors,
             'player_id' => $player_id,
+            'new_names' => $new_names,
             'last_cache_update' => $last_cache_update
         ]);
 

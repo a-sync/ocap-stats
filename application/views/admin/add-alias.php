@@ -1,4 +1,6 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
+
+$event_types = $this->config->item('event_types');
 ?>
 
 <div class="mdc-layout-grid">
@@ -90,6 +92,28 @@
             </div>
         </div>
 
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center mdc-typography--body1">
+            <div id="new_names" class="mdc-elevation--z2 mdc-theme--surface mdc-theme--on-surface">
+                <h3>👶 New names from the past 6 ops</h3>
+
+                <?php
+                foreach ($new_names as $op) {
+                    echo '<u>' 
+                        // . $op['operation_id] . ' '
+                        . substr($op['start_time'], 0, 10) . ' '
+                        // . $event_types[$op['event']] . ' '
+                        . html_escape($op['mission_name']) 
+                        . '</u>';
+
+                    echo '<ul>';
+                    foreach ($op['players'] as $name) {
+                        echo '<li>' . html_escape($name) . '</li>';
+                    }
+                    echo '</ul>';
+                }
+                ?>
+            </div>
+        </div>
 
     </div>
 </div>
@@ -101,7 +125,10 @@
     const player_aliases = players.reduce((res, p) => {
         if (p.alias_of !== undefined && p.uid === undefined) {
             if (res[p.alias_of] === undefined) res[p.alias_of] = [];
-            res[p.alias_of].push({id: p.id, name: p.name});
+            res[p.alias_of].push({
+                id: p.id,
+                name: p.name
+            });
         }
         return res;
     }, {});
