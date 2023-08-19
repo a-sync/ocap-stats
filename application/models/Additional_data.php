@@ -727,4 +727,55 @@ class Additional_data extends CI_Model
 
         return array_column($this->db->get()->result_array(), 'operation_id', 'id');
     }
+
+    public function get_new_names($ops_limit = 6)
+    {
+        $this->db
+            ->select('id')
+            ->from('operations')
+            ->where('event !=', '')
+            ->order_by('id', 'DESC')
+            ->limit($ops_limit);
+        $operations = $this->db->get()->result_array();
+        $operation_ids = array_unique(array_column($operations, 'id'));
+
+        $this->db
+            ->select('operations.id AS operation_id, operations.event, operations.mission_name, operations.start_time, players.id AS player_id, entities.name AS entity_name')
+            ->from('operations')
+            ->where('operations.event !=', '')
+            ->join('entities', 'operations.id = entities.operation_id')
+            ->join('players', 'entities.player_id = players.id')
+            ->where_in('operations.id', $operation_ids)
+            ->order_by('operations.id', 'DESC');
+        $operations_players = $this->db->get()->result_array();
+        $player_ids = array_unique(array_column($operations_players, 'player_id'));
+
+        $players_first_op = $this->get_first_ops_of_players($player_ids);
+
+        $new_players = [];
+        foreach ($operations_players as $player) {
+            if (!isset($new_players[$player['player_id']]) && isset($players_first_op[$player['player_id']]) && $players_first_op[$player['player_id']] === $player['operation_id']) {
+                $new_players[$player['player_id']] = $player;
+            }
+        }
+
+        $grouped_results = [];
+        foreach ($new_players as $np) {
+            $opid = $np['operation_id'];
+
+            if (!isset($grouped_results[$opid])) {
+                $grouped_results[$opid] = [
+                    'operation_id' => $opid,
+                    'event' => $np['event'],
+                    'mission_name' => $np['mission_name'],
+                    'start_time' => $np['start_time'],
+                    'players' => []
+                ];
+            }
+
+            $grouped_results[$opid]['players'][] = $np['entity_name'];
+        }
+
+        return $grouped_results;
+    }
 }
