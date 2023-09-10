@@ -199,6 +199,11 @@ img.ocap-link {
     line-height: 1.5rem;
 }
 
+#new_names ul li span:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
 /* Dark mode */
 @media (prefers-color-scheme: dark) {
     html, body {

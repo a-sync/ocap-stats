@@ -79,8 +79,10 @@ Self inflicted and environmental hits / kills (_something_) are omitted! (except
 ### Direct database connection
 To create more complex views and charts directly from the database you can use tools like [Seal Report](https://sealreport.org/) or [Metabase](https://www.metabase.com/start/oss/).
 
-### Deployment
+
+## Deployment
 Check out [SETUP.md](./SETUP.md) for instructions on how to start your own stats page.
+
 
 ## Known issues
   1. player stats are collected based on name only (aliases must be set manually to mitigate this)  

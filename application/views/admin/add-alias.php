@@ -95,7 +95,6 @@ $event_types = $this->config->item('event_types');
         <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center mdc-typography--body1">
             <div id="new_names" class="mdc-elevation--z2 mdc-theme--surface mdc-theme--on-surface">
                 <h3>👶 New names from the past 6 ops</h3>
-
                 <?php
                 foreach ($new_names as $op) {
                     echo '<u>' 
@@ -104,10 +103,9 @@ $event_types = $this->config->item('event_types');
                         // . $event_types[$op['event']] . ' '
                         . html_escape($op['mission_name']) 
                         . '</u>';
-
                     echo '<ul>';
-                    foreach ($op['players'] as $name) {
-                        echo '<li>' . html_escape($name) . '</li>';
+                    foreach ($op['players'] as $id => $name) {
+                        echo '<li><span onclick="selectPlayer(' . $id . ');">' . html_escape($name) . '</span></li>';
                     }
                     echo '</ul>';
                 }
@@ -223,4 +221,10 @@ $event_types = $this->config->item('event_types');
             text: ''
         }])
     });
+
+    function selectPlayer(value) {
+        if (ss_player) {
+            ss_player.setSelected(value);
+        }
+    }
 </script>

@@ -773,7 +773,7 @@ class Additional_data extends CI_Model
                 ];
             }
 
-            $grouped_results[$opid]['players'][] = $np['entity_name'];
+            $grouped_results[$opid]['players'][$np['player_id']] = $np['entity_name'];
         }
 
         return $grouped_results;
