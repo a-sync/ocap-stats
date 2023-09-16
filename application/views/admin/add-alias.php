@@ -131,6 +131,7 @@ $event_types = $this->config->item('event_types');
         return res;
     }, {});
 
+    let should_open_aliases_after_change = false;
     const ss_aliases = new SlimSelect({
         select: '#aliases-select',
         closeOnSelect: false,
@@ -185,6 +186,12 @@ $event_types = $this->config->item('event_types');
 
                     ss_aliases.setData(aliases_opts);
                     ss_aliases.enable();
+                    if (should_open_aliases_after_change) {
+                        should_open_aliases_after_change = false;
+                        setTimeout(() => {
+                            ss_aliases.open();
+                        }, 50);
+                    }
                 });
         },
         addToBody: true,
@@ -223,8 +230,15 @@ $event_types = $this->config->item('event_types');
     });
 
     function selectPlayer(value) {
-        if (ss_player) {
-            ss_player.setSelected(value);
+        if (!ss_aliases || !ss_player) return;
+
+        if (ss_aliases.data.contentOpen) {
+            ss_aliases.close();
         }
+
+        setTimeout(() => {
+            should_open_aliases_after_change = true;
+            ss_player.setSelected(value);
+        }, ss_aliases.data.contentOpen ? 250 : 10);
     }
 </script>
