@@ -94,7 +94,7 @@ $event_types = $this->config->item('event_types');
 
         <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center mdc-typography--body1">
             <div id="new_names" class="mdc-elevation--z2 mdc-theme--surface mdc-theme--on-surface">
-                <h3>👶 New names from the past <?php echo $past_ops; ?><a href="?past_ops=<?php echo $past_ops + 6; ?>">➕</a> ops</h3>
+                <h3>👶 New names from the past <?php echo $past_ops; ?> ops <a href="?past_ops=<?php echo $past_ops + 6; ?>" title="Show 6 more">➕</a></h3>
                 <?php
                 foreach ($new_names as $op) {
                     echo '<u>' 
