@@ -51,6 +51,12 @@ class Data extends CI_Controller
         $new_player_name = $this->input->post('new_player_name', true);
         $player_id = $this->input->post('player_id');
         $alias_ids = $this->input->post('aliases');
+        $past_ops = intval($this->input->get('past_ops'));
+
+        if ($past_ops < 6) {
+            $past_ops = 6;
+        }
+
         if (!is_array($alias_ids)) {
             $alias_ids = [];
         }
@@ -96,7 +102,7 @@ class Data extends CI_Controller
             return $p;
         }, $this->additional_data->get_players_names());
 
-        $new_names = $this->additional_data->get_new_names();
+        $new_names = $this->additional_data->get_new_names($past_ops);
 
         $last_cache_update = 0;
         $homepage_cache_file = get_cache_file('');
@@ -111,7 +117,8 @@ class Data extends CI_Controller
             'errors' => $errors,
             'player_id' => $player_id,
             'new_names' => $new_names,
-            'last_cache_update' => $last_cache_update
+            'last_cache_update' => $last_cache_update,
+            'past_ops' => $past_ops
         ]);
 
         $this->_foot();
