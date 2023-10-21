@@ -31,7 +31,7 @@ $event_types = $this->config->item('event_types');
         <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center">
             <div class="mdc-data-table mdc-elevation--z2">
                 <div class="mdc-data-table__table-container">
-                    <?php echo form_open('', ['id' => 'add-alias-form']); ?>
+                    <?php echo form_open('?past_ops=' . $past_ops, ['id' => 'add-alias-form']); ?>
                     <table class="mdc-data-table__table">
                         <tbody class="mdc-data-table__content">
                             <tr class="mdc-data-table__row">
