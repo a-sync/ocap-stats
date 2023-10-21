@@ -13,10 +13,11 @@ $config['event_types'] = [
     'titans' => 'Titans',
     'tnt' => 'TNT',
     'vsofcra' => 'FNF vs OFCRA',
-    'soon' => 'SOON'
+    'soon' => 'SOON',
+    'vsarmasa' => 'FNF vs Arma Sudamerica'
 ];
 
-$config['default_selected_event_types'] = ['eu', 'na', 'titans', 'tnt', 'vsofcra', 'soon'];
+$config['default_selected_event_types'] = ['eu', 'na', 'titans', 'tnt', 'vsofcra', 'soon', 'vsarmasa'];
 
 $config['tag_event_types'] = [
     'fnfeu' => 'eu',
