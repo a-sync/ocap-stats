@@ -14,7 +14,7 @@ $config['event_types'] = [
     'tnt' => 'TNT',
     'vsofcra' => 'FNF vs OFCRA',
     'soon' => 'SOON',
-    'vssud' => 'FNF vs SUD'
+    'vssud' => 'FNF vs AS'
 ];
 
 $config['default_selected_event_types'] = ['eu', 'na', 'titans', 'tnt', 'vsofcra', 'soon', 'vssud'];
