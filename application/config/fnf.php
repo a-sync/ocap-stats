@@ -36,6 +36,7 @@ $config['tag_event_types'] = [
 // Keep these ordered by rank
 $config['cmd_group_names'] = [
     'CMD',
+    'Company HQ',
     'PLHQ',
     'PLTHQ',
     'BLU PLT HQ',
@@ -44,6 +45,7 @@ $config['cmd_group_names'] = [
     'P1HQ',
     'P2HQ',
     'DPTHQ',
+    'Alpha',
     'Alpha 1-1'
 ];
 
@@ -51,6 +53,7 @@ $config['cmd_group_names'] = [
 $config['cmd_role_names'] = [
     'Company Commander',
     'Platoon Leader',
+    'Platoon Sergeant',
     'Chief',
     'Evil General',
     'Cult Leader',
