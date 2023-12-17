@@ -127,7 +127,7 @@ class Data extends CI_Controller
     private function _ajax($data)
     {
         if (!$this->input->is_ajax_request()) {
-            return show_error(400);
+            return show_error('Invalid request', 400);
         }
 
         $json_flags = JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES;

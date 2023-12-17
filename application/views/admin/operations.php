@@ -246,7 +246,10 @@ $event_types = $this->config->item('event_types');
             try {
                 const response = await fetch(form_action, {
                     method: 'POST',
-                    body: formData
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
                 });
                 
                 if (response.ok) {

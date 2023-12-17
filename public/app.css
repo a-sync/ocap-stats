@@ -30,8 +30,6 @@ h1 {
 .mdc-data-table {
     max-width: 100%;
 }
-.mdc-data-table__table-container {
-}
 
 .mdc-data-table__cell, .mdc-data-table__header-cell {
     padding-left: 10px;
@@ -325,10 +323,6 @@ img.ocap-link {
 }
 /* /TODO */
 
-.side__, .side__ a:link, .mdc-data-table td.side__ a:visited {
-}
-.side__logic, .side__logic a:link, .mdc-data-table td.side__logic a:visited {
-}
 .side__unknown, .side__unknown a:link, .mdc-data-table td.side__unknown a:visited {
     color: #b29900 !important;
 }

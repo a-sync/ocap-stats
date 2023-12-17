@@ -235,7 +235,7 @@ class Admin extends CI_Controller
                                             $errors[] = 'Failed to save operation.';
                                         }
 
-                                        if (count($errors) === 0 && $redirect === 'list') {
+                                        if (count($errors) === 0 && $redirect === 'list' && !$is_ajax_req) {
                                             return redirect(base_url('manage/#id-' . $operation['id']));
                                         }
                                         $op_in_db = $this->operations->exists($operation['id']);
@@ -458,7 +458,7 @@ class Admin extends CI_Controller
     private function _ajax($data)
     {
         if (!$this->input->is_ajax_request()) {
-            return show_error(400);
+            return show_error('Invalid request', 400);
         }
 
         $json_flags = JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES;
