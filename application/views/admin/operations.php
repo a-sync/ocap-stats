@@ -120,24 +120,32 @@ $event_types = $this->config->item('event_types');
                                             }
                                         ?>
                                             <td class="mdc-data-table__cell" colspan="2">
-                                                <?php echo form_open(base_url('manage/' . $op['id']), '', $hidden);
-                                                if ($vet_count > 0 && !defined('MANAGE_DATA_JSON_FILES')) : ?>
-                                                    <button type="submit" name="action" value="parse" class="mdc-button mdc-button--raised mdc-button--leading">
+                                                <?php echo form_open(base_url('manage/' . $op['id']), '', $hidden); ?>
+                                                <button type="submit" name="action" value="ignore" class="mdc-button mdc-button--outlined" title="Ignore">
+                                                    <div class="mdc-button__ripple"></div>
+                                                    <span class="mdc-button__focus-ring"></span>
+                                                    <span class="mdc-button__label">
+                                                        <i class="material-icons mdc-button__icon" aria-hidden="true">not_interested</i>
+                                                    </span>
+                                                </button>
+                                                <?php if ($vet_count > 0 && !defined('MANAGE_DATA_JSON_FILES')) : ?>
+                                                    <button type="submit" name="action" value="parse" class="mdc-button mdc-button--raised mdc-button--icon-leading">
                                                         <span class="mdc-button__ripple"></span>
+                                                        <span class="mdc-button__focus-ring"></span>
                                                         <i class="material-icons mdc-button__icon" aria-hidden="true">publish</i>
                                                         <span class="mdc-button__label">Parse as <?php echo $event_types[$hidden['event']]; ?></span>
                                                     </button>
+                                                    <button type="button" class="mdc-icon-button change-btn" title="Change event type">
+                                                        <span class="mdc-button__ripple"></span>
+                                                        <span class="mdc-icon-button__focus-ring"></span>
+                                                        <i class="material-icons mdc-button__icon" aria-hidden="true">edit</i>
+                                                    </button>
                                                 <?php elseif ($vet_count > 0) : ?>
                                                     <a href="<?php echo base_url('manage/' . $op['id']); ?>" class="mdc-button mdc-button--raised mdc-button--leading">
-                                                        <span class="mdc-button__ripple"></span>
+                                                        <span class="mdc-button__focus-ring"></span>
                                                         <span class="mdc-button__label">Process</span>
                                                     </a>
                                                 <?php endif; ?>
-                                                <button type="submit" name="action" value="ignore" class="mdc-button mdc-button--outlined">
-                                                    <span class="mdc-button__ripple"></span>
-                                                    <i class="material-icons mdc-button__icon" aria-hidden="true">not_interested</i>
-                                                    <span class="mdc-button__label">Ignore</span>
-                                                </button>
                                                 <?php echo form_close(); ?>
                                             </td>
                                         <?php endif; ?>

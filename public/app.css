@@ -48,6 +48,14 @@ h1 {
     word-wrap: break-word;
 }
 
+.mdc-data-table__cell button {
+    vertical-align: middle;
+}
+.mdc-data-table__cell button[value="ignore"] .mdc-button__icon {
+    margin-left: 0;
+    margin-right: 0;
+}
+
 .list__no_items {
     text-align: center;
     margin-top: 20px;
