@@ -42,9 +42,8 @@ $event_types = $this->config->item('event_types');
             $op0 = $operations[0];
         ?>
             <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-                <div class="mdc-data-table mdc-data-table--sticky-header mdc-elevation--z2 list__table" data-mdc-auto-init="MDCDataTable">
+                <div id="manage-table" class="mdc-data-table mdc-data-table--sticky-header mdc-elevation--z2 list__table" data-mdc-auto-init="MDCDataTable">
                     <div class="mdc-data-table__table-container">
-                        <table class="mdc-data-table__table" id="manage-table">
                         <table class="mdc-data-table__table" aria-label="OCAP recordings">
                             <thead>
                                 <tr class="mdc-data-table__header-row">
@@ -79,7 +78,6 @@ $event_types = $this->config->item('event_types');
                                     }
                                 ?>
                                     <tr class="mdc-data-table__row<?php echo $append_class; ?>" id="id-<?php echo $op['id']; ?>" data-row-id="op<?php echo $op['id']; ?>">
-                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric mdc-typography--caption">
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric mdc-typography--caption" id="op<?php echo $op['id']; ?>">
                                             <a href="<?php echo base_url('manage/' . $op['id']); ?>">
                                                 <?php echo $op['id']; ?>
@@ -140,7 +138,37 @@ $event_types = $this->config->item('event_types');
                                                         <span class="mdc-button__label">Parse as <?php echo $event_types[$hidden['event']]; ?></span>
                                                     </button>
                                                     <?php if ($vet_count > 1) : ?>
-                                                        <button type="button" class="mdc-icon-button edit-btn" title="Change event type" data-event-types="<?php echo html_escape(implode(',', $op_valid_event_types)); ?>">
+                                                        <div class="mdc-select mdc-select--filled mdc-select--required op-event-select dnone" data-mdc-auto-init="MDCSelect">
+                                                            <div class="mdc-select__anchor menu-minwidth" role="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="op<?php echo $op['id']; ?>-event-label op<?php echo $op['id']; ?>-event-selected-text" aria-required="true">
+                                                                <span class="mdc-select__ripple"></span>
+                                                                <span id="op<?php echo $op['id']; ?>-event-label" class="mdc-floating-label">Event</span>
+                                                                <span class="mdc-select__selected-text-container">
+                                                                    <span id="op<?php echo $op['id']; ?>-event-selected-text" class="mdc-select__selected-text"></span>
+                                                                </span>
+                                                                <span class="mdc-select__dropdown-icon">
+                                                                    <svg class="mdc-select__dropdown-icon-graphic" viewBox="7 10 10 5" focusable="false">
+                                                                        <polygon class="mdc-select__dropdown-icon-inactive" stroke="none" fill-rule="evenodd" points="7 10 12 15 17 10">
+                                                                        </polygon>
+                                                                        <polygon class="mdc-select__dropdown-icon-active" stroke="none" fill-rule="evenodd" points="7 15 12 10 17 15">
+                                                                        </polygon>
+                                                                    </svg>
+                                                                </span>
+                                                                <span class="mdc-line-ripple"></span>
+                                                            </div>
+                                                            <div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fixed menu-minwidth">
+                                                                <ul class="mdc-list" role="listbox" aria-label="Event types">
+                                                                <?php foreach ($op_valid_event_types as $et) : ?>
+                                                                    <li class="mdc-list-item<?php echo ($et === $hidden['event']) ? ' mdc-list-item--selected' : ''; ?>" aria-selected="<?php echo ($et === $hidden['event']) ? 'true' : 'false'; ?>" data-value="<?php echo $et; ?>" role="option">
+                                                                        <span class="mdc-list-item__ripple"></span>
+                                                                        <span class="mdc-list-item__text">
+                                                                            <?php echo $event_types[$et]; ?>
+                                                                        </span>
+                                                                    </li>
+                                                                <?php endforeach; ?>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                        <button type="button" class="mdc-icon-button edit-btn" title="Change event type">
                                                             <span class="mdc-icon-button__ripple"></span>
                                                             <span class="mdc-icon-button__focus-ring"></span>
                                                             <i class="material-icons mdc-icon-button__icon" aria-hidden="true">edit</i>
@@ -254,35 +282,25 @@ $event_types = $this->config->item('event_types');
 
         const parse_form = edit_btn.closest('form');
         const parse_btn = parse_form.querySelector('button[name="action"][value="parse"]');
+        const parse_event = parse_form.querySelector('input[type="hidden"][name="event"]');
+        const parse_event_select = parse_form.querySelector('.op-event-select');
 
         if (edit_btn.dataset.active !== 'true') {
             edit_btn.dataset.active = 'true';
 
-            const parse_select = document.createElement('select');
-            parse_select.setAttribute('name', 'event');
-            
-            const allowed_types = edit_btn.dataset.eventTypes.split(',');
-            for (const et of allowed_types) {
-                const option = document.createElement('option');
-                option.setAttribute('value', et);
-                option.textContent = event_types[et];
-                parse_select.appendChild(option);
-            }
-
-            parse_btn.style.display = 'none';
-            edit_btn.parentNode.insertBefore(parse_select, edit_btn);
+            parse_btn.classList.add('dnone');
+            parse_event_select.classList.remove('dnone');
             edit_btn.querySelector('.mdc-icon-button__icon').textContent = 'done';
         } else {
             edit_btn.dataset.active = 'false';
 
-            const parse_event = parse_form.querySelector('input[type="hidden"][name="event"]');
-            const parse_select = parse_form.querySelector('select[name="event"]');
-            parse_event.value = parse_select.value;
+            const new_event_value = parse_event_select.MDCSelect.value;
+            parse_event.value = new_event_value;
             const parse_btn_text = parse_btn.querySelector('.mdc-button__label');
-            parse_btn_text.textContent = 'Parse as ' + event_types[parse_select.value];
+            parse_btn_text.textContent = 'Parse as ' + event_types[new_event_value];
 
-            parse_select.parentNode.removeChild(parse_select);
-            parse_btn.style.display = null;
+            parse_event_select.classList.add('dnone');
+            parse_btn.classList.remove('dnone');
             edit_btn.querySelector('.mdc-icon-button__icon').textContent = 'edit';
         }
     }
@@ -326,6 +344,7 @@ $event_types = $this->config->item('event_types');
 
             const form_action = form.getAttribute('action');
             try {
+                manageTableProgressUpd(1);
                 const response = await fetch(form_action, {
                     method: 'POST',
                     body: formData,
@@ -333,6 +352,7 @@ $event_types = $this->config->item('event_types');
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 });
+                manageTableProgressUpd(-1);
                 
                 if (response.ok) {
                     const resJson = await response.json();
@@ -362,12 +382,24 @@ $event_types = $this->config->item('event_types');
                 }
             } catch (err) {
                 console.error(err);
+                manageTableProgressUpd(-1);
                 label.classList.add('errors');
                 label.textContent = 'Request error... ';
             }
 
             td.replaceChildren(label);
         }
+    }
+
+    let requestsInProgress = 0;
+    function manageTableProgressUpd(n) {
+        const dataTable = document.querySelector('#manage-table').MDCDataTable;
+
+        requestsInProgress += Number(n);
+        if(requestsInProgress < 0) requestsInProgress = 0;
+
+        // if (requestsInProgress === 0) dataTable.hideProgress();
+        // else dataTable.showProgress();
     }
 
     const domLoaded = () => {

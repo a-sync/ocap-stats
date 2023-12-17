@@ -46,7 +46,7 @@ h1 {
     word-wrap: break-word;
 }
 
-.mdc-data-table__cell button {
+.mdc-data-table__cell button, .mdc-data-table__cell .mdc-select {
     vertical-align: middle;
 }
 #manage-table .mdc-data-table__cell button[name="action"][value="ignore"] .mdc-button__icon {
@@ -64,6 +64,9 @@ h1 {
     animation-duration: 3000ms;
     animation-iteration-count: infinite;
     animation-timing-function: linear;
+}
+.menu-minwidth {
+    min-width: 200px;
 }
 
 .list__no_items {
@@ -220,6 +223,10 @@ img.ocap-link {
 #new_names ul li span:hover {
     cursor: pointer;
     text-decoration: underline;
+}
+
+.dnone {
+    display: none;
 }
 
 @keyframes spin {
