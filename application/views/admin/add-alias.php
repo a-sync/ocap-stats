@@ -11,6 +11,7 @@ $event_types = $this->config->item('event_types');
             <?php echo form_open(base_url('clearcache'), ['id' => 'clear_cache'], ['redirect' => 'add-alias']); ?>
             <button type="submit" name="clear_cache" value="1" class="mdc-button mdc-button--outlined">
                 <span class="mdc-button__ripple"></span>
+                <span class="mdc-button__focus-ring"></span>
                 <i class="material-icons mdc-button__icon" aria-hidden="true">auto_delete</i>
                 <span class="mdc-button__label">Clear site cache</span>
             </button>
@@ -51,6 +52,7 @@ $event_types = $this->config->item('event_types');
                                 <td colspan="2" class="mdc-data-table__cell">
                                     <button type="submit" name="add_new_player" value="1" class="mdc-button mdc-button--raised mdc-button--icon-trailing">
                                         <span class="mdc-button__ripple"></span>
+                                        <span class="mdc-button__focus-ring"></span>
                                         <i class="material-icons mdc-button__icon" aria-hidden="true">person_add</i>
                                         <span class="mdc-button__label">Add new player</span>
                                     </button>
@@ -80,6 +82,7 @@ $event_types = $this->config->item('event_types');
                                 <td colspan="2" class="mdc-data-table__cell">
                                     <button type="submit" name="add_alias" value="1" class="mdc-button mdc-button--raised mdc-button--icon-trailing">
                                         <span class="mdc-button__ripple"></span>
+                                        <span class="mdc-button__focus-ring"></span>
                                         <i class="material-icons mdc-button__icon" aria-hidden="true">save</i>
                                         <span class="mdc-button__label">Save</span>
                                     </button>

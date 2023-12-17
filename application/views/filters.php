@@ -34,7 +34,11 @@ if (count($event_types) > 1) :
     <?php endforeach; ?>
 
     <div class="mdc-form-field filters_submit">
-        <button class="mdc-button mdc-button--raised"><span class="mdc-button__ripple"></span>Apply</button>
+        <button class="mdc-button mdc-button--raised">
+            <span class="mdc-button__ripple"></span>
+            <span class="mdc-button__focus-ring"></span>
+            <span class="mdc-button__label">Apply</span>
+        </button>
     </div>
 
 <?php

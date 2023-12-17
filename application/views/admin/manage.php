@@ -97,6 +97,7 @@ $sides = $this->config->item('sides');
                                             <?php if (defined('MANAGE_DATA_JSON_FILES')) : ?>
                                                 <button type="submit" name="action" value="update" class="mdc-button mdc-button--leading">
                                                     <span class="mdc-button__ripple"></span>
+                                                    <span class="mdc-button__focus-ring"></span>
                                                     <?php if ($last_update === 'none') : ?>
                                                         <i class="material-icons mdc-button__icon" aria-hidden="true">file_download</i>
                                                         <span class="mdc-button__label">Download</span>
@@ -108,6 +109,7 @@ $sides = $this->config->item('sides');
                                                 <?php if ($last_update !== 'none') : ?>
                                                     <button type="submit" name="action" value="del" class="mdc-button mdc-button--outlined">
                                                         <span class="mdc-button__ripple"></span>
+                                                        <span class="mdc-button__focus-ring"></span>
                                                         <i class="material-icons mdc-button__icon" aria-hidden="true">delete_forever</i>
                                                         <span class="mdc-button__label">Del</span>
                                                     </button>
@@ -150,11 +152,13 @@ $sides = $this->config->item('sides');
                                         <td colspan="2" class="mdc-data-table__cell">
                                             <button type="submit" name="action" value="parse" class="mdc-button<?php echo $should_ignore ? '' : ' mdc-button--raised mdc-button--leading'; ?>" <?php echo (defined('MANAGE_DATA_JSON_FILES') && $last_update === 'none') ? ' disabled' : ''; ?>>
                                                 <span class="mdc-button__ripple"></span>
+                                                <span class="mdc-button__focus-ring"></span>
                                                 <i class="material-icons mdc-button__icon" aria-hidden="true">publish</i>
                                                 <span class="mdc-button__label">Parse operation data</span>
                                             </button>
                                             <button type="submit" name="action" value="ignore" class="mdc-button mdc-button--outlined">
                                                 <span class="mdc-button__ripple"></span>
+                                                <span class="mdc-button__focus-ring"></span>
                                                 <i class="material-icons mdc-button__icon" aria-hidden="true">not_interested</i>
                                                 <span class="mdc-button__label">Ignore</span>
                                             </button>
@@ -175,6 +179,7 @@ $sides = $this->config->item('sides');
                                         <td colspan="2" class="mdc-data-table__cell">
                                             <button type="submit" name="action" value="purge" class="mdc-button mdc-button--outlined">
                                                 <span class="mdc-button__ripple"></span>
+                                                <span class="mdc-button__focus-ring"></span>
                                                 <i class="material-icons mdc-button__icon" aria-hidden="true">delete</i>
                                                 <span class="mdc-button__label">Purge</span>
                                             </button>

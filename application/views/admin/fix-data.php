@@ -13,6 +13,7 @@ $fixed_icon = '<span class="material-icons">check</span>';
             <?php echo form_open(base_url('clearcache'), ['id' => 'clear_cache'], ['redirect' => 'fix-data' . ($tab === 'unverified' ? '/unverified' : '')]); ?>
             <button type="submit" name="clear_cache" value="1" class="mdc-button mdc-button--outlined">
                 <span class="mdc-button__ripple"></span>
+                <span class="mdc-button__focus-ring"></span>
                 <i class="material-icons mdc-button__icon" aria-hidden="true">auto_delete</i>
                 <span class="mdc-button__label">Clear site cache</span>
             </button>

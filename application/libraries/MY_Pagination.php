@@ -12,14 +12,14 @@ class MY_Pagination extends CI_Pagination {
     protected $full_tag_close = '</div>';
     protected $num_tag_open = '';
     protected $num_tag_close = '';
-    protected $cur_tag_open = '<a href="" class="mdc-button mdc-button--unelevated"> <span class="mdc-button__ripple"></span> ';
+    protected $cur_tag_open = '<a href="" class="mdc-button mdc-button--unelevated"> <span class="mdc-button__ripple"></span> <span class="mdc-button__focus-ring"></span> ';
     protected $cur_tag_close = '</a>';
     protected $next_tag_open = '';
     protected $next_tag_close = '';
     protected $prev_tag_open = '';
     protected $prev_tag_close = '';
     protected $_attributes__class = 'mdc-button';
-    protected $_links_inner = ' <span class="mdc-button__ripple"></span> ';
+    protected $_links_inner = ' <span class="mdc-button__ripple"></span> <span class="mdc-button__focus-ring"></span> ';
 
     /**
      * Constructor

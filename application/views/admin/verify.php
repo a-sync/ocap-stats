@@ -375,11 +375,13 @@ foreach ($op_player_entities as $e) {
                                     <td colspan="2" class="mdc-data-table__cell">
                                         <button type="submit" name="action" value="update" class="mdc-button mdc-button--raised mdc-button--leading">
                                             <span class="mdc-button__ripple"></span>
+                                            <span class="mdc-button__focus-ring"></span>
                                             <i class="material-icons mdc-button__icon" aria-hidden="true">save</i>
                                             <span class="mdc-button__label">Save</span>
                                         </button>
                                         <button type="reset" name="action" value="reset" class="mdc-button mdc-button--outlined">
                                             <span class="mdc-button__ripple"></span>
+                                            <span class="mdc-button__focus-ring"></span>
                                             <i class="material-icons mdc-button__icon" aria-hidden="true">cancel</i>
                                             <span class="mdc-button__label">Reset</span>
                                         </button>

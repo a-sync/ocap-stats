@@ -9,6 +9,7 @@ $event_types = $this->config->item('event_types');
             <?php echo form_open(base_url('update'), ['id' => 'update_operations']); ?>
             <button type="submit" name="update_operations" value="1" class="mdc-button mdc-button--raised mdc-button--leading">
                 <span class="mdc-button__ripple"></span>
+                <span class="mdc-button__focus-ring"></span>
                 <i class="material-icons mdc-button__icon" aria-hidden="true">sync</i>
                 <span class="mdc-button__label">Update operations.json</span>
             </button>
@@ -24,6 +25,7 @@ $event_types = $this->config->item('event_types');
             <?php echo form_open(base_url('clearcache'), ['id' => 'clear_cache']); ?>
             <button type="submit" name="clear_cache" value="1" class="mdc-button mdc-button--outlined">
                 <span class="mdc-button__ripple"></span>
+                <span class="mdc-button__focus-ring"></span>
                 <i class="material-icons mdc-button__icon" aria-hidden="true">auto_delete</i>
                 <span class="mdc-button__label">Clear site cache</span>
             </button>
