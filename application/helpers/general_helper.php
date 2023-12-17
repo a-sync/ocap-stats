@@ -42,10 +42,16 @@ if (!function_exists('get_valid_event_types')) {
                         $valid_event_types = [$valid_event_types];
                     }
 
-                    return $valid_event_types;
-                } else {
-                    return [];
+                    if (defined('STRICT_TAG_EVENT_TYPES')) {
+                        return $valid_event_types;
+                    } else {
+                        return array_unique(array_merge($valid_event_types, array_keys($CI->config->item('event_types'))));
+                    }
                 }
+            }
+
+            if (defined('STRICT_TAG_EVENT_TYPES')) {
+                return [];
             }
         }
 

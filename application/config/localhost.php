@@ -33,11 +33,11 @@ $config['default_selected_event_types'] = ['pve', 'pvp'];
 
 /*
 |--------------------------------------------------------------------------
-| Tags to event type designations
+| Tag assignments to event types
 |--------------------------------------------------------------------------
 |
-| Operaton tag and event type ID pairs. Operations can only be processed 
-| as the designated events.
+| Operaton tag and event type ID pairs. If `STRICT_TAG_EVENT_TYPES` is 
+| enabled operations can only be processed as the assigned events!
 |
 | NOTE: If left empty, the operation event type must be selected 
 |       manually before processing.
@@ -202,5 +202,20 @@ if (!function_exists('preprocess_op_data')) {
 | Require the admin to download / delete the operation data JSON files.  
 | Useful during development.
 |
+| IMPORTANT: Defining any value enables this option!
+|
 */
 // define('MANAGE_DATA_JSON_FILES', true);
+
+/*
+|--------------------------------------------------------------------------
+| Strict handling of tag assignments to event types
+|--------------------------------------------------------------------------
+|
+| Restrict the allowed event type selection based on the assigned events 
+| in `config[tag_event_types]`.
+|
+| IMPORTANT: Defining any value enables this option!
+|
+*/
+// define('STRICT_TAG_EVENT_TYPES', true);
