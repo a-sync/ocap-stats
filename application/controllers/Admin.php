@@ -318,6 +318,8 @@ class Admin extends CI_Controller
             log_message('error', implode('; ', $errors));
         }
 
+        // TODO: ajax response
+
         $this->_head('manage', $operation ? $operation['mission_name'] . ' (' . $operation['id'] . ')' : '');
 
         $this->load->view('admin/manage', [
@@ -440,5 +442,19 @@ class Admin extends CI_Controller
         }
 
         return JsonMachine\Items::fromFile($path, ['pointer' => $pointer, 'decoder' => $this->_json_decoder]);
+    }
+
+    private function _ajax($data)
+    {
+        if (!$this->input->is_ajax_request()) {
+            return show_error(400);
+        }
+
+        $json_flags = JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES;
+
+        return $this->output
+            ->set_status_header(200)
+            ->set_content_type('application/json', 'utf-8')
+            ->set_output(json_encode($data, $json_flags));
     }
 }

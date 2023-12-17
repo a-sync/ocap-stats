@@ -168,6 +168,8 @@ $event_types = $this->config->item('event_types');
     const event_types = <?php echo json_encode($event_types); ?>;
 
     function editEventType (edit_btn) {
+        if (edit_btn.disabled) return;
+
         const parse_form = edit_btn.closest('form');
         const parse_btn = parse_form.querySelector('button[name="action"][value="parse"]');
 
@@ -203,13 +205,74 @@ $event_types = $this->config->item('event_types');
         }
     }
 
+    async function submitForm (form, submitter) {
+        if (submitter.name === 'action' && ['parse', 'ignore'].includes(submitter.value)) {
+            const formData = new FormData(form);
+            formData.append('action', submitter.value);
+
+            form.classList.add('submitting');
+
+            const ignore_btn = form.querySelector('button[name="action"][value="ignore"]');
+            if (ignore_btn) {
+                ignore_btn.disabled = true;
+                if (formData.get('action') === 'ignore') {
+                    ignore_btn.querySelector('.mdc-button__icon').textContent = 'rotate_right';
+                    ignore_btn.classList.add('processing');
+                }
+            }
+
+            const parse_btn = form.querySelector('button[name="action"][value="parse"]');
+            if (parse_btn) {
+                parse_btn.disabled = true;
+                if (formData.get('action') === 'parse') {
+                    parse_btn.querySelector('.mdc-button__icon').textContent = 'rotate_right';
+                    parse_btn.classList.add('processing');
+                }
+            }
+
+            const edit_btn = form.querySelector('.edit-btn');
+            if (edit_btn) {
+                if (formData.get('action') === 'ignore' && edit_btn.dataset.active === 'true') {
+                    editEventType(edit_btn);
+                }
+                edit_btn.disabled = true;
+            }
+
+            const td = form.closest('td');
+
+            const form_action = form.getAttribute('action');
+            try {
+                const response = await fetch(form_action, {
+                    method: 'POST',
+                    body: formData
+                });
+                console.log('RES text', await response.text());//debug
+
+                const label = document.createElement('span');
+                label.textContent = event_types[formData.get('event')];
+                td.replaceChildren(label);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+    }
+
     const domLoaded = () => {
         console.log('DOM loaded');
-        const elements = document.querySelectorAll('.edit-btn');
-        
-        for (const el of elements) {
-            el.addEventListener('click', (e) => {
-                editEventType(el);
+
+        const edit_btns = document.querySelectorAll('.edit-btn');
+        for (const b of edit_btns) {
+            b.addEventListener('click', (ev) => {
+                ev.preventDefault();
+                editEventType(b);
+            });
+        }
+
+        const manage_table_forms = document.querySelectorAll('#manage-table form');
+        for (const f of manage_table_forms) {
+            f.addEventListener('submit', (ev) => {
+                ev.preventDefault();
+                submitForm(f, ev.submitter);
             });
         }
     };
