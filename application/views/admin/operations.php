@@ -209,6 +209,7 @@ $event_types = $this->config->item('event_types');
         if (submitter.name === 'action' && ['parse', 'ignore'].includes(submitter.value)) {
             const formData = new FormData(form);
             formData.append('action', submitter.value);
+            formData.append('ajax', true);
 
             form.classList.add('submitting');
 
@@ -239,6 +240,7 @@ $event_types = $this->config->item('event_types');
             }
 
             const td = form.closest('td');
+            const label = document.createElement('span');
 
             const form_action = form.getAttribute('action');
             try {
@@ -246,14 +248,40 @@ $event_types = $this->config->item('event_types');
                     method: 'POST',
                     body: formData
                 });
-                console.log('RES text', await response.text());//debug
-
-                const label = document.createElement('span');
-                label.textContent = event_types[formData.get('event')];
-                td.replaceChildren(label);
-            } catch (e) {
-                console.error(e);
+                
+                if (response.ok) {
+                    const resJson = await response.json();
+                    if (resJson.errors.length === 0) {
+                        if (resJson.action === 'ignore') {
+                            const i = document.createElement('i');
+                            i.textContent = 'ignored';
+                            label.appendChild(i);
+                            td.closest('tr').classList.add('ignored_operation');
+                        } else {
+                            label.textContent = event_types[resJson.op.event];
+                        }
+                    } else {
+                        label.classList.add('errors');
+                        errors.map(e => {
+                            if (label.childElementCount > 0) {
+                                label.appendChild(document.createElement('br'));
+                            }
+                            const ei = document.createElement('span');
+                            ei.textContent = e;
+                            label.appendChild(ei);
+                        });
+                    }
+                } else {
+                    label.classList.add('errors');
+                    label.textContent = 'Response not ok...';
+                }
+            } catch (err) {
+                console.error(err);
+                label.classList.add('errors');
+                label.textContent = 'Request error... ';
             }
+
+            td.replaceChildren(label);
         }
     }
 

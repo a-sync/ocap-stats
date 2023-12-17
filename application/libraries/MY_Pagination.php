@@ -225,8 +225,8 @@ class MY_Pagination extends CI_Pagination {
 
         // Calculate the start and end numbers. These determine
         // which number to start and end the digit links with.
-        $start	= (($this->cur_page - $this->num_links) > 0) ? $this->cur_page - ($this->num_links - 1) : 1;
-        $end	= (($this->cur_page + $this->num_links) < $num_pages) ? $this->cur_page + $this->num_links : $num_pages;
+        $start  = (($this->cur_page - $this->num_links) > 0) ? $this->cur_page - ($this->num_links - 1) : 1;
+        $end    = (($this->cur_page + $this->num_links) < $num_pages) ? $this->cur_page + $this->num_links : $num_pages;
 
         // And here we go...
         $output = '';

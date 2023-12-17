@@ -179,6 +179,9 @@ class Admin extends CI_Controller
         $op = false;
         $file_size = 0;
         $last_update = 'none';
+        $action = null;
+        $redirect = null;
+        $is_ajax_req = false;
 
         if (file_exists(JSONPATH . 'operations.json')) {
             if (filter_var($op_id, FILTER_VALIDATE_INT) || filter_var($op_id, FILTER_VALIDATE_INT) === 0) {
@@ -204,6 +207,7 @@ class Admin extends CI_Controller
                     if (!is_null($this->input->post('id')) && $operation['id'] === intval($this->input->post('id'))) {
                         $action = $this->input->post('action');
                         $redirect = $this->input->post('redirect');
+                        $is_ajax_req = boolval($this->input->post('ajax'));
 
                         log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] operation (' . $operation['id'] . ') action: ' . $action);
 
@@ -260,7 +264,7 @@ class Admin extends CI_Controller
                                                 $errors = array_merge($errors, $err);
                                                 log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] operation (' . $operation['id'] . ') parsing finished (errors: ' . count($errors) . ')');
 
-                                                if (count($errors) === 0 && $redirect === 'list') {
+                                                if (count($errors) === 0 && $redirect === 'list' && !$is_ajax_req) {
                                                     return redirect(base_url('manage/#id-' . $operation['id']));
                                                 }
                                                 $op_in_db = $this->operations->exists($operation['id']);
@@ -318,22 +322,29 @@ class Admin extends CI_Controller
             log_message('error', implode('; ', $errors));
         }
 
-        // TODO: ajax response
+        if ($is_ajax_req) {
+            return $this->_ajax([
+                'action' => $action,
+                'redirect' => $redirect,
+                'errors' => $errors,
+                'op' => $op
+            ]);
+        } else {
+            $this->_head('manage', $operation ? $operation['mission_name'] . ' (' . $operation['id'] . ')' : '');
 
-        $this->_head('manage', $operation ? $operation['mission_name'] . ' (' . $operation['id'] . ')' : '');
+            $this->load->view('admin/manage', [
+                'operation' => $operation,
+                'errors' => $errors,
+                'op_in_db' => $op_in_db,
+                'valid_event_types' => $valid_event_types,
+                'should_ignore' => $should_ignore,
+                'op' => $op,
+                'file_size' => $file_size,
+                'last_update' => $last_update
+            ]);
 
-        $this->load->view('admin/manage', [
-            'operation' => $operation,
-            'errors' => $errors,
-            'op_in_db' => $op_in_db,
-            'valid_event_types' => $valid_event_types,
-            'should_ignore' => $should_ignore,
-            'op' => $op,
-            'file_size' => $file_size,
-            'last_update' => $last_update
-        ]);
-
-        $this->_foot();
+            $this->_foot();
+        }
     }
 
     private function _json_update($operation)
