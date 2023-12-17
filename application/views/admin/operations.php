@@ -44,7 +44,7 @@ $event_types = $this->config->item('event_types');
             <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
                 <div class="mdc-data-table mdc-elevation--z2 list__table">
                     <div class="mdc-data-table__table-container">
-                        <table class="mdc-data-table__table">
+                        <table class="mdc-data-table__table" id="manage-table">
                             <thead>
                                 <tr class="mdc-data-table__header-row">
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col">ID</th>
@@ -137,11 +137,13 @@ $event_types = $this->config->item('event_types');
                                                         <i class="material-icons mdc-button__icon" aria-hidden="true">publish</i>
                                                         <span class="mdc-button__label">Parse as <?php echo $event_types[$hidden['event']]; ?></span>
                                                     </button>
-                                                    <button type="button" class="mdc-icon-button change-btn" title="Change event type">
-                                                        <span class="mdc-button__ripple"></span>
-                                                        <span class="mdc-icon-button__focus-ring"></span>
-                                                        <i class="material-icons mdc-button__icon" aria-hidden="true">edit</i>
-                                                    </button>
+                                                    <?php if ($vet_count > 1) : ?>
+                                                        <button type="button" class="mdc-icon-button edit-btn" title="Change event type" data-event-types="<?php echo html_escape(implode(',', $op_valid_event_types)); ?>">
+                                                            <span class="mdc-icon-button__ripple"></span>
+                                                            <span class="mdc-icon-button__focus-ring"></span>
+                                                            <i class="material-icons mdc-icon-button__icon" aria-hidden="true">edit</i>
+                                                        </button>
+                                                    <?php endif; ?>
                                                 <?php elseif ($vet_count > 0) : ?>
                                                     <a href="<?php echo base_url('manage/' . $op['id']); ?>" class="mdc-button mdc-button--raised mdc-button--leading">
                                                         <span class="mdc-button__focus-ring"></span>
@@ -161,3 +163,58 @@ $event_types = $this->config->item('event_types');
         <?php endif; ?>
     </div>
 </div>
+
+<script>
+    const event_types = <?php echo json_encode($event_types); ?>;
+
+    function editEventType (edit_btn) {
+        const parse_form = edit_btn.closest('form');
+        const parse_btn = parse_form.querySelector('button[name="action"][value="parse"]');
+
+        if (edit_btn.dataset.active !== 'true') {
+            edit_btn.dataset.active = 'true';
+
+            const parse_select = document.createElement('select');
+            parse_select.setAttribute('name', 'event');
+            
+            const allowed_types = edit_btn.dataset.eventTypes.split(',');
+            for (const et of allowed_types) {
+                const option = document.createElement('option');
+                option.setAttribute('value', et);
+                option.textContent = event_types[et];
+                parse_select.appendChild(option);
+            }
+
+            parse_btn.style.display = 'none';
+            edit_btn.parentNode.insertBefore(parse_select, edit_btn);
+            edit_btn.querySelector('.mdc-icon-button__icon').textContent = 'done';
+        } else {
+            edit_btn.dataset.active = 'false';
+
+            const parse_event = parse_form.querySelector('input[type="hidden"][name="event"]');
+            const parse_select = parse_form.querySelector('select[name="event"]');
+            parse_event.value = parse_select.value;
+            const parse_btn_text = parse_btn.querySelector('.mdc-button__label');
+            parse_btn_text.textContent = 'Parse as ' + event_types[parse_select.value];
+
+            parse_select.parentNode.removeChild(parse_select);
+            parse_btn.style.display = null;
+            edit_btn.querySelector('.mdc-icon-button__icon').textContent = 'edit';
+        }
+    }
+
+    const domLoaded = () => {
+        console.log('DOM loaded');
+        const elements = document.querySelectorAll('.edit-btn');
+        
+        for (const el of elements) {
+            el.addEventListener('click', (e) => {
+                editEventType(el);
+            });
+        }
+    };
+
+    if (document.readyState === 'complete' ||
+        (document.readyState !== 'loading' && !document.documentElement.doScroll)) domLoaded();
+    else document.addEventListener('DOMContentLoaded', domLoaded);
+</script>

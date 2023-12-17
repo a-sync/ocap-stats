@@ -51,9 +51,14 @@ h1 {
 .mdc-data-table__cell button {
     vertical-align: middle;
 }
-.mdc-data-table__cell button[value="ignore"] .mdc-button__icon {
+
+#manage-table .mdc-data-table__cell button[name="action"][value="ignore"] .mdc-button__icon {
     margin-left: 0;
     margin-right: 0;
+}
+
+.edit-btn {
+    transform: scale(0.7);
 }
 
 .list__no_items {
