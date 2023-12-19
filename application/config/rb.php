@@ -1,6 +1,8 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
+ini_set('memory_limit', '256M');// B I G B O Y E
+
 $config['admin_key'] = 'team';
 
 $config['site_title'] = 'Red Bear Stats';
@@ -47,7 +49,7 @@ $config['sides'] = [
     'UNKNOWN' => 'unknown'
 ];
 
-define('OPERATIONS_JSON_URL', 'https://ocap.red-bear.ru/api/v1/operations/get?type=&name=&newer=2017-06-01&older=2099-12-12&_=1');
+define('OPERATIONS_JSON_URL', 'https://ocap.red-bear.ru/api/v1/operations?tag=&name=&newer=2017-06-01&older=2099-12-12&_=1');
 define('OPERATION_DATA_JSON_URL_PATH', 'https://ocap.red-bear.ru/data/');
 define('OCAP_URL_PREFIX', 'https://ocap.red-bear.ru/?zoom=1.4&x=-100&y=100&file=');
 define('ADJUST_HIT_DATA', -1);
