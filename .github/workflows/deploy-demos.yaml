@@ -118,7 +118,7 @@ jobs:
           replace: "SetEnv CI_ENV production"
 
       - name: 📂 Sync files
-        uses: SamKirkland/FTP-Deploy-Action@4.3.3
+        uses: SamKirkland/FTP-Deploy-Action@4.3.4
         with:
           server: "${{ secrets.FTP_HOSTNAME }}"
           username: "${{ secrets.FTP_USERNAME }}"
