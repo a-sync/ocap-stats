@@ -73,6 +73,7 @@ $config['cmd_group_names'] = [
 // Keep these ordered by rank
 $config['cmd_role_names'] = [
     'Company Commander',
+    'Company Sergeant',
     'Platoon Leader',
     'Platoon Sergeant',
     'Squad Leader',
