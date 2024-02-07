@@ -21,7 +21,9 @@ $config['tag_event_types'] = [
 $config['cmd_group_names'] = [];
 
 // Keep these ordered by rank
-$config['cmd_role_names'] = [];
+$config['cmd_role_names'] = [
+    'Platoon Leader'
+];
 
 $config['sides'] = [
     'WEST' => 'BLUFOR',
