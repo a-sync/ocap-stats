@@ -33,6 +33,8 @@ The data is presented on a simple spreadsheet like web frontend.
  &nbsp; &rdca; based on [OCAP](https://ocap.red-bear.ru) data from [RED-BEAR](https://www.red-bear.ru)  
 [tbd-stats.devs.space](https://tbd-stats.devs.space)  
  &nbsp; &rdca; based on [OCAP2](http://tbdevent.eu:5000) data from [TBD](https://tbdevent.eu)  
+[hk-stats.devs.space](https://hk-stats.devs.space)  
+ &nbsp; &rdca; based on [OCAP2](http://aar.highkommand.com:5000) data from [HK](https://highkommand.com)  
 
 
 ## Search

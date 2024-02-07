@@ -53,6 +53,9 @@ jobs:
           - config: tbd
             uname_secret: DB_USERNAME_TBD
             pword_secret: DB_PASSWORD_TBD
+          - config: hk
+            uname_secret: DB_USERNAME_HK
+            pword_secret: DB_PASSWORD_HK
 
     steps:
       - name: 🚚 Get latest code
