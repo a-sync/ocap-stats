@@ -12,7 +12,9 @@ $config['event_types'] = [
     's1tb' => 'S1 Tiebreaker'
 ];
 
-$config['default_selected_event_types'] = [];
+$config['default_selected_event_types'] = [
+    's1'
+];
 
 $config['tag_event_types'] = [
     'Season One' => 's1'
