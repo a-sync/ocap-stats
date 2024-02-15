@@ -8,7 +8,8 @@ $config['site_title'] = 'High Kommand Stats';
 $config['site_logo'] = 'public/hk_logo.png';
 
 $config['event_types'] = [
-    's1' => 'Season One'
+    's1' => 'Season One',
+    's1tb' => 'S1 Tiebreaker'
 ];
 
 $config['default_selected_event_types'] = [];

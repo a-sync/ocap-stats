@@ -219,3 +219,13 @@ if (!function_exists('preprocess_op_data')) {
 |
 */
 // define('STRICT_TAG_EVENT_TYPES', true);
+
+/*
+|--------------------------------------------------------------------------
+| URL pointing to the ocap-odata instance based on this database
+|--------------------------------------------------------------------------
+|
+| Renders a one time notification for users about the ocap-odata instance.
+|
+*/
+// define('OCAP_ODATA_URL', 'http://localhost:8500');
