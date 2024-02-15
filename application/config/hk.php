@@ -42,8 +42,8 @@ define('OCAP_URL_PREFIX', 'http://aar.highkommand.com:5000/?zoom=1.4&x=-100&y=10
 if (!function_exists('should_op_be_ignored')) {
     function should_op_be_ignored($op)
     {
-        // Mission lasting less then 20 minutes
-        if (floor(intval($op['mission_duration']) / 60) < 20) {
+        // Mission lasting less then 20 minutes and not on VR map (possible tiebreaker)
+        if (floor(intval($op['mission_duration']) / 60) < 20 && strtolower($op['world_name']) !== 'vr') {
             return true;
         }
 
