@@ -56,7 +56,11 @@ $sides = $this->config->item('sides');
                                 $name = html_escape($i['name']);
                                 $pname_or_class = 'n/a';
                                 if ($i['player_id']) {
-                                    $name = '<a href="' . base_url('player/') . $i['player_id'] . '">' . $name . '</a>';
+                                    if (intval($i['invalid']) === 1) {
+                                        $name = '<i>' . $name . '</i>';
+                                    } else {
+                                        $name = '<a href="' . base_url('player/') . $i['player_id'] . '">' . $name . '</a>';
+                                    }
                                     $pname_or_class = $i['player_name'];
                                 } elseif ($i['class']) {
                                     $pname_or_class = $i['class'];

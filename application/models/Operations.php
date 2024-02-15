@@ -119,6 +119,7 @@ class Operations extends CI_Model
                 'deaths' => 0,
                 '_deaths' => 0,
                 'distance_traveled' => 0,
+                'invalid' => null,
                 'uid' => element('uid', $e, null)
             ];
 
@@ -162,6 +163,7 @@ class Operations extends CI_Model
                                 // Note: this attempts to fix missing/incorrect name and player flag for actual player entities
                                 $entities[$e['id']]['is_player'] = 1;
                                 $entities[$e['id']]['name'] = $p[4];
+                                $entities[$e['id']]['invalid'] = 0;
                             }
                         }
                     }
@@ -240,6 +242,7 @@ class Operations extends CI_Model
             */
             if ($entities[$e['id']]['name'] === '') {
                 $entities[$e['id']]['is_player'] = 0;
+                $entities[$e['id']]['invalid'] = 1;
             }
         }
 
@@ -851,7 +854,7 @@ class Operations extends CI_Model
             ])
             ->select('COUNT(DISTINCT entities.player_id) AS players_total')
             ->from('operations')
-            ->join('entities', 'entities.operation_id = operations.id AND entities.player_id != 0', 'LEFT')
+            ->join('entities', 'entities.operation_id = operations.id AND entities.player_id != 0 AND entities.is_player = 1 AND entities.invalid != 1', 'LEFT')
             ->group_by('operations.id')
             ->order_by('operations.id DESC');
 
@@ -886,6 +889,7 @@ class Operations extends CI_Model
                 'entities.type',
                 'entities.class',
                 'entities.distance_traveled',
+                'entities.invalid',
                 '(entities.last_frame_num - entities.start_frame_num) * operations.capture_delay AS seconds_in_game',
                 'players.name AS player_name'
             ])
@@ -901,7 +905,7 @@ class Operations extends CI_Model
             ->join('players', 'players.id = entities.player_id', 'LEFT')
             ->where('entities.operation_id', $id)
             ->group_by('entities.id')
-            ->order_by('is_player DESC, kills DESC, deaths ASC, hits DESC, vkills DESC, shots ASC, entities.id ASC');
+            ->order_by('invalid ASC, is_player DESC, kills DESC, deaths ASC, hits DESC, vkills DESC, shots ASC, entities.id ASC');
 
         return $this->db->get()->result_array();
     }
@@ -929,8 +933,8 @@ class Operations extends CI_Model
             ->from('events')
             ->join('entities AS victim', 'victim.id = events.victim_id AND victim.operation_id = ' . $id, 'LEFT')
             ->join('entities AS attacker', 'attacker.id = events.attacker_id AND attacker.operation_id = ' . $id, 'LEFT')
-            ->join('players AS victim_player', 'victim_player.id = victim.player_id', 'LEFT')
-            ->join('players AS attacker_player', 'attacker_player.id = attacker.player_id', 'LEFT')
+            ->join('players AS victim_player', 'victim_player.id = victim.player_id AND victim.is_player = 1 AND victim.invalid != 1', 'LEFT')
+            ->join('players AS attacker_player', 'attacker_player.id = attacker.player_id AND attacker.is_player = 1 AND attacker.invalid != 1', 'LEFT')
             ->where('events.operation_id', $id)
             ->order_by("events.frame ASC, victim.name ASC, FIELD(events.event, 'hit', 'killed', '_awake', '_uncon', '_dead')");
 

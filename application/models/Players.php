@@ -37,6 +37,8 @@ class Players extends CI_Model
             ->select('COUNT(DISTINCT entities.operation_id) AS attendance')
             ->from('players')
             ->join('entities', 'entities.player_id = players.id')
+            ->where('entities.is_player', 1)
+            ->where('entities.invalid !=', 1)
             ->join('operations', 'operations.id = entities.operation_id')
             ->where('players.alias_of', 0)
             ->group_by('players.id')
@@ -66,6 +68,8 @@ class Players extends CI_Model
                 ->select_sum('entities.fhits')
                 ->from('players')
                 ->join('entities', 'entities.player_id = players.id AND entities.operation_id >= ' . ADJUST_HIT_DATA)
+                ->where('entities.is_player', 1)
+                ->where('entities.invalid !=', 1)
                 ->join('operations', 'operations.id = entities.operation_id')
                 ->where('players.alias_of', 0)
                 ->group_by('players.id');
@@ -141,6 +145,7 @@ class Players extends CI_Model
                 'entities.vkills',
                 'entities.deaths',
                 'entities.distance_traveled',
+                'entities.invalid',
                 'entities.cmd',
                 '((entities.last_frame_num - entities.start_frame_num) * operations.capture_delay) AS seconds_in_game',
                 'operations.mission_name',
@@ -153,12 +158,11 @@ class Players extends CI_Model
                 'operations.start_time',
                 'operations.end_winner',
                 'operations.end_message',
-                '(SELECT COUNT(DISTINCT ents.player_id) FROM entities AS ents WHERE ents.operation_id = operations.id) AS players_total'
+                '(SELECT COUNT(DISTINCT ents.player_id) FROM entities AS ents WHERE ents.operation_id = operations.id AND ents.player_id != 0 AND ents.is_player = 1 AND ents.invalid != 1) AS players_total'
             ])
             ->from('operations')
-            ->join('entities', 'entities.operation_id = operations.id', 'RIGHT')
+            ->join('entities', 'entities.operation_id = operations.id AND entities.player_id = "' . intval($id) . '" AND entities.is_player = 1 AND entities.invalid != 1', 'RIGHT')
             ->join('players', 'players.id = entities.player_id')
-            ->where('entities.player_id', $id)
             ->group_by('entities.id, entities.operation_id')
             ->order_by('entities.operation_id DESC, entities.id ASC');
 
@@ -190,6 +194,8 @@ class Players extends CI_Model
             ->from('entities')
             ->join('operations', 'operations.id = entities.operation_id')
             ->where('entities.player_id', $id)
+            ->where('entities.is_player', 1)
+            ->where('entities.invalid !=', 1)
             ->where('entities.role !=', '')
             ->group_by('role_name')
             ->order_by('total_count DESC, kills DESC, deaths ASC');
@@ -208,6 +214,8 @@ class Players extends CI_Model
                 ->select_sum('fhits')
                 ->from('entities')
                 ->where('entities.player_id', $id)
+                ->where('entities.is_player', 1)
+                ->where('entities.invalid !=', 1)
                 ->where('entities.role !=', '')
                 ->where('entities.operation_id >=', ADJUST_HIT_DATA)
                 ->group_by('role_name');
@@ -267,6 +275,8 @@ class Players extends CI_Model
                     $this->db
                         ->select(['players.id as player_id', 'players.name'])
                         ->join('players', 'players.id = attacker.player_id')
+                        ->where('attacker.is_player', 1)
+                        ->where('attacker.invalid !=', 1)
                         ->group_by('players.id');
                 } else { // vehicle
                     $this->db
@@ -283,6 +293,8 @@ class Players extends CI_Model
                     $this->db
                         ->select(['players.id as player_id', 'players.name'])
                         ->join('players', 'players.id = victim.player_id')
+                        ->where('victim.is_player', 1)
+                        ->where('victim.invalid !=', 1)
                         ->group_by('players.id');
                 } else { // vehicle
                     $this->db
@@ -333,6 +345,8 @@ class Players extends CI_Model
             ->join('entities AS attacker', 'attacker.id = events.attacker_id AND attacker.operation_id = events.operation_id')
             ->join('entities AS victim', 'victim.id = events.victim_id AND victim.operation_id = events.operation_id')
             ->where('attacker.player_id', $id)
+            ->where('attacker.is_player', 1)
+            ->where('attacker.invalid !=', 1)
             ->where('victim.player_id != attacker.player_id')
             ->where_in('events.event', ['hit', 'killed'])
             ->where('events.weapon !=', '')

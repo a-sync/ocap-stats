@@ -602,7 +602,7 @@ class Additional_data extends CI_Model
                 'operations.start_time',
                 'operations.end_winner',
                 'operations.end_message',
-                '(SELECT COUNT(DISTINCT ents.side) FROM entities AS ents WHERE ents.operation_id = operations.id AND ents.is_player = 1) AS sides_total'
+                '(SELECT COUNT(DISTINCT ents.side) FROM entities AS ents WHERE ents.operation_id = operations.id AND ents.is_player = 1 AND ents.invalid != 1) AS sides_total'
             ])
             ->from('operations')
             ->where('operations.event !=', '')
@@ -633,6 +633,7 @@ class Additional_data extends CI_Model
             ->from('entities')
             ->where('entities.operation_id', $id)
             ->where('entities.is_player', 1)
+            ->where('entities.invalid !=', 1)
             ->group_by('entities.side')
             ->order_by('entities.id ASC');
 
@@ -647,6 +648,7 @@ class Additional_data extends CI_Model
             ->from('entities')
             ->where('entities.operation_id', $id)
             ->where('entities.is_player', 0)
+            ->where('entities.invalid !=', 1)
             ->group_by('entities.side')
             ->order_by('entities.id ASC');
 
@@ -678,6 +680,7 @@ class Additional_data extends CI_Model
             ->join('players', 'players.id = entities.player_id')
             ->where('entities.operation_id', $id)
             ->where('entities.is_player', 1)
+            ->where('entities.invalid !=', 1)
             ->order_by('entities.id ASC');
 
         return $this->db->get()->result_array();
@@ -722,6 +725,8 @@ class Additional_data extends CI_Model
             ])
             ->from('players')
             ->join('entities', 'entities.player_id = players.id')
+            ->where('entities.is_player', 1)
+            ->where('entities.invalid !=', 1)
             ->where_in('players.id', $ids)
             ->group_by('players.id');
 
@@ -744,6 +749,8 @@ class Additional_data extends CI_Model
             ->from('operations')
             ->where('operations.event !=', '')
             ->join('entities', 'operations.id = entities.operation_id')
+            ->where('entities.is_player', 1)
+            ->where('entities.invalid !=', 1)
             ->join('players', 'entities.player_id = players.id')
             ->where_in('operations.id', $operation_ids)
             ->order_by('operations.id', 'DESC');
