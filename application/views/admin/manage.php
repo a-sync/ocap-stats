@@ -47,7 +47,16 @@ $sides = $this->config->item('sides');
                                             </a>
                                             <a href="<?php echo base_url('manage/' . $op['id'] . '/entities'); ?>" class="mdc-tab" role="tab" aria-selected="false" tabindex="7">
                                                 <span class="mdc-tab__content">
-                                                    <span class="mdc-tab__text-label">Edit entities</span>
+                                                    <span class="mdc-tab__text-label">Entities</span>
+                                                </span>
+                                                <span class="mdc-tab-indicator">
+                                                    <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
+                                                </span>
+                                                <span class="mdc-tab__ripple"></span>
+                                            </a>
+                                            <a href="<?php echo base_url('manage/' . $op['id'] . '/events'); ?>" class="mdc-tab" role="tab" aria-selected="false" tabindex="8">
+                                                <span class="mdc-tab__content">
+                                                    <span class="mdc-tab__text-label">Events</span>
                                                 </span>
                                                 <span class="mdc-tab-indicator">
                                                     <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>

@@ -329,4 +329,100 @@ class Data extends CI_Controller
 
         $this->_foot();
     }
+    
+    public function entities($op_id = null)
+    {
+        $this->load->model('operations');
+        $this->load->model('additional_data');//dbg
+
+        $errors = [];
+        $op = false;
+        $op_sides = [];
+        $op_player_entities = [];
+        $op_commanders_data = [];
+        if (filter_var($op_id, FILTER_VALIDATE_INT) || filter_var($op_id, FILTER_VALIDATE_INT) === 0) {
+            $op = $this->operations->get_by_id($op_id);
+
+            if ($op) {
+                //dbg
+                $op_sides = $this->additional_data->get_op_sides($op['id']);
+                $op_player_entities = $this->additional_data->get_op_player_entities($op['id']);
+                $op_commanders_data = $this->additional_data->get_commanders(true, $op['id'], true);
+
+
+            } else {
+                $errors[] = 'Unknown operation ID given.';
+            }
+        } else {
+            $errors[] = 'Invalid operation ID given.';
+        }
+
+        if (count($errors) > 0) {
+            log_message('error', implode('; ', $errors));
+        }
+
+        $this->_head('fix-data', $op ? $op['mission_name'] . ' (' . $op['id'] . ')' : '');
+
+        $this->load->view('admin/entities', [
+            'errors' => $errors,
+            'op' => $op,
+            //dbg
+            'op_sides' => $op_sides,
+            'op_player_entities' => $op_player_entities,
+            'cmd_resolved' => $op ? element($op['id'], $op_commanders_data['resolved'], []) : [],
+            'cmd_verified' => $op ? element($op['id'], $op_commanders_data['verified'], []) : [],
+            'cmd_unambiguous' => $op ? element($op['id'], $op_commanders_data['unambiguous'], []) : [],
+            'cmd_ambiguous' => $op ? element($op['id'], $op_commanders_data['ambiguous'], []) : []
+        ]);
+
+        $this->_foot();
+    }
+    
+    public function events($op_id = null)
+    {
+        $this->load->model('operations');
+        $this->load->model('additional_data');//dbg
+
+        $errors = [];
+        $op = false;
+        $op_sides = [];
+        $op_player_entities = [];
+        $op_commanders_data = [];
+        if (filter_var($op_id, FILTER_VALIDATE_INT) || filter_var($op_id, FILTER_VALIDATE_INT) === 0) {
+            $op = $this->operations->get_by_id($op_id);
+
+            if ($op) {
+                //dbg
+                $op_sides = $this->additional_data->get_op_sides($op['id']);
+                $op_player_entities = $this->additional_data->get_op_player_entities($op['id']);
+                $op_commanders_data = $this->additional_data->get_commanders(true, $op['id'], true);
+
+
+            } else {
+                $errors[] = 'Unknown operation ID given.';
+            }
+        } else {
+            $errors[] = 'Invalid operation ID given.';
+        }
+
+        if (count($errors) > 0) {
+            log_message('error', implode('; ', $errors));
+        }
+
+        $this->_head('fix-data', $op ? $op['mission_name'] . ' (' . $op['id'] . ')' : '');
+
+        $this->load->view('admin/events', [
+            'errors' => $errors,
+            'op' => $op,
+            //dbg
+            'op_sides' => $op_sides,
+            'op_player_entities' => $op_player_entities,
+            'cmd_resolved' => $op ? element($op['id'], $op_commanders_data['resolved'], []) : [],
+            'cmd_verified' => $op ? element($op['id'], $op_commanders_data['verified'], []) : [],
+            'cmd_unambiguous' => $op ? element($op['id'], $op_commanders_data['unambiguous'], []) : [],
+            'cmd_ambiguous' => $op ? element($op['id'], $op_commanders_data['ambiguous'], []) : []
+        ]);
+
+        $this->_foot();
+    }
 }

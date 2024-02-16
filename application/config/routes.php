@@ -64,6 +64,8 @@ $route['manage'] = 'admin/operations';
 $route['manage/(:num)'] = 'admin/process/$1';
 
 $route['manage/(:num)/verify'] = 'data/verify/$1';
+$route['manage/(:num)/entities'] = 'data/entities/$1';
+$route['manage/(:num)/events'] = 'data/events/$1';
 $route['add-alias'] = 'data/add_alias';
 $route['fix-data'] = 'data/fix_data';
 $route['fix-data/unverified'] = 'data/fix_data/unverified';
