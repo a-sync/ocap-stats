@@ -115,3 +115,4 @@ Check out [SETUP.md](./SETUP.md) for instructions on how to start your own stats
 ## Similar projects _(not open source)_
  * https://aar.ofcra.org/stats/
  * https://en.stats.wogames.info/projects/wog-a3/
+ * https://stats.tbdevent.eu/

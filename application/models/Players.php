@@ -153,12 +153,11 @@ class Players extends CI_Model
                 'operations.start_time',
                 'operations.end_winner',
                 'operations.end_message',
-                '(SELECT COUNT(DISTINCT ents.player_id) FROM entities AS ents WHERE ents.operation_id = operations.id) AS players_total'
+                '(SELECT COUNT(DISTINCT ents.player_id) FROM entities AS ents WHERE ents.operation_id = operations.id AND ents.is_player = 1) AS players_total'
             ])
             ->from('operations')
-            ->join('entities', 'entities.operation_id = operations.id', 'RIGHT')
+            ->join('entities', 'entities.operation_id = operations.id AND entities.player_id = ' . intval($id), 'RIGHT')
             ->join('players', 'players.id = entities.player_id')
-            ->where('entities.player_id', $id)
             ->group_by('entities.id, entities.operation_id')
             ->order_by('entities.operation_id DESC, entities.id ASC');
 

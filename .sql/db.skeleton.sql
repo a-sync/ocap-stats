@@ -69,6 +69,10 @@ CREATE TABLE IF NOT EXISTS `events` (
 --       `entities` -> `id`
 --   `attacker_id`
 --       `entities` -> `id`
+--   `victim_aid`
+--       `entities` -> `aid`
+--   `attacker_aid`
+--       `entities` -> `aid`
 --
 
 

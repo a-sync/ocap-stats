@@ -851,7 +851,7 @@ class Operations extends CI_Model
             ])
             ->select('COUNT(DISTINCT entities.player_id) AS players_total')
             ->from('operations')
-            ->join('entities', 'entities.operation_id = operations.id AND entities.player_id != 0', 'LEFT')
+            ->join('entities', 'entities.operation_id = operations.id AND entities.is_player = 1', 'LEFT')
             ->group_by('operations.id')
             ->order_by('operations.id DESC');
 
@@ -947,7 +947,7 @@ class Operations extends CI_Model
             ->select_sum("CASE WHEN events.event = 'killed' THEN 1 ELSE 0 END", 'kills')
             ->select_sum("CASE WHEN events.event = 'killed' AND attacker.side = victim.side THEN 1 ELSE 0 END", 'fkills')
             ->select_avg("CASE WHEN events.event = 'killed' THEN events.distance ELSE NULL END", 'avg_kill_dist')
-            ->select('COUNT(DISTINCT events.attacker_id) AS players_total')
+            ->select('COUNT(DISTINCT CASE WHEN attacker.is_player = 1 THEN attacker.player_id ELSE NULL END) AS players_total')
             ->from('events')
             ->join('entities AS attacker', 'attacker.id = events.attacker_id AND attacker.operation_id = events.operation_id')
             ->join('entities AS victim', 'victim.id = events.victim_id AND victim.operation_id = events.operation_id')
