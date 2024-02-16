@@ -76,6 +76,15 @@ foreach ($op_player_entities as $e) {
                                             </span>
                                             <span class="mdc-tab__ripple"></span>
                                         </a>
+                                        <a href="<?php echo base_url('manage/' . $op['id'] . '/entities'); ?>" class="mdc-tab" role="tab" aria-selected="false" tabindex="7">
+                                            <span class="mdc-tab__content">
+                                                <span class="mdc-tab__text-label">Edit entities</span>
+                                            </span>
+                                            <span class="mdc-tab-indicator">
+                                                <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
+                                            </span>
+                                            <span class="mdc-tab__ripple"></span>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
