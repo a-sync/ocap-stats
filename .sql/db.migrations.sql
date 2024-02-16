@@ -9,7 +9,7 @@ UPDATE `events` SET `weapon`=NULL WHERE `event` NOT IN ('hit', 'killed') ;
 
 ALTER TABLE `operations` ADD `verified` TINYINT(1) UNSIGNED NULL DEFAULT NULL ;
 
-ALTER TABLE `players` ADD `uid` VARCHAR(64) NULL DEFAULT NULL , ADD `unit_id` VARCHAR(64) NULL DEFAULT NULL , ADD UNIQUE (`uid`) ;
+ALTER TABLE `players` ADD `uid` VARCHAR(64) NULL DEFAULT NULL, ADD `unit_id` VARCHAR(64) NULL DEFAULT NULL, ADD UNIQUE (`uid`) ;
 
 --
 -- 2022-01-01
@@ -41,3 +41,8 @@ ALTER TABLE `events` ADD `victim_aid` INT(10) UNSIGNED NULL DEFAULT NULL, ADD `a
 UPDATE `events` JOIN `entities` AS `victim` ON `victim`.`id` = `events`.`victim_id` AND `victim`.`operation_id` = `events`.`operation_id` SET `events`.`victim_aid` = `victim`.`aid` WHERE `events`.`victim_aid` IS NULL AND `events`.`victim_id` IS NOT NULL ;
 
 UPDATE `events` JOIN `entities` AS `attacker` ON `attacker`.`id` = `events`.`attacker_id` AND `attacker`.`operation_id` = `events`.`operation_id` SET `events`.`attacker_aid` = `attacker`.`aid` WHERE `events`.`attacker_aid` IS NULL AND `events`.`attacker_id` IS NOT NULL ;
+
+--
+-- 2024-02-16
+--
+ALTER TABLE `entities` DROP `invalid`;

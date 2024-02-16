@@ -321,9 +321,7 @@ foreach ($op_player_entities as $e) {
                                                             echo '<optgroup label="' . html_escape($g) . '">';
                                                             foreach ($ents as $c) {
                                                                 $extra_attr = '';
-                                                                if (intval($c['invalid']) === 1) {
-                                                                    $extra_attr = ' disabled';
-                                                                } elseif ($c['entity_id'] === $curr) {
+                                                                if ($c['entity_id'] === $curr) {
                                                                     $extra_attr = ' selected';
                                                                 }
                                                                 echo '<option value="' . $c['entity_id'] . '"' . $extra_attr . '>';

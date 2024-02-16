@@ -40,7 +40,6 @@ class Additional_data extends CI_Model
             'entities.group_name',
             'entities.role',
             "TRIM(SUBSTRING_INDEX(entities.role, '@', 1)) AS role_name",
-            'entities.invalid',
             'entities.cmd',
             'operations.end_winner'
         ])
@@ -89,7 +88,6 @@ class Additional_data extends CI_Model
             'entities.group_name',
             'entities.role',
             "TRIM(SUBSTRING_INDEX(entities.role, '@', 1)) AS role_name",
-            'entities.invalid',
             'entities.cmd',
             'operations.end_winner'
         ])
@@ -182,7 +180,7 @@ class Additional_data extends CI_Model
         $matching_sides = [];
         foreach ($op_leads as $op_id => $ol) {
             foreach ($ol as $side => $l)
-                if ((!is_null($l['cmd']) && intval($l['cmd']) === 0) || intval($l['invalid']) === 1) {
+                if (!is_null($l['cmd']) && intval($l['cmd']) === 0) {
                     unset($op_leads[$op_id][$side]);
                 } elseif (!isset($matching_sides[$side])) {
                     $matching_sides[$side] = true;
@@ -671,8 +669,7 @@ class Additional_data extends CI_Model
                 'entities.name AS entity_name',
                 'entities.side',
                 'entities.group_name',
-                'entities.role',
-                'entities.invalid'
+                'entities.role'
             ])
             ->from('entities')
             ->join('players', 'players.id = entities.player_id')

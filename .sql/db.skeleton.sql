@@ -28,7 +28,6 @@ CREATE TABLE IF NOT EXISTS `entities` (
   `vkills` int(10) unsigned NOT NULL DEFAULT '0',
   `deaths` int(10) unsigned NOT NULL DEFAULT '0',
   `distance_traveled` int(10) unsigned NOT NULL DEFAULT '0',
-  `invalid` TINYINT(1) unsigned DEFAULT NULL,
   `cmd` TINYINT(1) unsigned DEFAULT NULL,
   `uid` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `aid` int(10) unsigned NOT NULL AUTO_INCREMENT,
