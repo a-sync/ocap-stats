@@ -306,7 +306,7 @@ class App extends CI_Controller
         $this->load->model('additional_data');
 
         $errors = [];
-        $op = null;
+        $op = false;
         $op_commanders = [];
         $op_sides = [];
         $op_events = [];

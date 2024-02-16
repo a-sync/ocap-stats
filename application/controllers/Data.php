@@ -329,26 +329,86 @@ class Data extends CI_Controller
 
         $this->_foot();
     }
-    
+
     public function entities($op_id = null)
     {
         $this->load->model('operations');
-        $this->load->model('additional_data');//dbg
+        $this->load->model('additional_data');
 
         $errors = [];
         $op = false;
         $op_sides = [];
-        $op_player_entities = [];
-        $op_commanders_data = [];
+        $op_commanders = [];
+        $op_entities = [];
+        $players_first_op = [];
         if (filter_var($op_id, FILTER_VALIDATE_INT) || filter_var($op_id, FILTER_VALIDATE_INT) === 0) {
             $op = $this->operations->get_by_id($op_id);
 
             if ($op) {
-                //dbg
-                $op_sides = $this->additional_data->get_op_sides($op['id']);
-                $op_player_entities = $this->additional_data->get_op_player_entities($op['id']);
                 $op_commanders_data = $this->additional_data->get_commanders(true, $op['id'], true);
+                if (isset($op_commanders_data['resolved'][$op['id']])) {
+                    $op_commanders = $op_commanders_data['resolved'][$op['id']];
+                }
 
+                $op_sides = $this->additional_data->get_op_sides($op['id']);
+
+                $op_entities = $this->operations->get_entities_by_id($op['id']);
+                $op_entities = array_filter($op_entities, function($e) {
+                    return intval($e['is_player']) === 1;
+                });
+                array_multisort(array_column($op_entities, 'id'), SORT_ASC, $op_entities);
+
+                $op_player_ids = [];
+                if (count($op_entities) > 0) {
+                    $op_player_ids = array_unique(array_column($op_entities, 'player_id'), SORT_NUMERIC);
+
+                    function get_iqr_stat_value($stat_values) {
+                        sort($stat_values);
+                        $q1 = $stat_values[floor(count($stat_values) * 0.25)];
+                        $q3 = $stat_values[floor(count($stat_values) * 0.75)];
+                        return $q3 - $q1;
+                    }
+                    function get_stddev_stat_value($stat_values) {
+                        $mean = array_sum($stat_values) / count($stat_values);
+                        $squared_deviations = array_map(function($value) use ($mean) {
+                            return pow($value - $mean, 2);
+                        }, $stat_values);
+                        $variance = array_sum($squared_deviations) / count($stat_values);
+                        return sqrt($variance);
+                    }
+                    function points_for_deviation($value, $average, $iqr, $stddev, $weight = 1) {
+                        $deviation_from_iqr = abs($value - $average) - $iqr / 2;
+                        $normalized_deviation_iqr = $deviation_from_iqr / ($iqr ? $iqr : 1);
+                        $deviation_from_stddev = abs($value - $average) / ($stddev ? $stddev : 1);
+                        $points = ($normalized_deviation_iqr + $deviation_from_stddev) * $weight;
+                        return $points > 0 ? $points : 0;
+                    }
+
+                    $seconds_in_game = array_column($op_entities, 'seconds_in_game');
+                    $seconds_in_game_avg = array_sum($seconds_in_game) / count($seconds_in_game);
+                    $distance_traveled = array_column($op_entities, 'distance_traveled');
+                    $distance_traveled_avg = array_sum($distance_traveled) / count($distance_traveled);
+                    $deaths = array_column($op_entities, 'deaths');
+                    $deaths_avg = array_sum($deaths) / count($deaths);
+                    $seconds_in_game_iqr = get_iqr_stat_value($seconds_in_game);
+                    $seconds_in_game_stddev = get_stddev_stat_value($seconds_in_game);
+                    $distance_traveled_iqr = get_iqr_stat_value($distance_traveled);
+                    $distance_traveled_stddev = get_stddev_stat_value($distance_traveled);
+                    $deaths_iqr = get_iqr_stat_value($deaths);
+                    $deaths_stddev = get_stddev_stat_value($deaths);
+
+                    foreach ($op_entities as $i => $ent) {
+                        $sus_factor = 0;
+                        if ($ent['is_player']) {
+                            $sus_factor = points_for_deviation($ent['seconds_in_game'], $seconds_in_game_avg, $seconds_in_game_iqr, $seconds_in_game_stddev, 1.5) + points_for_deviation($ent['distance_traveled'], $distance_traveled_avg, $distance_traveled_iqr, $distance_traveled_stddev) + points_for_deviation($ent['deaths'], $deaths_avg, $deaths_iqr, $deaths_stddev);
+                        }
+                        $op_entities[$i]['sus_factor'] = $sus_factor;
+                    }
+                }
+
+                if (count($op_player_ids) > 0) {
+                    $players_first_op = $this->additional_data->get_first_ops_of_players($op_player_ids);
+                }
 
             } else {
                 $errors[] = 'Unknown operation ID given.';
@@ -366,13 +426,11 @@ class Data extends CI_Controller
         $this->load->view('admin/entities', [
             'errors' => $errors,
             'op' => $op,
-            //dbg
+            'items' => $op_entities,
             'op_sides' => $op_sides,
-            'op_player_entities' => $op_player_entities,
-            'cmd_resolved' => $op ? element($op['id'], $op_commanders_data['resolved'], []) : [],
-            'cmd_verified' => $op ? element($op['id'], $op_commanders_data['verified'], []) : [],
-            'cmd_unambiguous' => $op ? element($op['id'], $op_commanders_data['unambiguous'], []) : [],
-            'cmd_ambiguous' => $op ? element($op['id'], $op_commanders_data['ambiguous'], []) : []
+            'op_commanders' => $op_commanders,
+            'op_id' => $op['id'],
+            'players_first_op' => $players_first_op
         ]);
 
         $this->_foot();
@@ -380,8 +438,9 @@ class Data extends CI_Controller
     
     public function events($op_id = null)
     {
+        //TODO
         $this->load->model('operations');
-        $this->load->model('additional_data');//dbg
+        // $this->load->model('additional_data');
 
         $errors = [];
         $op = false;
@@ -392,12 +451,7 @@ class Data extends CI_Controller
             $op = $this->operations->get_by_id($op_id);
 
             if ($op) {
-                //dbg
-                $op_sides = $this->additional_data->get_op_sides($op['id']);
-                $op_player_entities = $this->additional_data->get_op_player_entities($op['id']);
-                $op_commanders_data = $this->additional_data->get_commanders(true, $op['id'], true);
-
-
+                //TODO
             } else {
                 $errors[] = 'Unknown operation ID given.';
             }
@@ -413,14 +467,7 @@ class Data extends CI_Controller
 
         $this->load->view('admin/events', [
             'errors' => $errors,
-            'op' => $op,
-            //dbg
-            'op_sides' => $op_sides,
-            'op_player_entities' => $op_player_entities,
-            'cmd_resolved' => $op ? element($op['id'], $op_commanders_data['resolved'], []) : [],
-            'cmd_verified' => $op ? element($op['id'], $op_commanders_data['verified'], []) : [],
-            'cmd_unambiguous' => $op ? element($op['id'], $op_commanders_data['unambiguous'], []) : [],
-            'cmd_ambiguous' => $op ? element($op['id'], $op_commanders_data['ambiguous'], []) : []
+            'op' => $op
         ]);
 
         $this->_foot();
