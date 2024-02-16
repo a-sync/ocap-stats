@@ -58,7 +58,7 @@ foreach ($op_player_entities as $e) {
                             <div class="mdc-tab-scroller">
                                 <div class="mdc-tab-scroller__scroll-area">
                                     <div class="mdc-tab-scroller__scroll-content">
-                                        <a href="<?php echo base_url('manage/' . $op['id']); ?>" class="mdc-tab" role="tab" aria-selected="true" tabindex="5">
+                                        <a href="<?php echo base_url('manage/' . $op['id']); ?>" class="mdc-tab" role="tab" aria-selected="false" tabindex="5">
                                             <span class="mdc-tab__content">
                                                 <span class="mdc-tab__text-label">Process data</span>
                                             </span>
@@ -67,7 +67,7 @@ foreach ($op_player_entities as $e) {
                                             </span>
                                             <span class="mdc-tab__ripple"></span>
                                         </a>
-                                        <a href="<?php echo base_url('manage/' . $op['id'] . '/verify'); ?>" class="mdc-tab mdc-tab--active" role="tab" aria-selected="false" tabindex="6">
+                                        <a href="<?php echo base_url('manage/' . $op['id'] . '/verify'); ?>" class="mdc-tab mdc-tab--active" role="tab" aria-selected="true" tabindex="6">
                                             <span class="mdc-tab__content">
                                                 <span class="mdc-tab__text-label">Verify data</span>
                                             </span>
