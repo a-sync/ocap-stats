@@ -21,6 +21,6 @@ services:
         ports:
             - 8080:8080
         volumes:
-            - ./.sql/fnf-seed-2023-12-17.sql.gz:/var/www/html/adminer.sql.gz:ro
+            - ./.sql/fnf-seed-2024-02-15.sql.gz:/var/www/html/adminer.sql.gz:ro
 volumes:
     mysqldata: {}
