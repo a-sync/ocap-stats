@@ -777,12 +777,23 @@ class Additional_data extends CI_Model
     }
 
     public function calculate_entities_sus_factor($op_entities) {
+        $player_entities = [];
+        foreach ($op_entities as $i => $ent) {
+            if (!isset($player_entities[$ent['player_id']])) $player_entities[$ent['player_id']] = [];
+            if (intval($ent['player_id']) !== 0) $player_entities[$ent['player_id']][] = $ent['id'];
+        }
+        $op_entities = array_map(function($ent) use ($player_entities) {
+            $ent['player_entities'] = $player_entities[$ent['player_id']];
+            return $ent;
+        }, $op_entities);
+
         function get_iqr_stat_value($stat_values) {
             sort($stat_values);
             $q1 = $stat_values[floor(count($stat_values) * 0.25)];
             $q3 = $stat_values[floor(count($stat_values) * 0.75)];
             return $q3 - $q1;
         }
+
         function get_stddev_stat_value($stat_values) {
             $mean = array_sum($stat_values) / count($stat_values);
             $squared_deviations = array_map(function($value) use ($mean) {
@@ -791,6 +802,7 @@ class Additional_data extends CI_Model
             $variance = array_sum($squared_deviations) / count($stat_values);
             return sqrt($variance);
         }
+
         function points_for_deviation($value, $average, $iqr, $stddev, $weight = 1) {
             $deviation_from_iqr = abs($value - $average) - $iqr / 2;
             $normalized_deviation_iqr = $iqr ? $deviation_from_iqr / $iqr : $deviation_from_iqr;
@@ -798,6 +810,7 @@ class Additional_data extends CI_Model
             $points = ($normalized_deviation_iqr + $deviation_from_stddev) * $weight;
             return $points > 0 ? $points : 0;
         }
+
         function points_for_low_deviation($value, $average, $iqr, $stddev, $weight = 1) {
             $deviation_from_iqr = max(0, $average - $value - $iqr / 2);
             $normalized_deviation_iqr = $iqr ? $deviation_from_iqr / $iqr : $deviation_from_iqr;
@@ -812,29 +825,27 @@ class Additional_data extends CI_Model
         $distance_traveled_avg = array_sum($distance_traveled) / count($distance_traveled);
         $deaths = array_column($op_entities, 'deaths');
         $deaths_avg = array_sum($deaths) / count($deaths);
+        $player_entities = array_map(function ($pe) {
+            return count($pe);
+        }, array_column($op_entities, 'player_entities'));
+        $player_entities_avg = array_sum($player_entities) / count($player_entities);
+
         $seconds_in_game_iqr = get_iqr_stat_value($seconds_in_game);
         $seconds_in_game_stddev = get_stddev_stat_value($seconds_in_game);
         $distance_traveled_iqr = get_iqr_stat_value($distance_traveled);
         $distance_traveled_stddev = get_stddev_stat_value($distance_traveled);
         $deaths_iqr = get_iqr_stat_value($deaths);
         $deaths_stddev = get_stddev_stat_value($deaths);
+        $player_entities_iqr = get_iqr_stat_value($player_entities);
+        $player_entities_stddev = get_stddev_stat_value($player_entities);
 
-        $player_entities = [];
         foreach ($op_entities as $i => $ent) {
-            if (!isset($player_entities[$ent['player_id']])) $player_entities[$ent['player_id']] = [];
-            if (intval($ent['player_id']) !== 0) $player_entities[$ent['player_id']][] = $ent['id'];
-
             $sus_factor = 0;
             if ($ent['is_player']) {
-                $sus_factor = points_for_low_deviation($ent['seconds_in_game'], $seconds_in_game_avg, $seconds_in_game_iqr, $seconds_in_game_stddev, 2) + points_for_low_deviation($ent['distance_traveled'], $distance_traveled_avg, $distance_traveled_iqr, $distance_traveled_stddev) + points_for_deviation($ent['deaths'], $deaths_avg, $deaths_iqr, $deaths_stddev, 50);
+                $sus_factor = points_for_low_deviation($ent['seconds_in_game'], $seconds_in_game_avg, $seconds_in_game_iqr, $seconds_in_game_stddev, 2) + points_for_low_deviation($ent['distance_traveled'], $distance_traveled_avg, $distance_traveled_iqr, $distance_traveled_stddev) + points_for_deviation($ent['deaths'], $deaths_avg, $deaths_iqr, $deaths_stddev, 50) + points_for_deviation(count($ent['player_entities']), $player_entities_avg, $player_entities_iqr, $player_entities_stddev, 50);
             }
             $op_entities[$i]['sus_factor'] = $sus_factor;
         }
-
-        $op_entities = array_map(function($ent) use ($player_entities) {
-            $ent['player_entities'] = $player_entities[$ent['player_id']];
-            return $ent;
-        }, $op_entities);
 
         return $op_entities;
     }

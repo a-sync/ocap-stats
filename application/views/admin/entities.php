@@ -210,6 +210,9 @@ if (count($items) === 0) {
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="fkills" title="Teamkills">Tk</th>
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="vkills" title="Destroyed assets">DA</th>
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="sus" title="Sus factor">ඞ</th>
+                                    <?php if (!$verified) : ?>
+                                        <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="actions"></th>
+                                    <?php endif; ?>
                                 </tr>
                             </thead>
                             <tbody class="mdc-data-table__content">
@@ -265,7 +268,7 @@ if (count($items) === 0) {
                                         $medals[] = '<span class="side__' . html_escape(strtolower($i['side'])) . '">🎖</span>';
                                     }
                                 ?>
-                                    <tr class="mdc-data-table__row">
+                                    <tr class="mdc-data-table__row player-id--<?php echo $i['player_id']; ?>">
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['id']; ?></td>
                                         <td class="mdc-data-table__cell cell__title">
                                             <span title="<?php echo html_escape($pname_or_class); ?>"><?php echo $name; ?></span><?php echo implode(' ', $medals); ?>
@@ -289,14 +292,16 @@ if (count($items) === 0) {
                                         <?php endif; ?>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['fkills']; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['vkills']; ?></td>
-                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo $i['sus_factor']; ?>">
-                                            <?php echo number_format($i['sus_factor'], 2, '.', ''); ?>
-                                            <button type="button" class="mdc-icon-button edit-btn" title="Not a player">
-                                                <span class="mdc-icon-button__ripple"></span>
-                                                <span class="mdc-icon-button__focus-ring"></span>
-                                                <i class="material-icons mdc-icon-button__icon" aria-hidden="true">person_off</i>
-                                            </button>
-                                        </td>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo $i['sus_factor']; ?>"><?php echo number_format($i['sus_factor'], 2, '.', ''); ?></td>
+                                        <?php if (!$verified) : ?>
+                                            <td class="mdc-data-table__cell mdc-data-table__cell--numeric">
+                                                <button type="button" class="mdc-icon-button edit-btn" title="Not a player">
+                                                    <span class="mdc-icon-button__ripple"></span>
+                                                    <span class="mdc-icon-button__focus-ring"></span>
+                                                    <i class="material-icons mdc-icon-button__icon" aria-hidden="true">person_off</i>
+                                                </button>
+                                            </td>
+                                        <?php endif; ?>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
