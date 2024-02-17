@@ -79,3 +79,18 @@ if (!function_exists('print_end_winners')) {
         echo implode(' / ', $winners);
     }
 }
+
+if (!function_exists('get_timestamp')) {
+    function get_timestamp($seconds)
+    {
+        $hours = floor($seconds / 3600);
+        $minutes = floor(($seconds % 3600) / 60);
+        $seconds = $seconds % 60;
+
+        if ($hours < 10) {
+            $hours = str_pad($hours, 2, '0', STR_PAD_LEFT);
+        }
+
+        return sprintf("%02d:%02d:%02d", $hours, $minutes, $seconds);
+    }
+}

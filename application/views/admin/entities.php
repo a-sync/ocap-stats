@@ -187,8 +187,6 @@ if (count($items) === 0) {
                 <div class="mdc-data-table mdc-elevation--z2">
                     <div class="mdc-data-table__table-container">
 
-                        <?php //echo $op_menu; ?>
-
                         <table class="mdc-data-table__table sortable">
                             <thead>
                                 <tr class="mdc-data-table__header-row">
@@ -196,8 +194,10 @@ if (count($items) === 0) {
                                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="name" title="Player name / Asset class">Name</th>
                                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="group">Group</th>
                                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="role">Role</th>
-                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="distance" title="Distance traveled">🏃</th>
+                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="player_entities" title="Player entities">👥</th>
+                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="join_time" title="Join time">🎬</th>
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="time" title="Time in game">⏱️</th>
+                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="distance" title="Distance traveled">🏃</th>
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="shots" title="Shots">S</th>
                                     <?php if ($show_hit_data) : ?>
                                         <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="hits" title="Hits">H</th>
@@ -240,17 +240,11 @@ if (count($items) === 0) {
                                         $distance = $i['distance_traveled'] . ' m';
                                     }
 
+                                    $join_time = get_timestamp($i['start_frame_num'] * $op['capture_delay']);
+
                                     $time = 'n/a';
                                     if ($i['seconds_in_game'] > 0) {
-                                        $hours = floor($i['seconds_in_game'] / 3600);
-                                        $minutes = floor(($i['seconds_in_game'] % 3600) / 60);
-                                        $seconds = $i['seconds_in_game'] % 60;
-
-                                        if ($hours < 10) {
-                                            $hours = str_pad($hours, 2, '0', STR_PAD_LEFT);
-                                        }
-
-                                        $time = sprintf("%02d:%02d:%02d", $hours, $minutes, $seconds);
+                                        $time = get_timestamp($i['seconds_in_game']);
                                     }
 
                                     $hits = $i['hits'];
@@ -278,9 +272,12 @@ if (count($items) === 0) {
                                         </td>
                                         <td class="mdc-data-table__cell side__<?php echo html_escape(strtolower($i['side'])); ?>"><?php echo html_escape($group); ?></td>
                                         <td class="mdc-data-table__cell"><?php echo html_escape($role); ?></td>
-
-                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo intval($i['distance_traveled']); ?>"><?php echo $distance; ?></td>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric">
+                                            <span title="<?php echo html_escape(implode(', ', $i['player_entities'])); ?>"><?php echo count($i['player_entities']); ?></span>
+                                        </td>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $join_time; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo intval($i['seconds_in_game']); ?>"><?php echo $time; ?></td>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo intval($i['distance_traveled']); ?>"><?php echo $distance; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['shots']; ?></td>
                                         <?php if ($show_hit_data) : ?>
                                             <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $hits; ?></td>
