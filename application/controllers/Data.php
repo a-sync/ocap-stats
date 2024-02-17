@@ -198,6 +198,7 @@ class Data extends CI_Controller
                 // ID was posted
                 if (!is_null($this->input->post('id')) && $op['id'] === $this->input->post('id')) {
                     $action = $this->input->post('action');
+                    $redirect = $this->input->post('redirect');
                     $valid_event_types = get_valid_event_types($op);
                     $op_verified = intval($op['verified']);
 
@@ -210,7 +211,7 @@ class Data extends CI_Controller
                                 'verified' => 0
                             ];
 
-                            if ($op_verified === 0) {
+                            if ($op_verified === 0 && !$redirect) {
                                 $start_time = $this->input->post('start_time');
                                 if (preg_match('/^[0-2][0-9]{3}-[0-1][0-9]-[0-3][0-9] [0-2][0-9]:[0-5][0-9]:[0-5][0-9]$/', $start_time) && strtotime($start_time) !== false) {
                                     $op_upd['start_time'] = gmdate('Y-m-d H:i:s', strtotime($start_time));
@@ -290,6 +291,10 @@ class Data extends CI_Controller
                             }
 
                             log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] operation (' . $op['id'] . ') update finished (errors: ' . count($errors) . ')');
+
+                            if (count($errors) === 0 && array_search($redirect, ['entities', 'events']) !== false) {
+                                return redirect(base_url('manage/' . $op['id'] . '/' . $redirect));
+                            }
 
                             // Reload updated data
                             $op = $this->operations->get_by_id($op['id']);
@@ -388,7 +393,6 @@ class Data extends CI_Controller
             'items' => $op_entities,
             'op_sides' => $op_sides,
             'op_commanders' => $op_commanders,
-            'op_id' => $op['id'],
             'players_first_op' => $players_first_op
         ]);
 
@@ -403,9 +407,7 @@ class Data extends CI_Controller
 
         $errors = [];
         $op = false;
-        $op_sides = [];
-        $op_player_entities = [];
-        $op_commanders_data = [];
+
         if (filter_var($op_id, FILTER_VALIDATE_INT) || filter_var($op_id, FILTER_VALIDATE_INT) === 0) {
             $op = $this->operations->get_by_id($op_id);
 
@@ -430,5 +432,59 @@ class Data extends CI_Controller
         ]);
 
         $this->_foot();
+    }
+
+    public function edit_entity() {
+        $this->load->model('operations');
+        $this->load->model('additional_data');
+
+        $errors = [];
+        $action = $this->input->post('action');
+        $entity_id = $this->input->post('entity_id');
+        $operation_id = $this->input->post('operation_id');
+
+        $op = false;
+        if (filter_var($operation_id, FILTER_VALIDATE_INT) || filter_var($operation_id, FILTER_VALIDATE_INT) === 0) {
+            $op = $this->operations->get_by_id($operation_id);
+
+            if ($op) {
+                $op_verified = intval($op['verified']);
+
+                log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] entity (' . $op['id'] . ' - ' . $entity_id . ') action: ' . $action);
+
+                if ($op_verified === 0) {
+                    try {
+                        if ($action === 'not-a-player') {
+                            $err = $this->additional_data->update_entity($op['id'], $entity_id, [
+                                'player_id' => 0,
+                                'is_player' => 0
+                            ]);
+                            $errors = array_merge($errors, $err);
+
+                            log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] entity (' . $op['id'] . ' - ' . $entity_id . ') update finished (errors: ' . count($errors) . ')');
+                        } else {
+                            $errors[] = 'Invalid action.';
+                        }
+                    } catch (Exception $e) {
+                        $errors[] = $e->getMessage();
+                    }
+                } else {
+                    $errors[] = 'Entities of a verified op can not be edited!';
+                }
+            } else {
+                $errors[] = 'Unknown operation ID given.';
+            }
+        } else {
+            $errors[] = 'Invalid operation ID given.';
+        }
+
+        if (count($errors) > 0) {
+            log_message('error', implode('; ', $errors));
+        }
+
+        return $this->_ajax([
+            'errors' => $errors,
+            'action' => $action
+        ]);
     }
 }

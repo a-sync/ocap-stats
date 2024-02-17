@@ -105,7 +105,6 @@ Check out [SETUP.md](./SETUP.md) for instructions on how to start your own stats
 ## TODO:
   1. format timestamps to local TZ (data-ts; Intl.DateTimeFormat().resolvedOptions().timeZone)
   1. filter op events visibility by type, event links to OCAP with timecode
-  1. ui to edit entities player assignment
   1. support `capture_delay` properly
   1. track friendly fire on assets by checking the side of the asset's crew  
      (preprocess and track asset entities crews via positions)

@@ -74,7 +74,7 @@ $fixed_icon = '<span class="material-icons">check</span>';
                             </div>
                         </div>
 
-                        <?php echo form_open('', ['id' => 'op-data-form'], ['id' => $op['id']]); ?>
+                        <?php echo form_open(base_url('manage/' . $op['id'] . '/verify'), ['id' => 'op-data-form'], ['id' => $op['id'], 'redirect' => 'entities']); ?>
                         <table class="mdc-data-table__table">
                             <tbody class="mdc-data-table__content">
                                 <tr class="mdc-data-table__row">
@@ -184,7 +184,7 @@ if (count($items) === 0) {
     <div class="mdc-layout-grid">
         <div class="mdc-layout-grid__inner">
             <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center">
-                <div class="mdc-data-table mdc-elevation--z2">
+                <div class="mdc-data-table mdc-elevation--z2" id="entities-table">
                     <div class="mdc-data-table__table-container">
 
                         <table class="mdc-data-table__table sortable">
@@ -251,24 +251,30 @@ if (count($items) === 0) {
                                     }
 
                                     $hits = $i['hits'];
-                                    if (defined('ADJUST_HIT_DATA') && $op_id < ADJUST_HIT_DATA) {
+                                    if (defined('ADJUST_HIT_DATA') && $op['id'] < ADJUST_HIT_DATA) {
                                         $hits = '';
                                     }
 
                                     $fhits = $i['fhits'];
-                                    if (defined('ADJUST_HIT_DATA') && $op_id < ADJUST_HIT_DATA) {
+                                    if (defined('ADJUST_HIT_DATA') && $op['id'] < ADJUST_HIT_DATA) {
                                         $fhits = '';
                                     }
 
                                     $medals = [];
-                                    if (isset($players_first_op[$i['player_id']]) && $players_first_op[$i['player_id']] === $op_id) {
+                                    if (isset($players_first_op[$i['player_id']]) && $players_first_op[$i['player_id']] === $op['id']) {
                                         $medals[] = '<span>👶</span>';
                                     }
                                     if (isset($op_commanders[$i['side']]) && $op_commanders[$i['side']]['entity_id'] === $i['id']) {
                                         $medals[] = '<span class="side__' . html_escape(strtolower($i['side'])) . '">🎖</span>';
                                     }
+
+                                    $player_entities_num = count($i['player_entities']);
+                                    $highlight = '';
+                                    if ($player_entities_num > 1) {
+                                        $highlight = ' onmouseover="highlightPlayer(' . $i['player_id'] . ')" onmouseout="highlightPlayer()"';
+                                    }
                                 ?>
-                                    <tr class="mdc-data-table__row player-id--<?php echo $i['player_id']; ?>">
+                                    <tr class="mdc-data-table__row" data-entity-id="<?php echo $i['id']; ?>" data-player-id="<?php echo $i['player_id']; ?>"<?php echo $highlight; ?>>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['id']; ?></td>
                                         <td class="mdc-data-table__cell cell__title">
                                             <span title="<?php echo html_escape($pname_or_class); ?>"><?php echo $name; ?></span><?php echo implode(' ', $medals); ?>
@@ -276,7 +282,7 @@ if (count($items) === 0) {
                                         <td class="mdc-data-table__cell side__<?php echo html_escape(strtolower($i['side'])); ?>"><?php echo html_escape($group); ?></td>
                                         <td class="mdc-data-table__cell"><?php echo html_escape($role); ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric">
-                                            <span title="<?php echo html_escape(implode(', ', $i['player_entities'])); ?>"><?php echo count($i['player_entities']); ?></span>
+                                            <span title="<?php echo html_escape(implode(', ', $i['player_entities'])); ?>"><?php echo $player_entities_num; ?></span>
                                         </td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $join_time; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo intval($i['seconds_in_game']); ?>"><?php echo $time; ?></td>
@@ -295,7 +301,7 @@ if (count($items) === 0) {
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo $i['sus_factor']; ?>"><?php echo number_format($i['sus_factor'], 2, '.', ''); ?></td>
                                         <?php if (!$verified) : ?>
                                             <td class="mdc-data-table__cell mdc-data-table__cell--numeric">
-                                                <button type="button" class="mdc-icon-button edit-btn" title="Not a player">
+                                                <button type="button" class="mdc-icon-button not-a-player-btn" title="Not a player">
                                                     <span class="mdc-icon-button__ripple"></span>
                                                     <span class="mdc-icon-button__focus-ring"></span>
                                                     <i class="material-icons mdc-icon-button__icon" aria-hidden="true">person_off</i>
@@ -315,3 +321,81 @@ if (count($items) === 0) {
 
     </div>
 </div>
+
+<script>
+    function highlightPlayer(playerId) {
+        const highlighted = document.querySelectorAll('#entities-table tbody tr.mdc-data-table__row--selected');
+        for (const tr of highlighted) {
+            tr.classList.remove('mdc-data-table__row--selected');
+        }
+
+        if (playerId) {
+            const players_entities = document.querySelectorAll('#entities-table tbody tr[data-player-id="' + playerId + '"]');
+            for (const tr of players_entities) {
+                tr.classList.add('mdc-data-table__row--selected');
+            }
+        }
+    }
+
+    async function notAPlayerAction(btn) {
+        const tr = btn.closest('tr');
+        const entity_id = tr.dataset.entityId;
+
+        const form_data = new FormData();
+        form_data.append('action', 'not-a-player');
+        form_data.append('entity_id', entity_id);
+        form_data.append('operation_id', <?php echo $op['id']; ?>);
+
+        const entity_name = tr.querySelector('td:nth-child(2) span').textContent.trim();
+        const entity_group = tr.querySelector('td:nth-child(3)').textContent.trim();
+        const entity_role = tr.querySelector('td:nth-child(4)').textContent.trim();
+        const confirmation = confirm('🙅‍♂️ Removing is_player & player_id fields of entity: \n\n#' + entity_id + ' ' + entity_name + '  (' + entity_role + '@' + entity_group + ') \n\nAre you sure?');
+        if (!confirmation) return;
+
+        try {
+            const response = await fetch('<?php echo base_url('edit-entity'); ?>', {
+                method: 'POST',
+                body: form_data,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            if (response.ok) {
+                const res_json = await response.json();
+                if (res_json.errors.length === 0) {
+                    if (res_json.action === 'not-a-player') {
+                        tr.style.opacity = '0.4';
+                        tr.querySelector('.not-a-player-btn').style.display = 'none';
+                        tr.querySelector('td:nth-child(2) span').textContent = entity_name;
+                    } else {
+                        throw new Error('Unknown response action 😵');
+                    }
+                } else {
+                    throw new Error('⚠ Errors:\n' + res_json.errors.join('\n'));
+                }
+            } else {
+                throw new Error('Response not ok 😔');
+            }
+        } catch (err) {
+            console.error(err);
+            alert(err.message || JSON.stringify(err));
+        }
+    }
+
+    const domLoaded = () => {
+        console.log('DOM loaded');
+
+        const edit_btns = document.querySelectorAll('.not-a-player-btn');
+        for (const b of edit_btns) {
+            b.addEventListener('click', (ev) => {
+                ev.preventDefault();
+                notAPlayerAction(b);
+            });
+        }
+    };
+
+    if (document.readyState === 'complete' ||
+        (document.readyState !== 'loading' && !document.documentElement.doScroll)) domLoaded();
+    else document.addEventListener('DOMContentLoaded', domLoaded);
+</script>

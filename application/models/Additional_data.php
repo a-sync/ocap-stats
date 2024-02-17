@@ -849,4 +849,17 @@ class Additional_data extends CI_Model
 
         return $op_entities;
     }
+
+    public function update_entity($op_id, $entity_id, $data)
+    {
+        $errors = [];
+
+        $this->db->where('operation_id', $op_id);
+        $this->db->where('id', $entity_id);
+        if (!$this->db->update('entities', $data)) {
+            $errors[] = 'Failed to update entity data. (' . $op_id . ' - ' . $entity_id . ')';
+        }
+
+        return $errors;
+    }
 }
