@@ -298,7 +298,7 @@ if (count($items) === 0) {
                                         <?php endif; ?>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['fkills']; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['vkills']; ?></td>
-                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo $i['sus_factor']; ?>"><?php echo number_format($i['sus_factor'], 2, '.', ''); ?></td>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo $i['sus_factor']; ?>"><?php echo number_format($i['sus_factor'], 0, '.', ''); ?></td>
                                         <?php if (!$verified) : ?>
                                             <td class="mdc-data-table__cell mdc-data-table__cell--numeric">
                                                 <button type="button" class="mdc-icon-button not-a-player-btn" title="Not a player">
