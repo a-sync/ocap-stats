@@ -229,10 +229,9 @@ if (count($items) === 0) {
                                         }
                                     }
 
-                                    $name = html_escape($i['name']);
+                                    $name = '<a href="' . base_url('manage/' . $op['id'] . '/events') . '?entity_id=' . $i['id'] . '">' . html_escape($i['name']) . '</a>';
                                     $pname_or_class = 'n/a';
                                     if ($i['player_id']) {
-                                        $name = '<a href="' . base_url('player/') . $i['player_id'] . '">' . $name . '</a>';
                                         $pname_or_class = $i['player_name'];
                                     } elseif ($i['class']) {
                                         $pname_or_class = $i['class'];
@@ -299,7 +298,7 @@ if (count($items) === 0) {
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['fkills']; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['vkills']; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo $i['sus_factor']; ?>"><?php echo number_format($i['sus_factor'], 0, '.', ''); ?></td>
-                                        <?php if (!$verified) : ?>
+                                        <?php if (!$verified && $i['is_player']) : ?>
                                             <td class="mdc-data-table__cell mdc-data-table__cell--numeric">
                                                 <button type="button" class="mdc-icon-button not-a-player-btn" title="Not a player">
                                                     <span class="mdc-icon-button__ripple"></span>
