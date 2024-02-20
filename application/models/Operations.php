@@ -910,6 +910,7 @@ class Operations extends CI_Model
     {
         $this->db
             ->select([
+                'events.id',
                 'events.frame',
                 'events.event',
                 'events.weapon',
@@ -932,7 +933,7 @@ class Operations extends CI_Model
             ->join('players AS victim_player', 'victim_player.id = victim.player_id', 'LEFT')
             ->join('players AS attacker_player', 'attacker_player.id = attacker.player_id', 'LEFT')
             ->where('events.operation_id', $id)
-            ->order_by("events.frame ASC, victim.name ASC, FIELD(events.event, 'hit', 'killed', '_awake', '_uncon', '_dead')");
+            ->order_by("events.frame ASC");
 
         return $this->db->get()->result_array();
     }

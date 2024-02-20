@@ -17,7 +17,7 @@
                     <a href="<?php echo base_url('fix-data'); ?>" class="mdc-tab" role="tab" aria-selected="true" tabindex="2">
                         <span class="mdc-tab__content">
                             <span class="mdc-tab__icon material-icons" aria-hidden="true">healing</span>
-                            <span class="mdc-tab__text-label">Fix missing OP data</span>
+                            <span class="mdc-tab__text-label">Fix OCAP data</span>
                         </span>
                         <span class="mdc-tab__ripple"></span>
                     </a>

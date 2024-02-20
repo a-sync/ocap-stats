@@ -48,7 +48,9 @@ $deduped_items = array_reduce($items, function ($acc, $next) {
                             </tr>
                         </thead>
                         <tbody class="mdc-data-table__content">
-                            <?php foreach ($deduped_items as $index => $i) :
+                            <?php 
+                            $events_num = [];
+                            foreach ($deduped_items as $index => $i) :
                                 $time = gmdate('H:i:s', $i['frame']);
 
                                 $attacker_player_name = is_null($i['attacker_player_name']) ? '' : $i['attacker_player_name'];
@@ -96,6 +98,12 @@ $deduped_items = array_reduce($items, function ($acc, $next) {
                                     $distance = html_escape($i['distance']) . ' m';
                                 }
 
+                                if (isset($events_num[$i['event']])) {
+                                    $events_num[$i['event']]++;
+                                } else {
+                                    $events_num[$i['event']] = 1;
+                                }
+
                                 $event = html_escape($i['event']);
                                 if ($i['event'] === 'connected' || $i['event'] === 'disconnected') {
                                     $event = html_escape($i['data']) . ' ' . $event;
@@ -107,12 +115,8 @@ $deduped_items = array_reduce($items, function ($acc, $next) {
                                     $event = $event . ' by ' . html_escape($d[0]);
                                 } elseif ($i['event'] === 'generalEvent') {
                                     $event = html_escape($i['data']);
-                                } elseif ($i['event'] === 'respawnTickets') {
-                                    $event = html_escape($i['data']); // TODO: format
-                                } elseif ($i['event'] === 'counterInit') {
-                                    $event = html_escape($i['data']); // TODO: format
-                                } elseif ($i['event'] === 'counterSet') {
-                                    $event = html_escape($i['data']); // TODO: format
+                                } elseif (in_array($i['event'], ['respawnTickets', 'counterInit', 'counterSet'])) {
+                                    $event = $event . ': <pre>' . html_escape($i['data']) . '</pre>';
                                 }
                             ?>
                                 <tr class="mdc-data-table__row event__<?php echo html_escape($i['event']); ?>">

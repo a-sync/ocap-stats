@@ -292,7 +292,7 @@ class Data extends CI_Controller
 
                             log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] operation (' . $op['id'] . ') update finished (errors: ' . count($errors) . ')');
 
-                            if (count($errors) === 0 && array_search($redirect, ['entities', 'events']) !== false) {
+                            if (count($errors) === 0 && in_array($redirect, ['entities', 'events'])) {
                                 return redirect(base_url('manage/' . $op['id'] . '/' . $redirect));
                             }
 
@@ -401,18 +401,38 @@ class Data extends CI_Controller
     
     public function events($op_id = null)
     {
-        //TODO
         $this->load->model('operations');
-        // $this->load->model('additional_data');
+        $this->load->model('additional_data');
 
         $errors = [];
         $op = false;
-
+        $op_sides = [];
+        $op_commanders = [];
+        $op_events = [];
+        $op_entities = [];
         if (filter_var($op_id, FILTER_VALIDATE_INT) || filter_var($op_id, FILTER_VALIDATE_INT) === 0) {
             $op = $this->operations->get_by_id($op_id);
 
             if ($op) {
-                //TODO
+                $op_commanders_data = $this->additional_data->get_commanders(true, $op['id'], true);
+                if (isset($op_commanders_data['resolved'][$op['id']])) {
+                    $op_commanders = $op_commanders_data['resolved'][$op['id']];
+                }
+
+                $op_sides = $this->additional_data->get_op_sides($op['id']);
+
+                $op_events = $this->operations->get_events_by_id($op['id']);
+
+                $op_entities = $this->operations->get_entities_by_id($op['id']);
+                $op_entities = array_map(function ($e) {
+                    return [
+                        'id' => $e['id'],
+                        'name' => $e['name'],
+                        'side' => $e['side'],
+                        'is_player' => $e['is_player']
+                    ];
+                }, $op_entities);
+                array_multisort(array_column($op_entities, 'is_player'), SORT_DESC, array_column($op_entities, 'id'), SORT_ASC, $op_entities);
             } else {
                 $errors[] = 'Unknown operation ID given.';
             }
@@ -428,7 +448,11 @@ class Data extends CI_Controller
 
         $this->load->view('admin/events', [
             'errors' => $errors,
-            'op' => $op
+            'op' => $op,
+            'items' => $op_events,
+            'op_sides' => $op_sides,
+            'op_commanders' => $op_commanders,
+            'op_entities' => $op_entities
         ]);
 
         $this->_foot();

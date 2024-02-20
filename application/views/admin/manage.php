@@ -56,7 +56,7 @@ $sides = $this->config->item('sides');
                                             </a>
                                             <a href="<?php echo base_url('manage/' . $op['id'] . '/events'); ?>" class="mdc-tab" role="tab" aria-selected="false" tabindex="8">
                                                 <span class="mdc-tab__content">
-                                                    <span class="mdc-tab__text-label">Events🚧</span>
+                                                    <span class="mdc-tab__text-label">Events</span>
                                                 </span>
                                                 <span class="mdc-tab-indicator">
                                                     <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>

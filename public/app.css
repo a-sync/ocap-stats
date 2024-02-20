@@ -330,18 +330,18 @@ img.ocap-link {
 }
 /* /TODO */
 
-.side__unknown, .side__unknown a:link, .mdc-data-table td.side__unknown a:visited {
+.side__unknown, .side__unknown a:link, .mdc-data-table td.side__unknown a:visited, .mdc-data-table td span.side__unknown a:visited {
     color: #b29900 !important;
 }
-.side__west, .side__west a:link, .mdc-data-table td.side__west a:visited {
+.side__west, .side__west a:link, .mdc-data-table td.side__west a:visited, .mdc-data-table td span.side__west a:visited {
     color: #00a8ff !important;
 }
-.side__east, .side__east a:link, .mdc-data-table td.side__east a:visited {
+.side__east, .side__east a:link, .mdc-data-table td.side__east a:visited, .mdc-data-table td span.side__east a:visited {
     color: #ff0000 !important;
 }
-.side__guer, .side__guer a:link, .mdc-data-table td.side__guer a:visited {
+.side__guer, .side__guer a:link, .mdc-data-table td.side__guer a:visited, .mdc-data-table td span.side__guer a:visited {
     color: #00cc00 !important;
 }
-.side__civ, .side__civ a:link, .mdc-data-table td.side__civ a:visited {
+.side__civ, .side__civ a:link, .mdc-data-table td.side__civ a:visited, .mdc-data-table td span.side__civ a:visited {
     color: #c900ff !important;
 }

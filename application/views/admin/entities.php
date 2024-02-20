@@ -62,7 +62,7 @@ $fixed_icon = '<span class="material-icons">check</span>';
                                         </a>
                                         <a href="<?php echo base_url('manage/' . $op['id'] . '/events'); ?>" class="mdc-tab" role="tab" aria-selected="false" tabindex="8">
                                             <span class="mdc-tab__content">
-                                                <span class="mdc-tab__text-label">Events🚧</span>
+                                                <span class="mdc-tab__text-label">Events</span>
                                             </span>
                                             <span class="mdc-tab-indicator">
                                                 <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
@@ -351,6 +351,7 @@ if (count($items) === 0) {
         const confirmation = confirm('🙅‍♂️ Removing is_player & player_id fields of entity: \n\n#' + entity_id + ' ' + entity_name + '  (' + entity_role + '@' + entity_group + ') \n\nAre you sure?');
         if (!confirmation) return;
 
+        btn.disabled = true;
         try {
             const response = await fetch('<?php echo base_url('edit-entity'); ?>', {
                 method: 'POST',
@@ -364,8 +365,8 @@ if (count($items) === 0) {
                 const res_json = await response.json();
                 if (res_json.errors.length === 0) {
                     if (res_json.action === 'not-a-player') {
+                        btn.style.display = 'none';
                         tr.style.opacity = '0.4';
-                        tr.querySelector('.not-a-player-btn').style.display = 'none';
                         tr.querySelector('td:nth-child(2) span').textContent = entity_name;
                     } else {
                         throw new Error('Unknown response action 😵');
@@ -379,6 +380,7 @@ if (count($items) === 0) {
         } catch (err) {
             console.error(err);
             alert(err.message || JSON.stringify(err));
+            btn.disabled = false;
         }
     }
 
