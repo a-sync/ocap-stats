@@ -438,7 +438,6 @@ class Data extends CI_Controller
                     ];
                 }, $op_entities);
                 array_multisort(array_column($op_entities, 'is_player'), SORT_DESC, array_column($op_entities, 'id'), SORT_ASC, $op_entities);
-                //$op_entities = array_column($op_entities, null, 'id');//debug
             } else {
                 $errors[] = 'Unknown operation ID given.';
             }
@@ -501,6 +500,64 @@ class Data extends CI_Controller
                     }
                 } else {
                     $errors[] = 'Entities of a verified op can not be edited!';
+                }
+            } else {
+                $errors[] = 'Unknown operation ID given.';
+            }
+        } else {
+            $errors[] = 'Invalid operation ID given.';
+        }
+
+        if (count($errors) > 0) {
+            log_message('error', implode('; ', $errors));
+        }
+
+        return $this->_ajax([
+            'errors' => $errors,
+            'action' => $action
+        ]);
+    }
+
+    public function edit_event() {
+        $this->load->model('operations');
+        $this->load->model('additional_data');
+
+        $errors = [];
+        $action = $this->input->post('action');
+        $event_id = $this->input->post('event_id');
+        $operation_id = $this->input->post('operation_id');
+
+        $op = false;
+        if (filter_var($operation_id, FILTER_VALIDATE_INT) || filter_var($operation_id, FILTER_VALIDATE_INT) === 0) {
+            $op = $this->operations->get_by_id($operation_id);
+
+            if ($op) {
+                $op_verified = intval($op['verified']);
+
+                log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] event (' . $op['id'] . ' - ' . $event_id . ') action: ' . $action);
+
+                if ($op_verified === 0) {
+                    try {
+                        if ($action === 'delete-event') {
+                            //TODO: remove event; recalculate hits, kills, fhits, fkills, vkills, deaths of old & new attacker entities
+                            
+                            // $err = $this->additional_data->update_entity($op['id'], $entity_id, [
+                            //     'player_id' => 0,
+                            //     'is_player' => 0
+                            // ]);
+                            // $errors = array_merge($errors, $err);
+                            //
+                            // log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] entity (' . $op['id'] . ' - ' . $entity_id . ') update finished (errors: ' . count($errors) . ')');
+                        } elseif ($action === 'edit-attacker') {
+                            //TODO2
+                        } else {
+                            $errors[] = 'Invalid action.';
+                        }
+                    } catch (Exception $e) {
+                        $errors[] = $e->getMessage();
+                    }
+                } else {
+                    $errors[] = 'Events of a verified op can not be edited!';
                 }
             } else {
                 $errors[] = 'Unknown operation ID given.';

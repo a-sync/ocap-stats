@@ -121,6 +121,11 @@ $event_types = $this->config->item('event_types');
 
 <script src="<?php echo base_url('public/slimselect.min.js'); ?>"></script>
 <script>
+    const ss_css = document.createElement('link');
+    ss_css.rel = 'stylesheet';
+    ss_css.href = '<?php echo base_url('public/slimselect.css'); ?>';
+    document.head.appendChild(ss_css);
+
     const player_id = <?php echo json_encode($player_id); ?>;
     const players = <?php echo json_encode($players); ?>;
     const player_aliases = players.reduce((res, p) => {

@@ -304,10 +304,16 @@ if (count($items) === 0) {
     </div>
 </div>
 
-<script src="<?php echo base_url('public/slimselect.min.js'); ?>"></script>
+<script src="https://unpkg.com/slim-select@2.8.1/dist/slimselect.min.js"></script>
 <script>
+    const ss_css = document.createElement('link');
+    ss_css.rel = 'stylesheet';
+    ss_css.href = 'https://unpkg.com/slim-select@2.8.1/dist/slimselect.css';
+    document.head.appendChild(ss_css);
+
     const entities = <?php echo json_encode($op_entities); ?>;
     const events_num = <?php echo json_encode($events_num); ?>;
+    const sides = <?php echo json_encode($sides); ?>;
 
     function highlightEntity(entityId) {
         const highlighted = document.querySelectorAll('#events-table tbody tr.mdc-data-table__row--selected');
@@ -323,37 +329,170 @@ if (count($items) === 0) {
         }
     }
 
+    function deepMerge(obj1, obj2) {
+        const merged = {};
+        for (const key in obj1) {
+            if (obj1.hasOwnProperty(key)) {
+
+                if (Array.isArray(obj1[key])) {
+                    merged[key] = [...obj1[key], ...obj2[key] || []];
+                } else if (typeof obj1[key] === 'object') {
+                    merged[key] = deepMerge(obj1[key], obj2[key] || {});
+                } else {
+                    merged[key] = obj1[key];
+                }
+            }
+        }
+        for (const key in obj2) {
+            if (obj2.hasOwnProperty(key) && !merged.hasOwnProperty(key)) {
+                merged[key] = obj2[key];
+            }
+        }
+        return merged;
+    }
+
     async function editAttackerAction(btn) {
-        //todo inject select/slimselect with entities grouped by side and player/non player
-        //todo start select list with none and the victim id (self inflicted)
-        console.log('.edit-attacker-btn click!');return;//debug
-        //debug#########################################################
-        
+        const btn_icon = btn.querySelector('i');
+        const td = btn.closest('td');
         const tr = btn.closest('tr');
         const event_id = tr.dataset.eventId;
+
+        try {
+            const attacker_id = tr.dataset.attackerId;
+            const attacker_entity = entities.find(e => e.id === attacker_id);
+            const victim_id = tr.dataset.victimId;
+            const victim_entity = entities.find(e => e.id === victim_id);
+
+            if (btn_icon.textContent === 'edit') {
+                btn_icon.textContent = 'done';
+
+                const side_player_entities = {};
+                const side_other_entities = {};
+                for (const ent of entities) {
+                    if (parseInt(ent.is_player, 10) === 1) {
+                        if (!side_player_entities[ent.side]) {
+                            side_player_entities[ent.side] = [{
+                                text: '=== 👤 ===',
+                                disabled: true
+                            }];
+                        }
+                        side_player_entities[ent.side].push({
+                            text: '#' + ent.id + ' ' + ent.name,
+                            value: ent.id,
+                            selected: ent.id === attacker_id
+                        });
+                    } else {
+                        if (!side_other_entities[ent.side]) {
+                            side_other_entities[ent.side] = [{
+                                text: '=== 🤖 ===',
+                                disabled: true
+                            }];
+                        }
+                        side_other_entities[ent.side].push({
+                            text: '#' + ent.id + ' ' + ent.name,
+                            value: ent.id,
+                            selected: ent.id === attacker_id
+                        });
+                    }
+                }
+
+                const side_entities = deepMerge(side_player_entities, side_other_entities);
+                const ss_entities_data_field = Object.keys(side_entities).map(side => {
+                    return {
+                        label: sides[side] || '❓',
+                        options: side_entities[side],
+                        closable: 'open'
+                    }
+                });
+
+                const select = document.createElement('select');
+                select.classList.add('edit-attacker-ss');
+                td.appendChild(select);
+                new SlimSelect({
+                    'select': select,
+                    'settings': {
+                        showSearch: true,
+                        allowDeselect: true
+                    },
+                    'data': [
+                        {
+                            text: 'None / "something"',
+                            placeholder: 'true',
+                            value: ''
+                        },
+                        {
+                            text: 'Self inflicted (#' + victim_entity.id + ' ' + victim_entity.name + ')',
+                            value: victim_entity.id
+                        },
+                        ...ss_entities_data_field
+                    ]
+                });
+            } else {
+                const select = td.querySelector('select');
+                if (select && select.slim) {
+                    select.slim.close();
+
+                    const new_attacker_id = select.value;
+
+                    console.log('new_attacker_id', typeof new_attacker_id, new_attacker_id);//debug
+                    console.log('attacker_id', typeof attacker_id, attacker_id);//debug
+                    if (new_attacker_id !== attacker_id) {
+                        confirm('🚧 new_attacker_id: #' + new_attacker_id);//debug
+
+                        const form_data = new FormData();
+                        form_data.append('action', 'edit-attacker');
+                        form_data.append('event_id', event_id);
+                        form_data.append('operation_id', <?php echo $op['id']; ?>);
+                        //TODO: send req and if succesfull, update dataset and a.href with new attacker id & name
+                        //#########################################################################################
+                    }
+
+                    select.slim.destroy();
+                } else {
+                    throw new Error('SlimSelect instance not available');
+                }
+
+                select.remove();
+                btn_icon.textContent = 'edit';
+            }
+        } catch (err) {
+            const select = td.querySelector('select');
+            if (select) {
+                if (select.slim) {
+                    select.slim.destroy();
+                }
+                select.remove();
+            }
+            
+            btn_icon.textContent = 'edit';
+
+            console.error(err);
+            alert(err.message || JSON.stringify(err));
+        }
     }
 
     async function deleteEventAction(btn) {
-        console.log('.delete-event-btn click!');return;//debug
-        //debug#########################################################
-        
         const tr = btn.closest('tr');
         const event_id = tr.dataset.eventId;
+        const attacker_id = tr.dataset.attackerId;
+        const attacker_entity = entities.find(e => e.id === attacker_id);
+        const victim_id = tr.dataset.victimId;
+        const victim_entity = entities.find(e => e.id === victim_id);
 
         const form_data = new FormData();
-        form_data.append('action', 'not-a-player');
-        form_data.append('entity_id', entity_id);
+        form_data.append('action', 'delete-event');
+        form_data.append('event_id', event_id);
         form_data.append('operation_id', <?php echo $op['id']; ?>);
 
-        const entity_name = tr.querySelector('td:nth-child(2) span').textContent.trim();
-        const entity_group = tr.querySelector('td:nth-child(3)').textContent.trim();
-        const entity_role = tr.querySelector('td:nth-child(4)').textContent.trim();
-        const confirmation = confirm('🙅‍♂️ Removing is_player & player_id fields of entity: \n\n#' + entity_id + ' ' + entity_name + '  (' + entity_role + '@' + entity_group + ') \n\nAre you sure?');
+        const event_time = tr.querySelector('td:nth-child(1)').textContent.trim();
+        const event_name = tr.querySelector('td:nth-child(3)').textContent.trim();
+
+        const confirmation = confirm('🗑️ Removing event: \n\n[' + event_time + '] #' + attacker_entity.id + ' ' + attacker_entity.name + ' <' + event_name + '>  #' + victim_entity.id + ' ' + victim_entity.name + ' \n\nAre you sure?');
         if (!confirmation) return;
 
         btn.disabled = true;
         try {
-            const response = await fetch('<?php echo base_url('edit-entity'); ?>', {
+            const response = await fetch('<?php echo base_url('edit-event'); ?>', {
                 method: 'POST',
                 body: form_data,
                 headers: {
@@ -364,10 +503,22 @@ if (count($items) === 0) {
             if (response.ok) {
                 const res_json = await response.json();
                 if (res_json.errors.length === 0) {
-                    if (res_json.action === 'not-a-player') {
-                        btn.style.display = 'none';
+                    if (res_json.action === 'delete-event') {
+                        btn.remove();
                         tr.style.opacity = '0.4';
-                        tr.querySelector('td:nth-child(2) span').textContent = entity_name;
+
+                        const edit_attacker_btn = tr.querySelector('td .edit-attacker-btn');
+                        if (edit_attacker_btn) {
+                            edit_attacker_btn.remove();
+
+                            const select = tr.querySelector('td select');
+                            if (select) {
+                                if (select.slim) {
+                                    select.slim.destroy();
+                                }
+                                select.remove();
+                            }
+                        }
                     } else {
                         throw new Error('Unknown response action 😵');
                     }

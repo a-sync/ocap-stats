@@ -418,6 +418,11 @@ foreach ($op_player_entities as $e) {
 
 <script src="<?php echo base_url('public/slimselect.min.js'); ?>"></script>
 <script>
+    const ss_css = document.createElement('link');
+    ss_css.rel = 'stylesheet';
+    ss_css.href = '<?php echo base_url('public/slimselect.css'); ?>';
+    document.head.appendChild(ss_css);
+
     <?php
     foreach ($op_sides as $s => $pc) :
         if ($pc > 0) :

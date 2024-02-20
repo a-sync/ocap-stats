@@ -365,7 +365,7 @@ if (count($items) === 0) {
                 const res_json = await response.json();
                 if (res_json.errors.length === 0) {
                     if (res_json.action === 'not-a-player') {
-                        btn.style.display = 'none';
+                        btn.remove();
                         tr.style.opacity = '0.4';
                         tr.querySelector('td:nth-child(2) span').textContent = entity_name;
                     } else {
