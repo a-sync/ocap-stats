@@ -48,9 +48,7 @@ $deduped_items = array_reduce($items, function ($acc, $next) {
                             </tr>
                         </thead>
                         <tbody class="mdc-data-table__content">
-                            <?php 
-                            $events_num = [];
-                            foreach ($deduped_items as $index => $i) :
+                            <?php foreach ($deduped_items as $index => $i) :
                                 $time = gmdate('H:i:s', $i['frame']);
 
                                 $attacker_player_name = is_null($i['attacker_player_name']) ? '' : $i['attacker_player_name'];
@@ -98,12 +96,6 @@ $deduped_items = array_reduce($items, function ($acc, $next) {
                                     $distance = html_escape($i['distance']) . ' m';
                                 }
 
-                                if (isset($events_num[$i['event']])) {
-                                    $events_num[$i['event']]++;
-                                } else {
-                                    $events_num[$i['event']] = 1;
-                                }
-
                                 $event = html_escape($i['event']);
                                 if ($i['event'] === 'connected' || $i['event'] === 'disconnected') {
                                     $event = html_escape($i['data']) . ' ' . $event;
@@ -119,7 +111,7 @@ $deduped_items = array_reduce($items, function ($acc, $next) {
                                     $event = $event . ': <pre>' . html_escape($i['data']) . '</pre>';
                                 }
                             ?>
-                                <tr class="mdc-data-table__row event__<?php echo html_escape($i['event']); ?>">
+                                <tr class="mdc-data-table__row" data-event-name="<?php echo html_escape($i['event']); ?>">
                                     <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $time; ?></td>
                                     <td class="mdc-data-table__cell cell__title <?php echo $attacker_side_class; ?>">
                                         <span<?php echo $attacker_title; ?>><?php echo $attacker_name; ?></span><?php echo implode(' ', $attacker_medals); ?>

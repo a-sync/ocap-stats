@@ -862,4 +862,263 @@ class Additional_data extends CI_Model
 
         return $errors;
     }
+
+    private function get_op_event($op_id, $event_id)
+    {
+        $this->db
+            ->select([
+                'events.event',
+                'events.victim_id',
+                'events.attacker_id',
+                'victim.id AS victim_id',
+                'victim.type AS victim_type',
+                'victim.side AS victim_side',
+                'victim.hits AS victim_hits',
+                'victim.kills AS victim_kills',
+                'victim.fhits AS victim_fhits',
+                'victim.fkills AS victim_fkills',
+                'victim.vkills AS victim_vkills',
+                'victim.deaths AS victim_deaths',
+                'attacker.id AS attacker_id',
+                'attacker.side AS attacker_side',
+                'attacker.hits AS attacker_hits',
+                'attacker.kills AS attacker_kills',
+                'attacker.fhits AS attacker_fhits',
+                'attacker.fkills AS attacker_fkills',
+                'attacker.vkills AS attacker_vkills',
+                'attacker.deaths AS attacker_deaths'
+            ])
+            ->from('events')
+            ->join('entities AS victim', 'victim.aid = events.victim_aid AND victim.operation_id = ' . $op_id, 'LEFT')
+            ->join('entities AS attacker', 'attacker.aid = events.attacker_aid AND attacker.operation_id = ' . $op_id, 'LEFT')
+            ->where('events.operation_id', $op_id)
+            ->where('events.id', $event_id)
+            ->order_by("events.frame ASC");
+
+        $re = $this->db->get()->result_array();
+
+        if (count($re) === 0) {
+            return false;
+        } else {
+            return $re[0];
+        }
+    }
+
+    private function get_entities_op_events($op_id, $entity_ids, $events = ['killed', '_dead']) {
+        $this->db
+            ->select([
+                'events.id',
+                'events.event',
+                'events.victim_id',
+                'events.attacker_id',
+            ])
+            ->from('events')
+            ->where('events.operation_id', $op_id)
+            ->where_in('event', $events)
+            ->group_start()
+            ->where_in('attacker_id', $entity_ids)
+            ->or_where_in('victim_id', $entity_ids)
+            ->group_end();
+
+        return $this->db->get()->result_array();
+    }
+
+    public function delete_event($op_id, $event_id)
+    {
+        $errors = [];
+        $event = $this->get_op_event($op_id, $event_id);
+        if ($event) {
+            $ev = $event['event'];
+
+            if (in_array($ev, ['hit', 'killed', '_dead'])) {
+                if ($ev === 'hit' && $event['attacker_id'] !== null && $event['attacker_id'] !== $event['victim_id']) {
+                    $hits_upd_errors = $this->update_entity($op_id, $event['attacker_id'], ['hits' => $event['attacker_hits'] - 1]);
+                    $fhits_upd_errors = [];
+
+                    if ($event['attacker_side'] === $event['victim_side']) {
+                        $fhits_upd_errors = $this->update_entity($op_id, $event['attacker_id'], ['fhits' => $event['attacker_fhits'] - 1]);
+                    }
+
+                    $errors = array_merge($errors, $hits_upd_errors, $fhits_upd_errors);
+                } elseif (in_array($ev,['killed', '_dead'])) {
+                    if ($event['attacker_id'] !== null && $ev === 'killed' && $event['attacker_id'] !== $event['victim_id']) {
+                        if ($event['victim_type'] === 'unit') {
+                            $kills_upd_errors = $this->update_entity($op_id, $event['attacker_id'], ['kills' => $event['attacker_kills'] - 1]);
+                            $fkills_upd_errors = [];
+
+                            if ($event['attacker_side'] === $event['victim_side']) {
+                                $fkills_upd_errors = $this->update_entity($op_id, $event['attacker_id'], ['fkills' => $event['attacker_fkills'] - 1]);
+                            }
+
+                            $errors = array_merge($errors, $kills_upd_errors, $fkills_upd_errors);
+                        } else {
+                            $vkills_upd_errors = $this->update_entity($op_id, $event['attacker_id'], ['vkills' => $event['attacker_vkills'] - 1]);
+
+                            $errors = array_merge($errors, $vkills_upd_errors);
+                        }
+                    }
+
+                    if ($event['victim_id'] !== null) {
+                        $knd_events = $this->get_entities_op_events($op_id, [$event['victim_id']], ['killed', '_dead']);
+
+                        $killed = 0;
+                        $_dead = 0;
+                        foreach ($knd_events as $e) {
+                            if (intval($e['id']) !== $event_id && $e['victim_id'] === $event['victim_id']) {
+                                if ($e['event'] === 'killed') {
+                                    $killed++;
+                                } elseif ($e['event'] === '_dead') {
+                                    $_dead++;
+                                }
+                            }
+                        }
+
+                        $deaths = max($killed, $_dead);
+                        $deaths_upd_errors = $this->update_entity($op_id, $event['victim_id'], ['deaths' => $deaths]);
+
+                        $errors = array_merge($errors, $deaths_upd_errors);
+                    }
+                }
+            }
+
+            if (count($errors) === 0) {
+                if (!$this->db->delete('events', ['operation_id' => $op_id, 'id' => $event_id])) {
+                    $errors[] = 'Failed to delete event.';
+                }
+            }
+        } else {
+            $errors[] = 'Event not found.';
+        }
+
+        return $errors;
+    }
+
+    private function get_op_entity($op_id, $entity_id) {
+        $this->db
+            ->select([
+                'entities.id',
+                'entities.aid',
+                'entities.side',
+                'entities.hits',
+                'entities.kills',
+                'entities.fhits',
+                'entities.fkills',
+                'entities.vkills',
+                'entities.deaths'
+            ])
+            ->from('entities')
+            ->where('entities.operation_id', $op_id)
+            ->where('entities.id', $entity_id);
+
+        $re = $this->db->get()->result_array();
+
+        if (count($re) === 0) {
+            return false;
+        } else {
+            return $re[0];
+        }
+    }
+
+    private function update_event($op_id, $event_id, $data)
+    {
+        $errors = [];
+
+        $this->db->where('operation_id', $op_id);
+        $this->db->where('id', $event_id);
+        if (!$this->db->update('events', $data)) {
+            $errors[] = 'Failed to update events data. (' . $op_id . ' - ' . $event_id . ')';
+        }
+
+        return $errors;
+    }
+
+    public function edit_event_attacker($op_id, $event_id, $new_attacker_id)
+    {
+        $errors = [];
+        $event = $this->get_op_event($op_id, $event_id);
+        if ($event) {
+            $ev = $event['event'];
+            if (in_array($ev, ['hit', 'killed'])) {
+                if ($event['attacker_id'] !== $new_attacker_id) {
+                    $new_attacker = is_numeric($new_attacker_id) ? $this->get_op_entity($op_id, $new_attacker_id) : false;
+
+                    if ($new_attacker_id === null || $new_attacker) {
+                        if ($event['attacker_id'] !== null && $event['attacker_id'] !== $event['victim_id']) {
+                            if ($ev === 'hit') {
+                                $hits_upd_errors = $this->update_entity($op_id, $event['attacker_id'], ['hits' => $event['attacker_hits'] - 1]);
+                                $fhits_upd_errors = [];
+
+                                if ($event['attacker_side'] === $event['victim_side']) {
+                                    $fhits_upd_errors = $this->update_entity($op_id, $event['attacker_id'], ['fhits' => $event['attacker_fhits'] - 1]);
+                                }
+
+                                $errors = array_merge($errors, $hits_upd_errors, $fhits_upd_errors);
+                            } elseif ($ev === 'killed') {
+                                if ($event['victim_type'] === 'unit') {
+                                    $kills_upd_errors = $this->update_entity($op_id, $event['attacker_id'], ['kills' => $event['attacker_kills'] - 1]);
+                                    $fkills_upd_errors = [];
+
+                                    if ($event['attacker_side'] === $event['victim_side']) {
+                                        $fkills_upd_errors = $this->update_entity($op_id, $event['attacker_id'], ['fkills' => $event['attacker_fkills'] - 1]);
+                                    }
+
+                                    $errors = array_merge($errors, $kills_upd_errors, $fkills_upd_errors);
+                                } else {
+                                    $vkills_upd_errors = $this->update_entity($op_id, $event['attacker_id'], ['vkills' => $event['attacker_vkills'] - 1]);
+
+                                    $errors = array_merge($errors, $vkills_upd_errors);
+                                }
+                            }
+                        }
+
+                        if ($new_attacker && $new_attacker_id !== $event['victim_id']) {
+                            if ($ev === 'hit') {
+                                $new_hits_upd_errors = $this->update_entity($op_id, $new_attacker_id, ['hits' => $new_attacker['hits'] + 1]);
+                                $new_fhits_upd_errors = [];
+
+                                if ($new_attacker['side'] === $event['victim_side']) {
+                                    $new_fhits_upd_errors = $this->update_entity($op_id, $new_attacker_id, ['fhits' => $new_attacker['fhits'] + 1]);
+                                }
+
+                                $errors = array_merge($errors, $new_hits_upd_errors, $new_fhits_upd_errors);
+                            } elseif ($ev === 'killed') {
+                                if ($event['victim_type'] === 'unit') {
+                                    $new_kills_upd_errors = $this->update_entity($op_id, $new_attacker_id, ['kills' => $new_attacker['kills'] + 1]);
+                                    $new_fkills_upd_errors = [];
+
+                                    if ($new_attacker['side'] === $event['victim_side']) {
+                                        $new_fkills_upd_errors = $this->update_entity($op_id, $new_attacker_id, ['fkills' => $new_attacker['fkills'] + 1]);
+                                    }
+
+                                    $errors = array_merge($errors, $new_kills_upd_errors, $new_fkills_upd_errors);
+                                } else {
+                                    $new_vkills_upd_errors = $this->update_entity($op_id, $new_attacker_id, ['vkills' => $new_attacker['vkills'] + 1]);
+
+                                    $errors = array_merge($errors, $new_vkills_upd_errors);
+                                }
+                            }
+                        }
+
+                        $new_attacker_id = $new_attacker ? $new_attacker['id'] : null;
+                        $new_attacker_aid = $new_attacker ? $new_attacker['aid'] : null;
+
+                        $err = $this->update_event($op_id, $event_id, [
+                            'attacker_id' => $new_attacker_id,
+                            'attacker_aid' => $new_attacker_aid
+                        ]);
+
+                        $errors = array_merge($errors, $err);
+                    } else {
+                        $errors[] = 'New attacker entity not found.';
+                    }
+                }
+            } else {
+                $errors[] = 'Event type not supported.';
+            }
+        } else {
+            $errors[] = 'Event not found.';
+        }
+
+        return $errors;
+    }
 }

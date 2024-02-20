@@ -357,11 +357,13 @@ class Data extends CI_Controller
 
                 $op_sides = $this->additional_data->get_op_sides($op['id']);
 
+                //todo: move to model function
                 $op_entities = $this->operations->get_entities_by_id($op['id']);
                 $op_entities = array_filter($op_entities, function($e) {
                     return intval($e['is_player']) === 1;
                 });
                 array_multisort(array_column($op_entities, 'id'), SORT_ASC, $op_entities);
+                ///todo
 
                 $op_player_ids = [];
                 if (count($op_entities) > 0) {
@@ -428,6 +430,7 @@ class Data extends CI_Controller
                 }
                 $op_events = $this->operations->get_events_by_id($op['id'], $entity_id);
 
+                //todo: move to model function
                 $op_entities = $this->operations->get_entities_by_id($op['id']);
                 $op_entities = array_map(function ($e) {
                     return [
@@ -438,6 +441,7 @@ class Data extends CI_Controller
                     ];
                 }, $op_entities);
                 array_multisort(array_column($op_entities, 'is_player'), SORT_DESC, array_column($op_entities, 'id'), SORT_ASC, $op_entities);
+                ///todo
             } else {
                 $errors[] = 'Unknown operation ID given.';
             }
@@ -470,33 +474,34 @@ class Data extends CI_Controller
 
         $errors = [];
         $action = $this->input->post('action');
-        $entity_id = $this->input->post('entity_id');
-        $operation_id = $this->input->post('operation_id');
+        $operation_id = filter_var($this->input->post('operation_id'), FILTER_VALIDATE_INT);
 
         $op = false;
-        if (filter_var($operation_id, FILTER_VALIDATE_INT) || filter_var($operation_id, FILTER_VALIDATE_INT) === 0) {
+        if ($operation_id !== false) {
             $op = $this->operations->get_by_id($operation_id);
 
             if ($op) {
-                $op_verified = intval($op['verified']);
+                if (intval($op['verified']) === 0) {
+                    $entity_id = filter_var($this->input->post('entity_id'), FILTER_VALIDATE_INT);
+                    if ($entity_id !== false) {
+                        log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] entity (' . $op['id'] . ' - ' . $entity_id . ') action: ' . $action);
+                        try {
+                            if ($action === 'not-a-player') {
+                                $err = $this->additional_data->update_entity($op['id'], $entity_id, [
+                                    'player_id' => 0,
+                                    'is_player' => 0
+                                ]);
+                                $errors = array_merge($errors, $err);
 
-                log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] entity (' . $op['id'] . ' - ' . $entity_id . ') action: ' . $action);
-
-                if ($op_verified === 0) {
-                    try {
-                        if ($action === 'not-a-player') {
-                            $err = $this->additional_data->update_entity($op['id'], $entity_id, [
-                                'player_id' => 0,
-                                'is_player' => 0
-                            ]);
-                            $errors = array_merge($errors, $err);
-
-                            log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] entity (' . $op['id'] . ' - ' . $entity_id . ') update finished (errors: ' . count($errors) . ')');
-                        } else {
-                            $errors[] = 'Invalid action.';
+                                log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] entity (' . $op['id'] . ' - ' . $entity_id . ') update finished (errors: ' . count($errors) . ')');
+                            } else {
+                                $errors[] = 'Invalid action.';
+                            }
+                        } catch (Exception $e) {
+                            $errors[] = $e->getMessage();
                         }
-                    } catch (Exception $e) {
-                        $errors[] = $e->getMessage();
+                    } else {
+                        $errors[] = 'Invalid entity ID given.';
                     }
                 } else {
                     $errors[] = 'Entities of a verified op can not be edited!';
@@ -524,37 +529,42 @@ class Data extends CI_Controller
 
         $errors = [];
         $action = $this->input->post('action');
-        $event_id = $this->input->post('event_id');
-        $operation_id = $this->input->post('operation_id');
+        $operation_id = filter_var($this->input->post('operation_id'), FILTER_VALIDATE_INT);
 
         $op = false;
-        if (filter_var($operation_id, FILTER_VALIDATE_INT) || filter_var($operation_id, FILTER_VALIDATE_INT) === 0) {
+        if ($operation_id !== false) {
             $op = $this->operations->get_by_id($operation_id);
-
             if ($op) {
-                $op_verified = intval($op['verified']);
+                if (intval($op['verified']) === 0) {
+                    $event_id = filter_var($this->input->post('event_id'), FILTER_VALIDATE_INT);
+                    if ($event_id !== false) {
+                        log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] event (' . $op['id'] . ' - ' . $event_id . ') action: ' . $action);
+                        try {
+                            if ($action === 'delete-event') {
+                                $err = $this->additional_data->delete_event($op['id'], $event_id);
+                                $errors = array_merge($errors, $err);
 
-                log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] event (' . $op['id'] . ' - ' . $event_id . ') action: ' . $action);
+                                log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] event (' . $op['id'] . ' - ' . $event_id . ') delete finished (errors: ' . count($errors) . ')');
+                            } elseif ($action === 'edit-attacker') {
+                                $new_attacker_id = $this->input->post('new_attacker_id');
+                                if (!is_numeric($new_attacker_id)) {
+                                    $new_attacker_id = null;
+                                }
 
-                if ($op_verified === 0) {
-                    try {
-                        if ($action === 'delete-event') {
-                            //TODO: remove event; recalculate hits, kills, fhits, fkills, vkills, deaths of old & new attacker entities
-                            
-                            // $err = $this->additional_data->update_entity($op['id'], $entity_id, [
-                            //     'player_id' => 0,
-                            //     'is_player' => 0
-                            // ]);
-                            // $errors = array_merge($errors, $err);
-                            //
-                            // log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] entity (' . $op['id'] . ' - ' . $entity_id . ') update finished (errors: ' . count($errors) . ')');
-                        } elseif ($action === 'edit-attacker') {
-                            //TODO2
-                        } else {
-                            $errors[] = 'Invalid action.';
+                                $err = $this->additional_data->edit_event_attacker($op['id'], $event_id, $new_attacker_id);
+                                $errors = array_merge($errors, $err);
+
+                                log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] event (' . $op['id'] . ' - ' . $event_id . ') edit-attacker (' . $new_attacker_id . ') finished (errors: ' . count($errors) . ')');
+                            } elseif ($action === 'edit-weapon') {
+                                $errors[] = '🚧 Not implemented yet.';
+                            } else {
+                                $errors[] = 'Invalid action.';
+                            }
+                        } catch (Exception $e) {
+                            $errors[] = $e->getMessage();
                         }
-                    } catch (Exception $e) {
-                        $errors[] = $e->getMessage();
+                    } else {
+                        $errors[] = 'Invalid event ID given.';
                     }
                 } else {
                     $errors[] = 'Events of a verified op can not be edited!';

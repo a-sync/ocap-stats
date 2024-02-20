@@ -300,7 +300,7 @@ if (count($items) === 0) {
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo $i['sus_factor']; ?>"><?php echo number_format($i['sus_factor'], 0, '.', ''); ?></td>
                                         <?php if (!$verified && $i['is_player']) : ?>
                                             <td class="mdc-data-table__cell mdc-data-table__cell--numeric">
-                                                <button type="button" class="mdc-icon-button not-a-player-btn" title="Not a player">
+                                                <button type="button" class="mdc-icon-button not-a-player-btn" title="Not a player" disabled="disabled">
                                                     <span class="mdc-icon-button__ripple"></span>
                                                     <span class="mdc-icon-button__focus-ring"></span>
                                                     <i class="material-icons mdc-icon-button__icon" aria-hidden="true">person_off</i>
@@ -342,8 +342,8 @@ if (count($items) === 0) {
 
         const form_data = new FormData();
         form_data.append('action', 'not-a-player');
-        form_data.append('entity_id', entity_id);
         form_data.append('operation_id', <?php echo $op['id']; ?>);
+        form_data.append('entity_id', entity_id);
 
         const entity_name = tr.querySelector('td:nth-child(2) span').textContent.trim();
         const entity_group = tr.querySelector('td:nth-child(3)').textContent.trim();
@@ -393,6 +393,7 @@ if (count($items) === 0) {
                 ev.preventDefault();
                 notAPlayerAction(b);
             });
+            b.disabled = false;
         }
     };
 

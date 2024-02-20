@@ -204,46 +204,28 @@ if (count($items) === 0) {
                                 </tr>
                             </thead>
                             <tbody class="mdc-data-table__content">
-                                <?php 
-                                $events_num = [];
-                                foreach ($items as $i) :
+                                <?php foreach ($items as $i) :
                                     $time = gmdate('H:i:s', $i['frame']);
 
-                                    $attacker_player_name = is_null($i['attacker_player_name']) ? '' : $i['attacker_player_name'];
                                     $attacker_name = html_escape($i['attacker_name']);
                                     $attacker_side_class = $i['attacker_side'] ? 'side__' . html_escape(strtolower($i['attacker_side'])) : '';
                                     $attacker_title = '';
                                     if ($i['attacker_id'] !== null) {
                                         $attacker_name = '<a href="' . base_url('manage/' . $op['id'] . '/events') . '?entity_id=' . $i['attacker_id'] . '">' . $attacker_name . '</a>';
                                         $attacker_title = ' title="#' . $i['attacker_id'] . '"';
-
-                                        if ($i['attacker_player_id'] && $attacker_player_name !== '' && $i['attacker_name'] !== $attacker_player_name) {
-                                            $attacker_title = ' title="' . html_escape($attacker_player_name) . '"';
-                                        }
                                     }
 
-                                    $victim_player_name = is_null($i['victim_player_name']) ? '' : $i['victim_player_name'];
                                     $victim_name = html_escape($i['victim_name']);
                                     $victim_side_class = $i['victim_side'] ? 'side__' . html_escape(strtolower($i['victim_side'])) : '';
                                     $victim_title = '';
                                     if ($i['victim_id'] !== null) {
                                         $victim_name = '<a href="' . base_url('manage/' . $op['id'] . '/events') . '?entity_id=' . $i['victim_id'] . '">' . $victim_name . '</a>';
                                         $victim_title = ' title="#' . $i['victim_id'] . '"';
-
-                                        if ($i['victim_player_id'] && $victim_player_name !== '' && $i['victim_name'] !== $victim_player_name) {
-                                            $victim_title = ' title="' . html_escape($victim_player_name) . '"';
-                                        }
                                     }
 
                                     $distance = '';
                                     if ($i['distance'] > 0) {
                                         $distance = html_escape($i['distance']) . ' m';
-                                    }
-
-                                    if (isset($events_num[$i['event']])) {
-                                        $events_num[$i['event']]++;
-                                    } else {
-                                        $events_num[$i['event']] = 1;
                                     }
 
                                     $event = html_escape($i['event']);
@@ -257,16 +239,16 @@ if (count($items) === 0) {
                                         $event = $event . ' by ' . html_escape($d[0]);
                                     } elseif ($i['event'] === 'generalEvent') {
                                         $event = html_escape($i['data']);
-                                    } elseif (in_array($i['event'], ['generalEvent', 'respawnTickets', 'counterInit', 'counterSet'])) {
+                                    } elseif (in_array($i['event'], ['respawnTickets', 'counterInit', 'counterSet'])) {
                                         $event = $event . ': <pre>' . html_escape($i['data']) . '</pre>';
                                     }
                                 ?>
-                                    <tr class="mdc-data-table__row event__<?php echo html_escape($i['event']); ?>" data-event-id="<?php echo $i['id']; ?>" data-attacker-id="<?php echo $i['attacker_id']; ?>" data-victim-id="<?php echo $i['victim_id']; ?>">
+                                    <tr class="mdc-data-table__row" data-event-name="<?php echo html_escape($i['event']); ?>" data-event-id="<?php echo $i['id']; ?>" data-attacker-id="<?php echo $i['attacker_id']; ?>" data-victim-id="<?php echo $i['victim_id']; ?>">
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $time; ?></td>
                                         <td class="mdc-data-table__cell cell__title">
                                             <span class="<?php echo $attacker_side_class; ?>"<?php echo $attacker_title; ?>><?php echo $attacker_name; ?></span>
                                             <?php if (!$verified && in_array($i['event'], ['hit', 'killed'])) : ?>
-                                                <button type="button" class="mdc-icon-button edit-attacker-btn" title="Change attacker entity">
+                                                <button type="button" class="mdc-icon-button edit-attacker-btn" title="Change attacker entity" disabled="disabled">
                                                     <span class="mdc-icon-button__ripple"></span>
                                                     <span class="mdc-icon-button__focus-ring"></span>
                                                     <i class="material-icons mdc-icon-button__icon" aria-hidden="true">edit</i>
@@ -283,7 +265,7 @@ if (count($items) === 0) {
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo html_escape($i['distance']); ?>"><?php echo $distance; ?></td>
                                         <?php if (!$verified) : ?>
                                             <td class="mdc-data-table__cell mdc-data-table__cell--numeric">
-                                                <button type="button" class="mdc-icon-button delete-event-btn" title="Delete event">
+                                                <button type="button" class="mdc-icon-button delete-event-btn" title="Delete event" disabled="disabled">
                                                     <span class="mdc-icon-button__ripple"></span>
                                                     <span class="mdc-icon-button__focus-ring"></span>
                                                     <i class="material-icons mdc-icon-button__icon" aria-hidden="true">delete_forever</i>
@@ -312,22 +294,7 @@ if (count($items) === 0) {
     document.head.appendChild(ss_css);
 
     const entities = <?php echo json_encode($op_entities); ?>;
-    const events_num = <?php echo json_encode($events_num); ?>;
     const sides = <?php echo json_encode($sides); ?>;
-
-    function highlightEntity(entityId) {
-        const highlighted = document.querySelectorAll('#events-table tbody tr.mdc-data-table__row--selected');
-        for (const tr of highlighted) {
-            tr.classList.remove('mdc-data-table__row--selected');
-        }
-
-        if (entityId) {
-            const entities = document.querySelectorAll('#events-table tbody tr[data-attacker-id="' + entityId + '"], #events-table tbody tr[data-victim-id="' + entityId + '"]');
-            for (const tr of entities) {
-                tr.classList.add('mdc-data-table__row--selected');
-            }
-        }
-    }
 
     function deepMerge(obj1, obj2) {
         const merged = {};
@@ -359,9 +326,8 @@ if (count($items) === 0) {
 
         try {
             const attacker_id = tr.dataset.attackerId;
-            const attacker_entity = entities.find(e => e.id === attacker_id);
-            const victim_id = tr.dataset.victimId;
-            const victim_entity = entities.find(e => e.id === victim_id);
+            const victim_entity = entities.find(e => e.id === tr.dataset.victimId);
+            const event_name = tr.dataset.eventName;
 
             if (btn_icon.textContent === 'edit') {
                 btn_icon.textContent = 'done';
@@ -384,7 +350,7 @@ if (count($items) === 0) {
                     } else {
                         if (!side_other_entities[ent.side]) {
                             side_other_entities[ent.side] = [{
-                                text: '=== 🤖 ===',
+                                text: '=== 🤖🚓🚁🔫 ===',
                                 disabled: true
                             }];
                         }
@@ -433,18 +399,54 @@ if (count($items) === 0) {
                     select.slim.close();
 
                     const new_attacker_id = select.value;
-
-                    console.log('new_attacker_id', typeof new_attacker_id, new_attacker_id);//debug
-                    console.log('attacker_id', typeof attacker_id, attacker_id);//debug
                     if (new_attacker_id !== attacker_id) {
-                        confirm('🚧 new_attacker_id: #' + new_attacker_id);//debug
+                        btn.disabled = true;
 
                         const form_data = new FormData();
                         form_data.append('action', 'edit-attacker');
-                        form_data.append('event_id', event_id);
                         form_data.append('operation_id', <?php echo $op['id']; ?>);
-                        //TODO: send req and if succesfull, update dataset and a.href with new attacker id & name
-                        //#########################################################################################
+                        form_data.append('event_id', event_id);
+                        form_data.append('new_attacker_id', new_attacker_id);
+
+                        const response = await fetch('<?php echo base_url('edit-event'); ?>', {
+                            method: 'POST',
+                            body: form_data,
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+
+                        if (response.ok) {
+                            const res_json = await response.json();
+                            if (res_json.errors.length === 0) {
+                                if (res_json.action === 'edit-attacker') {
+                                    tr.dataset.attackerId = new_attacker_id;
+
+                                    const span = td.querySelector('span');
+                                    if (span) {
+                                        span.textContent = '';
+                                        span.className = '';
+                                        span.title = '';
+                                    }
+
+                                    const new_attacker_entity = entities.find(e => e.id === new_attacker_id);
+                                    if (new_attacker_entity) {
+                                        span.className = 'side__' + String(new_attacker_entity.side).toLowerCase();
+                                        span.title = '#' + new_attacker_entity.id;
+                                        const a = document.createElement('a');
+                                        a.textContent = new_attacker_entity.name;
+                                        a.href = '<?php echo base_url('manage/' . $op['id'] . '/events'); ?>?entity_id=' + new_attacker_entity.id;
+                                        span.appendChild(a);
+                                    }
+                                } else {
+                                    throw new Error('Unknown response action 😵');
+                                }
+                            } else {
+                                throw new Error('⚠ Errors:\n' + res_json.errors.join('\n'));
+                            }
+                        } else {
+                            throw new Error('Response not ok 😔');
+                        }
                     }
 
                     select.slim.destroy();
@@ -454,8 +456,12 @@ if (count($items) === 0) {
 
                 select.remove();
                 btn_icon.textContent = 'edit';
+                btn.disabled = false;
             }
         } catch (err) {
+            console.error(err);
+            alert(err.message || JSON.stringify(err));
+
             const select = td.querySelector('select');
             if (select) {
                 if (select.slim) {
@@ -463,32 +469,30 @@ if (count($items) === 0) {
                 }
                 select.remove();
             }
-            
-            btn_icon.textContent = 'edit';
 
-            console.error(err);
-            alert(err.message || JSON.stringify(err));
+            btn_icon.textContent = 'edit';
+            btn.disabled = false;
         }
     }
 
     async function deleteEventAction(btn) {
         const tr = btn.closest('tr');
         const event_id = tr.dataset.eventId;
-        const attacker_id = tr.dataset.attackerId;
-        const attacker_entity = entities.find(e => e.id === attacker_id);
-        const victim_id = tr.dataset.victimId;
-        const victim_entity = entities.find(e => e.id === victim_id);
+        const attacker_entity = entities.find(e => e.id === tr.dataset.attackerId);
+        const attacker_string = attacker_entity ? '#' + attacker_entity.id + ' ' + attacker_entity.name : '';
+        const victim_entity = entities.find(e => e.id === tr.dataset.victimId);
+        const victim_string = victim_entity ? '#' + victim_entity.id + ' ' + victim_entity.name : '';
+        const event_name = tr.dataset.eventName;
+
+        const event_time = tr.querySelector('td:nth-child(1)').textContent.trim();
+
+        const confirmation = confirm('🗑️ Removing event: \n\n[' + event_time + '] ' + attacker_string + ' <' + event_name + '>  ' + victim_string + ' \n\nAre you sure?');
+        if (!confirmation) return;
 
         const form_data = new FormData();
         form_data.append('action', 'delete-event');
-        form_data.append('event_id', event_id);
         form_data.append('operation_id', <?php echo $op['id']; ?>);
-
-        const event_time = tr.querySelector('td:nth-child(1)').textContent.trim();
-        const event_name = tr.querySelector('td:nth-child(3)').textContent.trim();
-
-        const confirmation = confirm('🗑️ Removing event: \n\n[' + event_time + '] #' + attacker_entity.id + ' ' + attacker_entity.name + ' <' + event_name + '>  #' + victim_entity.id + ' ' + victim_entity.name + ' \n\nAre you sure?');
-        if (!confirmation) return;
+        form_data.append('event_id', event_id);
 
         btn.disabled = true;
         try {
@@ -544,6 +548,7 @@ if (count($items) === 0) {
                 ev.preventDefault();
                 editAttackerAction(b);
             });
+            b.disabled = false;
         }
 
         const delete_btns = document.querySelectorAll('.delete-event-btn');
@@ -552,6 +557,7 @@ if (count($items) === 0) {
                 ev.preventDefault();
                 deleteEventAction(b);
             });
+            b.disabled = false;
         }
     };
 
