@@ -176,6 +176,9 @@ $fixed_icon = '<span class="material-icons">check</span>';
 <?php
 if (count($items) === 0) {
     echo '<div class="mdc-typography--body1 list__no_items">No events found...</div>';
+} elseif ($entity_id !== false) {
+    $ent = $op_entities[array_search($entity_id, array_column($op_entities, 'id'))];
+    echo '<div class="mdc-typography--caption list__total">' . count($items) . ' events for <span class="selected-entity">#' . $ent['id'] . ' <span class="side__' . html_escape(strtolower($ent['side'])) . '">' . $ent['name'] . '</span></span></div>';
 } else {
     echo '<div class="mdc-typography--caption list__total">' . count($items) . ' events</div>';
 }
@@ -210,26 +213,26 @@ if (count($items) === 0) {
                                     $attacker_name = html_escape($i['attacker_name']);
                                     $attacker_side_class = $i['attacker_side'] ? 'side__' . html_escape(strtolower($i['attacker_side'])) : '';
                                     $attacker_title = '';
-                                    if ($i['attacker_player_id']) {
-                                        $attacker_name = '<a href="' . base_url('player/') . $i['attacker_player_id'] . '">' . $attacker_name . '</a>';
-                                        if ($attacker_player_name !== '' && $i['attacker_name'] !== $attacker_player_name) {
+                                    if ($i['attacker_id'] !== null) {
+                                        $attacker_name = '<a href="' . base_url('manage/' . $op['id'] . '/events') . '?entity_id=' . $i['attacker_id'] . '">' . $attacker_name . '</a>';
+                                        $attacker_title = ' title="#' . $i['attacker_id'] . '"';
+
+                                        if ($i['attacker_player_id'] && $attacker_player_name !== '' && $i['attacker_name'] !== $attacker_player_name) {
                                             $attacker_title = ' title="' . html_escape($attacker_player_name) . '"';
                                         }
-                                    } elseif ($i['attacker_id'] !== null) {
-                                        $attacker_name = '<span title="#' . $i['attacker_id'] . '">' . $attacker_name . '</span>';
                                     }
 
                                     $victim_player_name = is_null($i['victim_player_name']) ? '' : $i['victim_player_name'];
                                     $victim_name = html_escape($i['victim_name']);
                                     $victim_side_class = $i['victim_side'] ? 'side__' . html_escape(strtolower($i['victim_side'])) : '';
                                     $victim_title = '';
-                                    if ($i['victim_player_id']) {
-                                        $victim_name = '<a href="' . base_url('player/') . $i['victim_player_id'] . '">' . $victim_name . '</a>';
-                                        if ($victim_player_name !== '' && $i['victim_name'] !== $victim_player_name) {
+                                    if ($i['victim_id'] !== null) {
+                                        $victim_name = '<a href="' . base_url('manage/' . $op['id'] . '/events') . '?entity_id=' . $i['victim_id'] . '">' . $victim_name . '</a>';
+                                        $victim_title = ' title="#' . $i['victim_id'] . '"';
+
+                                        if ($i['victim_player_id'] && $victim_player_name !== '' && $i['victim_name'] !== $victim_player_name) {
                                             $victim_title = ' title="' . html_escape($victim_player_name) . '"';
                                         }
-                                    } elseif ($i['victim_id'] !== null) {
-                                        $victim_name = '<span title="#' . $i['victim_id'] . '">' . $victim_name . '</span>';
                                     }
 
                                     $distance = '';
@@ -304,6 +307,7 @@ if (count($items) === 0) {
 <script src="<?php echo base_url('public/slimselect.min.js'); ?>"></script>
 <script>
     const entities = <?php echo json_encode($op_entities); ?>;
+    const events_num = <?php echo json_encode($events_num); ?>;
 
     function highlightEntity(entityId) {
         const highlighted = document.querySelectorAll('#events-table tbody tr.mdc-data-table__row--selected');

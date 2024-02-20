@@ -906,8 +906,15 @@ class Operations extends CI_Model
         return $this->db->get()->result_array();
     }
 
-    public function get_events_by_id($id)
+    public function get_events_by_id($id, $entity_id = false)
     {
+        if ($entity_id !== false) {
+            $this->db->group_start()
+                ->where('events.victim_id', $entity_id)
+                ->or_where('events.attacker_id', $entity_id)
+                ->group_end();
+        }
+
         $this->db
             ->select([
                 'events.id',

@@ -410,6 +410,7 @@ class Data extends CI_Controller
         $op_commanders = [];
         $op_events = [];
         $op_entities = [];
+        $entity_id = false;
         if (filter_var($op_id, FILTER_VALIDATE_INT) || filter_var($op_id, FILTER_VALIDATE_INT) === 0) {
             $op = $this->operations->get_by_id($op_id);
 
@@ -421,7 +422,11 @@ class Data extends CI_Controller
 
                 $op_sides = $this->additional_data->get_op_sides($op['id']);
 
-                $op_events = $this->operations->get_events_by_id($op['id']);
+                $entity_id = filter_var($this->input->get('entity_id'), FILTER_VALIDATE_INT);
+                if (!$entity_id && $entity_id !== 0) {
+                    $entity_id = false;
+                }
+                $op_events = $this->operations->get_events_by_id($op['id'], $entity_id);
 
                 $op_entities = $this->operations->get_entities_by_id($op['id']);
                 $op_entities = array_map(function ($e) {
@@ -433,6 +438,7 @@ class Data extends CI_Controller
                     ];
                 }, $op_entities);
                 array_multisort(array_column($op_entities, 'is_player'), SORT_DESC, array_column($op_entities, 'id'), SORT_ASC, $op_entities);
+                //$op_entities = array_column($op_entities, null, 'id');//debug
             } else {
                 $errors[] = 'Unknown operation ID given.';
             }
@@ -452,7 +458,8 @@ class Data extends CI_Controller
             'items' => $op_events,
             'op_sides' => $op_sides,
             'op_commanders' => $op_commanders,
-            'op_entities' => $op_entities
+            'op_entities' => $op_entities,
+            'entity_id' => $entity_id
         ]);
 
         $this->_foot();
