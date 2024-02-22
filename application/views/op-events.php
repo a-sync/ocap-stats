@@ -160,6 +160,7 @@ $deduped_items = array_reduce($items, function ($acc, $next) {
 </div>
 
 <script src="https://unpkg.com/slim-select@2.8.1/dist/slimselect.min.js"></script>
+<script src="<?php echo base_url('public/events-filters.js'); ?>"></script>
 <script>
     const ss_css = document.createElement('link');
     ss_css.rel = 'stylesheet';
@@ -169,5 +170,13 @@ $deduped_items = array_reduce($items, function ($acc, $next) {
     const entities = <?php echo json_encode($op_entities); ?>;
     const sides = <?php echo json_encode($sides); ?>;
     const events_num = <?php echo json_encode($events_num); ?>;
+
+    const domLoaded = () => {
+        console.log('DOM loaded');
+        init_events_filters(entities, sides, events_num);
+    };
+
+    if (document.readyState === 'complete' ||
+        (document.readyState !== 'loading' && !document.documentElement.doScroll)) domLoaded();
+    else document.addEventListener('DOMContentLoaded', domLoaded);
 </script>
-<script src="<?php echo base_url('public/events-filters.js'); ?>"></script>

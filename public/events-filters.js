@@ -20,9 +20,9 @@ function deepMerge(obj1, obj2) {
     return merged;
 }
 
-const events_filters = document.getElementById('events-filters');
+function init_events_filters(entities, sides, events_num) {
+    const events_filters = document.getElementById('events-filters');
 
-if (events_filters && entities && sides && events_num) {
     const tab_bar = document.querySelector('#events-table .mdc-tab-bar');
     const tabs = tab_bar ? tab_bar.querySelectorAll('.mdc-tab') : [];
     function update_tabs () {
@@ -244,5 +244,5 @@ if (events_filters && entities && sides && events_num) {
         }
     }
 
-    setTimeout(()=>{events_filters.classList.remove('dnone');},20);
+    events_filters.classList.remove('dnone');
 }

@@ -16,7 +16,7 @@ The data is presented on a simple spreadsheet like web frontend.
  * player tracking via the unit name or uid (not implemented in the official OCAP release)
  * content manager interface
    * select what OCAP entries get added to the stats as ops
-   * fix incorrect or missing op data (event type, mission info, commanders)
+   * fix incorrect or missing op data (op info, commanders, entities, events)
    * assign player aliases
 
 

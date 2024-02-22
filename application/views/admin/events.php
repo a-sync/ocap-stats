@@ -305,6 +305,7 @@ if ($entity_id !== false) {
 </div>
 
 <script src="https://unpkg.com/slim-select@2.8.1/dist/slimselect.min.js"></script>
+<script src="<?php echo base_url('public/events-filters.js'); ?>"></script>
 <script>
     const ss_css = document.createElement('link');
     ss_css.rel = 'stylesheet';
@@ -538,6 +539,7 @@ if ($entity_id !== false) {
 
     const domLoaded = () => {
         console.log('DOM loaded');
+        init_events_filters(entities, sides, events_num);
 
         const edit_btns = document.querySelectorAll('.edit-attacker-btn');
         for (const b of edit_btns) {
@@ -562,4 +564,3 @@ if ($entity_id !== false) {
         (document.readyState !== 'loading' && !document.documentElement.doScroll)) domLoaded();
     else document.addEventListener('DOMContentLoaded', domLoaded);
 </script>
-<script src="<?php echo base_url('public/events-filters.js'); ?>"></script>
