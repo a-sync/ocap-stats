@@ -191,20 +191,38 @@ if (count($items) === 0) {
 
                         <table class="mdc-data-table__table sortable">
                             <thead>
+                                <?php if (count($items) > 0) : ?>
+                                    <tr class="mdc-data-table__header-row dnone" id="events-filters">
+                                        <td class="mdc-data-table__header-cell"></td>
+                                        <td class="mdc-data-table__header-cell" id="attacker-filter"></td>
+                                        <td class="mdc-data-table__header-cell" id="event-filter"></td>
+                                        <td class="mdc-data-table__header-cell" id="victim-filter"></td>
+                                        <td class="mdc-data-table__header-cell"></td>
+                                        <td class="mdc-data-table__header-cell"></td>
+                                    </tr>
+                                <?php endif; ?>
                                 <tr class="mdc-data-table__header-row">
-                                <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="ascending" data-column-id="time">Time</th>
-                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="attacker" title="Player name / Entity ID">Attacker</th>
-                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="event">Event</th>
-                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="victim" title="Player name / Entity ID">Victim</th>
-                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="weapon">Weapon</th>
-                                <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="distance">Distance</th>
+                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="ascending" data-column-id="time">Time</th>
+                                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="attacker" title="Player name / Entity ID">Attacker</th>
+                                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="event">Event</th>
+                                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="victim" title="Player name / Entity ID">Victim</th>
+                                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="weapon">Weapon</th>
+                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="distance">Distance</th>
                                     <?php if (!$verified) : ?>
                                         <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="actions"></th>
                                     <?php endif; ?>
                                 </tr>
                             </thead>
                             <tbody class="mdc-data-table__content">
-                                <?php foreach ($items as $i) :
+                                <?php 
+                                $events_num = [];
+                                foreach ($items as $i) :
+                                    if (isset($events_num[$i['event']])) {
+                                        $events_num[$i['event']] += 1;
+                                    } else {
+                                        $events_num[$i['event']] = 1;
+                                    }
+
                                     $time = gmdate('H:i:s', $i['frame']);
 
                                     $attacker_name = html_escape($i['attacker_name']);
@@ -295,28 +313,7 @@ if (count($items) === 0) {
 
     const entities = <?php echo json_encode($op_entities); ?>;
     const sides = <?php echo json_encode($sides); ?>;
-
-    function deepMerge(obj1, obj2) {
-        const merged = {};
-        for (const key in obj1) {
-            if (obj1.hasOwnProperty(key)) {
-
-                if (Array.isArray(obj1[key])) {
-                    merged[key] = [...obj1[key], ...obj2[key] || []];
-                } else if (typeof obj1[key] === 'object') {
-                    merged[key] = deepMerge(obj1[key], obj2[key] || {});
-                } else {
-                    merged[key] = obj1[key];
-                }
-            }
-        }
-        for (const key in obj2) {
-            if (obj2.hasOwnProperty(key) && !merged.hasOwnProperty(key)) {
-                merged[key] = obj2[key];
-            }
-        }
-        return merged;
-    }
+    const events_num = <?php echo json_encode($events_num); ?>;
 
     async function editAttackerAction(btn) {
         const btn_icon = btn.querySelector('i');
@@ -565,3 +562,4 @@ if (count($items) === 0) {
         (document.readyState !== 'loading' && !document.documentElement.doScroll)) domLoaded();
     else document.addEventListener('DOMContentLoaded', domLoaded);
 </script>
+<script src="<?php echo base_url('public/events-filters.js'); ?>"></script>
