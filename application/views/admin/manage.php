@@ -38,7 +38,7 @@ $sides = $this->config->item('sides');
                                         <?php if ($op_in_db && $op && $op['event'] !== '') : ?>
                                             <a href="<?php echo base_url('manage/' . $operation['id'] . '/verify'); ?>" class="mdc-tab" role="tab" aria-selected="false" tabindex="6">
                                                 <span class="mdc-tab__content">
-                                                    <span class="mdc-tab__text-label">Verify data</span>
+                                                    <span class="mdc-tab__text-label">Op</span>
                                                 </span>
                                                 <span class="mdc-tab-indicator">
                                                     <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>

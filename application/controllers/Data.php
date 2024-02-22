@@ -192,7 +192,7 @@ class Data extends CI_Controller
 
             if ($op) {
                 $op_sides = $this->additional_data->get_op_sides($op['id']);
-                $op_player_entities = $this->additional_data->get_op_player_entities($op['id']);
+                $op_player_entities = $this->additional_data->get_op_player_entities_simple($op['id']);
                 $op_commanders_data = $this->additional_data->get_commanders(true, $op['id'], true);
 
                 // ID was posted
@@ -299,7 +299,7 @@ class Data extends CI_Controller
                             // Reload updated data
                             $op = $this->operations->get_by_id($op['id']);
                             $op_sides = $this->additional_data->get_op_sides($op['id']);
-                            $op_player_entities = $this->additional_data->get_op_player_entities($op['id']);
+                            $op_player_entities = $this->additional_data->get_op_player_entities_simple($op['id']);
                             $op_commanders_data = $this->additional_data->get_commanders(true, $op['id'], true);
                         } else {
                             $errors[] = 'Invalid action.';
@@ -357,13 +357,7 @@ class Data extends CI_Controller
 
                 $op_sides = $this->additional_data->get_op_sides($op['id']);
 
-                //todo: move to model function
-                $op_entities = $this->operations->get_entities_by_id($op['id']);
-                $op_entities = array_filter($op_entities, function($e) {
-                    return intval($e['is_player']) === 1;
-                });
-                array_multisort(array_column($op_entities, 'id'), SORT_ASC, $op_entities);
-                ///todo
+                $op_entities = $this->additional_data->get_op_player_entities($op['id']);
 
                 $op_player_ids = [];
                 if (count($op_entities) > 0) {
@@ -428,20 +422,10 @@ class Data extends CI_Controller
                 if (!$entity_id && $entity_id !== 0) {
                     $entity_id = false;
                 }
+
                 $op_events = $this->operations->get_events_by_id($op['id'], $entity_id);
 
-                //todo: move to model function
-                $op_entities = $this->operations->get_entities_by_id($op['id']);
-                $op_entities = array_map(function ($e) {
-                    return [
-                        'id' => $e['id'],
-                        'name' => $e['name'],
-                        'side' => $e['side'],
-                        'is_player' => $e['is_player']
-                    ];
-                }, $op_entities);
-                array_multisort(array_column($op_entities, 'is_player'), SORT_DESC, array_column($op_entities, 'id'), SORT_ASC, $op_entities);
-                ///todo
+                $op_entities = $this->additional_data->get_op_entities($op['id']);
             } else {
                 $errors[] = 'Unknown operation ID given.';
             }
@@ -487,7 +471,7 @@ class Data extends CI_Controller
                         log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] entity (' . $op['id'] . ' - ' . $entity_id . ') action: ' . $action);
                         try {
                             if ($action === 'not-a-player') {
-                                $err = $this->additional_data->update_entity($op['id'], $entity_id, [
+                                $err = $this->additional_data->update_op_entity($op['id'], $entity_id, [
                                     'player_id' => 0,
                                     'is_player' => 0
                                 ]);
@@ -541,7 +525,7 @@ class Data extends CI_Controller
                         log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] event (' . $op['id'] . ' - ' . $event_id . ') action: ' . $action);
                         try {
                             if ($action === 'delete-event') {
-                                $err = $this->additional_data->delete_event($op['id'], $event_id);
+                                $err = $this->additional_data->delete_op_event($op['id'], $event_id);
                                 $errors = array_merge($errors, $err);
 
                                 log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] event (' . $op['id'] . ' - ' . $event_id . ') delete finished (errors: ' . count($errors) . ')');
@@ -551,7 +535,7 @@ class Data extends CI_Controller
                                     $new_attacker_id = null;
                                 }
 
-                                $err = $this->additional_data->edit_event_attacker($op['id'], $event_id, $new_attacker_id);
+                                $err = $this->additional_data->edit_op_event_attacker($op['id'], $event_id, $new_attacker_id);
                                 $errors = array_merge($errors, $err);
 
                                 log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] event (' . $op['id'] . ' - ' . $event_id . ') edit-attacker (' . $new_attacker_id . ') finished (errors: ' . count($errors) . ')');

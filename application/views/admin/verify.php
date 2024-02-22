@@ -69,7 +69,7 @@ foreach ($op_player_entities as $e) {
                                         </a>
                                         <a href="<?php echo base_url('manage/' . $op['id'] . '/verify'); ?>" class="mdc-tab mdc-tab--active" role="tab" aria-selected="true" tabindex="6">
                                             <span class="mdc-tab__content">
-                                                <span class="mdc-tab__text-label">Verify data</span>
+                                                <span class="mdc-tab__text-label">Op</span>
                                             </span>
                                             <span class="mdc-tab-indicator mdc-tab-indicator--active">
                                                 <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>

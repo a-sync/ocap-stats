@@ -197,7 +197,7 @@ img.ocap-link {
 }
 
 .verified-icon {
-    font-size: inherit;
+    vertical-align: middle;
 }
 
 .selected-entity {

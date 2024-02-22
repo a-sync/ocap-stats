@@ -43,7 +43,7 @@ $fixed_icon = '<span class="material-icons">check</span>';
                                         </a>
                                         <a href="<?php echo base_url('manage/' . $op['id'] . '/verify'); ?>" class="mdc-tab" role="tab" aria-selected="false" tabindex="6">
                                             <span class="mdc-tab__content">
-                                                <span class="mdc-tab__text-label">Verify data</span>
+                                                <span class="mdc-tab__text-label">Op</span>
                                             </span>
                                             <span class="mdc-tab-indicator">
                                                 <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
@@ -382,12 +382,12 @@ if (count($items) === 0) {
                     },
                     'data': [
                         {
-                            text: 'None / "something"',
+                            text: 'nobody / "something"',
                             placeholder: 'true',
                             value: ''
                         },
                         {
-                            text: 'Self inflicted (#' + victim_entity.id + ' ' + victim_entity.name + ')',
+                            text: '#' + victim_entity.id + ' ' + victim_entity.name + ' (self inflicted)',
                             value: victim_entity.id
                         },
                         ...ss_entities_data_field

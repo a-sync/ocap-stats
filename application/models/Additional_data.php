@@ -661,7 +661,23 @@ class Additional_data extends CI_Model
         return $op_sides;
     }
 
-    public function get_op_player_entities($id)
+    public function get_op_entities($id)
+    {
+        $this->db
+            ->select([
+                'entities.id',
+                'entities.name',
+                'entities.side',
+                'entities.is_player'
+            ])
+            ->from('entities')
+            ->where('entities.operation_id', $id)
+            ->order_by('entities.is_player DESC, entities.id ASC');
+
+        return $this->db->get()->result_array();
+    }
+
+    public function get_op_player_entities_simple($id)
     {
         $this->db
             ->select([
@@ -675,6 +691,42 @@ class Additional_data extends CI_Model
             ->join('players', 'players.id = entities.player_id')
             ->where('entities.operation_id', $id)
             ->where('entities.is_player', 1)
+            ->order_by('entities.id ASC');
+
+        return $this->db->get()->result_array();
+    }
+
+    public function get_op_player_entities($id)
+    {
+        $this->db
+            ->select([
+                'entities.id',
+                'entities.player_id',
+                'entities.group_name',
+                'entities.is_player',
+                'entities.name',
+                'entities.role',
+                'entities.side',
+                'entities.type',
+                'entities.class',
+                'entities.distance_traveled',
+                '(entities.start_frame_num * operations.capture_delay) AS join_time_seconds',
+                '(entities.last_frame_num - entities.start_frame_num) * operations.capture_delay AS seconds_in_game',
+                'players.name AS player_name'
+            ])
+            ->select_sum('shots')
+            ->select_sum('hits')
+            ->select_sum('fhits')
+            ->select_sum('kills')
+            ->select_sum('fkills')
+            ->select_sum('vkills')
+            ->select_sum('deaths')
+            ->from('entities')
+            ->join('operations', 'operations.id = entities.operation_id')
+            ->join('players', 'players.id = entities.player_id AND entities.operation_id = ' . $id, 'LEFT')
+            ->where('entities.operation_id', $id)
+            ->where('entities.is_player', 1)
+            ->group_by('entities.id')
             ->order_by('entities.id ASC');
 
         return $this->db->get()->result_array();
@@ -850,7 +902,7 @@ class Additional_data extends CI_Model
         return $op_entities;
     }
 
-    public function update_entity($op_id, $entity_id, $data)
+    public function update_op_entity($op_id, $entity_id, $data)
     {
         $errors = [];
 
@@ -889,11 +941,11 @@ class Additional_data extends CI_Model
                 'attacker.deaths AS attacker_deaths'
             ])
             ->from('events')
-            ->join('entities AS victim', 'victim.aid = events.victim_aid AND victim.operation_id = ' . $op_id, 'LEFT')
-            ->join('entities AS attacker', 'attacker.aid = events.attacker_aid AND attacker.operation_id = ' . $op_id, 'LEFT')
+            ->join('entities AS victim', 'victim.id = events.victim_id AND victim.operation_id = ' . $op_id, 'LEFT')
+            ->join('entities AS attacker', 'attacker.id = events.attacker_id AND attacker.operation_id = ' . $op_id, 'LEFT')
             ->where('events.operation_id', $op_id)
             ->where('events.id', $event_id)
-            ->order_by("events.frame ASC");
+            ->order_by('events.frame ASC');
 
         $re = $this->db->get()->result_array();
 
@@ -904,7 +956,7 @@ class Additional_data extends CI_Model
         }
     }
 
-    private function get_entities_op_events($op_id, $entity_ids, $events = ['killed', '_dead']) {
+    private function get_op_entities_events($op_id, $entity_ids, $events = ['killed', '_dead']) {
         $this->db
             ->select([
                 'events.id',
@@ -923,7 +975,7 @@ class Additional_data extends CI_Model
         return $this->db->get()->result_array();
     }
 
-    public function delete_event($op_id, $event_id)
+    public function delete_op_event($op_id, $event_id)
     {
         $errors = [];
         $event = $this->get_op_event($op_id, $event_id);
@@ -932,34 +984,34 @@ class Additional_data extends CI_Model
 
             if (in_array($ev, ['hit', 'killed', '_dead'])) {
                 if ($ev === 'hit' && $event['attacker_id'] !== null && $event['attacker_id'] !== $event['victim_id']) {
-                    $hits_upd_errors = $this->update_entity($op_id, $event['attacker_id'], ['hits' => $event['attacker_hits'] - 1]);
+                    $hits_upd_errors = $this->update_op_entity($op_id, $event['attacker_id'], ['hits' => $event['attacker_hits'] - 1]);
                     $fhits_upd_errors = [];
 
                     if ($event['attacker_side'] === $event['victim_side']) {
-                        $fhits_upd_errors = $this->update_entity($op_id, $event['attacker_id'], ['fhits' => $event['attacker_fhits'] - 1]);
+                        $fhits_upd_errors = $this->update_op_entity($op_id, $event['attacker_id'], ['fhits' => $event['attacker_fhits'] - 1]);
                     }
 
                     $errors = array_merge($errors, $hits_upd_errors, $fhits_upd_errors);
                 } elseif (in_array($ev,['killed', '_dead'])) {
                     if ($event['attacker_id'] !== null && $ev === 'killed' && $event['attacker_id'] !== $event['victim_id']) {
                         if ($event['victim_type'] === 'unit') {
-                            $kills_upd_errors = $this->update_entity($op_id, $event['attacker_id'], ['kills' => $event['attacker_kills'] - 1]);
+                            $kills_upd_errors = $this->update_op_entity($op_id, $event['attacker_id'], ['kills' => $event['attacker_kills'] - 1]);
                             $fkills_upd_errors = [];
 
                             if ($event['attacker_side'] === $event['victim_side']) {
-                                $fkills_upd_errors = $this->update_entity($op_id, $event['attacker_id'], ['fkills' => $event['attacker_fkills'] - 1]);
+                                $fkills_upd_errors = $this->update_op_entity($op_id, $event['attacker_id'], ['fkills' => $event['attacker_fkills'] - 1]);
                             }
 
                             $errors = array_merge($errors, $kills_upd_errors, $fkills_upd_errors);
                         } else {
-                            $vkills_upd_errors = $this->update_entity($op_id, $event['attacker_id'], ['vkills' => $event['attacker_vkills'] - 1]);
+                            $vkills_upd_errors = $this->update_op_entity($op_id, $event['attacker_id'], ['vkills' => $event['attacker_vkills'] - 1]);
 
                             $errors = array_merge($errors, $vkills_upd_errors);
                         }
                     }
 
                     if ($event['victim_id'] !== null) {
-                        $knd_events = $this->get_entities_op_events($op_id, [$event['victim_id']], ['killed', '_dead']);
+                        $knd_events = $this->get_op_entities_events($op_id, [$event['victim_id']], ['killed', '_dead']);
 
                         $killed = 0;
                         $_dead = 0;
@@ -974,7 +1026,7 @@ class Additional_data extends CI_Model
                         }
 
                         $deaths = max($killed, $_dead);
-                        $deaths_upd_errors = $this->update_entity($op_id, $event['victim_id'], ['deaths' => $deaths]);
+                        $deaths_upd_errors = $this->update_op_entity($op_id, $event['victim_id'], ['deaths' => $deaths]);
 
                         $errors = array_merge($errors, $deaths_upd_errors);
                     }
@@ -1019,7 +1071,7 @@ class Additional_data extends CI_Model
         }
     }
 
-    private function update_event($op_id, $event_id, $data)
+    private function update_op_event($op_id, $event_id, $data)
     {
         $errors = [];
 
@@ -1032,7 +1084,7 @@ class Additional_data extends CI_Model
         return $errors;
     }
 
-    public function edit_event_attacker($op_id, $event_id, $new_attacker_id)
+    public function edit_op_event_attacker($op_id, $event_id, $new_attacker_id)
     {
         $errors = [];
         $event = $this->get_op_event($op_id, $event_id);
@@ -1045,26 +1097,26 @@ class Additional_data extends CI_Model
                     if ($new_attacker_id === null || $new_attacker) {
                         if ($event['attacker_id'] !== null && $event['attacker_id'] !== $event['victim_id']) {
                             if ($ev === 'hit') {
-                                $hits_upd_errors = $this->update_entity($op_id, $event['attacker_id'], ['hits' => $event['attacker_hits'] - 1]);
+                                $hits_upd_errors = $this->update_op_entity($op_id, $event['attacker_id'], ['hits' => $event['attacker_hits'] - 1]);
                                 $fhits_upd_errors = [];
 
                                 if ($event['attacker_side'] === $event['victim_side']) {
-                                    $fhits_upd_errors = $this->update_entity($op_id, $event['attacker_id'], ['fhits' => $event['attacker_fhits'] - 1]);
+                                    $fhits_upd_errors = $this->update_op_entity($op_id, $event['attacker_id'], ['fhits' => $event['attacker_fhits'] - 1]);
                                 }
 
                                 $errors = array_merge($errors, $hits_upd_errors, $fhits_upd_errors);
                             } elseif ($ev === 'killed') {
                                 if ($event['victim_type'] === 'unit') {
-                                    $kills_upd_errors = $this->update_entity($op_id, $event['attacker_id'], ['kills' => $event['attacker_kills'] - 1]);
+                                    $kills_upd_errors = $this->update_op_entity($op_id, $event['attacker_id'], ['kills' => $event['attacker_kills'] - 1]);
                                     $fkills_upd_errors = [];
 
                                     if ($event['attacker_side'] === $event['victim_side']) {
-                                        $fkills_upd_errors = $this->update_entity($op_id, $event['attacker_id'], ['fkills' => $event['attacker_fkills'] - 1]);
+                                        $fkills_upd_errors = $this->update_op_entity($op_id, $event['attacker_id'], ['fkills' => $event['attacker_fkills'] - 1]);
                                     }
 
                                     $errors = array_merge($errors, $kills_upd_errors, $fkills_upd_errors);
                                 } else {
-                                    $vkills_upd_errors = $this->update_entity($op_id, $event['attacker_id'], ['vkills' => $event['attacker_vkills'] - 1]);
+                                    $vkills_upd_errors = $this->update_op_entity($op_id, $event['attacker_id'], ['vkills' => $event['attacker_vkills'] - 1]);
 
                                     $errors = array_merge($errors, $vkills_upd_errors);
                                 }
@@ -1073,26 +1125,26 @@ class Additional_data extends CI_Model
 
                         if ($new_attacker && $new_attacker_id !== $event['victim_id']) {
                             if ($ev === 'hit') {
-                                $new_hits_upd_errors = $this->update_entity($op_id, $new_attacker_id, ['hits' => $new_attacker['hits'] + 1]);
+                                $new_hits_upd_errors = $this->update_op_entity($op_id, $new_attacker_id, ['hits' => $new_attacker['hits'] + 1]);
                                 $new_fhits_upd_errors = [];
 
                                 if ($new_attacker['side'] === $event['victim_side']) {
-                                    $new_fhits_upd_errors = $this->update_entity($op_id, $new_attacker_id, ['fhits' => $new_attacker['fhits'] + 1]);
+                                    $new_fhits_upd_errors = $this->update_op_entity($op_id, $new_attacker_id, ['fhits' => $new_attacker['fhits'] + 1]);
                                 }
 
                                 $errors = array_merge($errors, $new_hits_upd_errors, $new_fhits_upd_errors);
                             } elseif ($ev === 'killed') {
                                 if ($event['victim_type'] === 'unit') {
-                                    $new_kills_upd_errors = $this->update_entity($op_id, $new_attacker_id, ['kills' => $new_attacker['kills'] + 1]);
+                                    $new_kills_upd_errors = $this->update_op_entity($op_id, $new_attacker_id, ['kills' => $new_attacker['kills'] + 1]);
                                     $new_fkills_upd_errors = [];
 
                                     if ($new_attacker['side'] === $event['victim_side']) {
-                                        $new_fkills_upd_errors = $this->update_entity($op_id, $new_attacker_id, ['fkills' => $new_attacker['fkills'] + 1]);
+                                        $new_fkills_upd_errors = $this->update_op_entity($op_id, $new_attacker_id, ['fkills' => $new_attacker['fkills'] + 1]);
                                     }
 
                                     $errors = array_merge($errors, $new_kills_upd_errors, $new_fkills_upd_errors);
                                 } else {
-                                    $new_vkills_upd_errors = $this->update_entity($op_id, $new_attacker_id, ['vkills' => $new_attacker['vkills'] + 1]);
+                                    $new_vkills_upd_errors = $this->update_op_entity($op_id, $new_attacker_id, ['vkills' => $new_attacker['vkills'] + 1]);
 
                                     $errors = array_merge($errors, $new_vkills_upd_errors);
                                 }
@@ -1102,7 +1154,7 @@ class Additional_data extends CI_Model
                         $new_attacker_id = $new_attacker ? $new_attacker['id'] : null;
                         $new_attacker_aid = $new_attacker ? $new_attacker['aid'] : null;
 
-                        $err = $this->update_event($op_id, $event_id, [
+                        $err = $this->update_op_event($op_id, $event_id, [
                             'attacker_id' => $new_attacker_id,
                             'attacker_aid' => $new_attacker_aid
                         ]);

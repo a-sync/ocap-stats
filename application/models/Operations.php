@@ -882,7 +882,6 @@ class Operations extends CI_Model
                 'entities.name',
                 'entities.role',
                 'entities.side',
-                'entities.start_frame_num',
                 'entities.type',
                 'entities.class',
                 'entities.distance_traveled',
@@ -906,12 +905,28 @@ class Operations extends CI_Model
         return $this->db->get()->result_array();
     }
 
+    private function get_name_of_entity($id, $entity_id) {
+        return $this->db->select('name')
+            ->from('entities')
+            ->where('operation_id', $id)
+            ->where('id', $entity_id)
+            ->get()->row()->name;
+    }
+
     public function get_events_by_id($id, $entity_id = false)
     {
         if ($entity_id !== false) {
+            $entity_name = $this->get_name_of_entity($id, $entity_id);
+
             $this->db->group_start()
-                ->where('events.victim_id', $entity_id)
-                ->or_where('events.attacker_id', $entity_id)
+                    ->group_start()
+                        ->where('events.victim_id', $entity_id)
+                        ->or_where('events.attacker_id', $entity_id)
+                    ->group_end()
+                    ->or_group_start()
+                        ->where_in('events.event', ['connected', 'disconnected'])
+                        ->where('events.data', $entity_name)
+                    ->group_end()
                 ->group_end();
         }
 
@@ -937,10 +952,10 @@ class Operations extends CI_Model
             ->from('events')
             ->join('entities AS victim', 'victim.id = events.victim_id AND victim.operation_id = ' . $id, 'LEFT')
             ->join('entities AS attacker', 'attacker.id = events.attacker_id AND attacker.operation_id = ' . $id, 'LEFT')
-            ->join('players AS victim_player', 'victim_player.id = victim.player_id', 'LEFT')
-            ->join('players AS attacker_player', 'attacker_player.id = attacker.player_id', 'LEFT')
+            ->join('players AS victim_player', 'victim_player.id = victim.player_id AND victim.operation_id = ' . $id, 'LEFT')
+            ->join('players AS attacker_player', 'attacker_player.id = attacker.player_id AND attacker.operation_id = ' . $id, 'LEFT')
             ->where('events.operation_id', $id)
-            ->order_by("events.frame ASC");
+            ->order_by('events.frame ASC');
 
         return $this->db->get()->result_array();
     }

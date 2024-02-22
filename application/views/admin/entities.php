@@ -44,7 +44,7 @@ $fixed_icon = '<span class="material-icons">check</span>';
                                         </a>
                                         <a href="<?php echo base_url('manage/' . $op['id'] . '/verify'); ?>" class="mdc-tab" role="tab" aria-selected="false" tabindex="6">
                                             <span class="mdc-tab__content">
-                                                <span class="mdc-tab__text-label">Verify data</span>
+                                                <span class="mdc-tab__text-label">Op</span>
                                             </span>
                                             <span class="mdc-tab-indicator">
                                                 <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
@@ -242,7 +242,7 @@ if (count($items) === 0) {
                                         $distance = $i['distance_traveled'] . ' m';
                                     }
 
-                                    $join_time = get_timestamp($i['start_frame_num'] * $op['capture_delay']);
+                                    $join_time = get_timestamp($i['join_time_seconds']);
 
                                     $time = 'n/a';
                                     if ($i['seconds_in_game'] > 0) {
@@ -367,7 +367,6 @@ if (count($items) === 0) {
                     if (res_json.action === 'not-a-player') {
                         btn.remove();
                         tr.style.opacity = '0.4';
-                        tr.querySelector('td:nth-child(2) span').textContent = entity_name;
                     } else {
                         throw new Error('Unknown response action 😵');
                     }
