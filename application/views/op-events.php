@@ -292,7 +292,7 @@ $deduped_items = array_reduce($items, function ($acc, $next) {
             }
         });
 
-        const ss_events_data_field = Object.keys(events_num).sort().map(ev => {
+        const ss_events_data_field = Object.keys(events_num).map(ev => {
             return {
                 text: ev + ' (' + events_num[ev] + ')',
                 value: ev
@@ -356,33 +356,42 @@ $deduped_items = array_reduce($items, function ($acc, $next) {
             event_ss.setData(ss_events_data_field_new);
         }
 
-        const stylesheet = new CSSStyleSheet();
-        const events_table = document.getElementById('events-table');
-        events_table.adoptedStyleSheets = [stylesheet];
         function update_events_table_classes() {
-            const rules = [];
-
+            let attacker_id = false;
             const attacker_ss_value = attacker_ss.getSelected();
             if (attacker_ss_value.length && attacker_ss_value[0] !== '') {
-                const attacker_id = attacker_ss_value[0] === 'null' ? '' : attacker_ss_value[0];
-                rules.push('tbody tr:not([data-attacker-id=' + attacker_id + ']) { display: none; }');
+                attacker_id = attacker_ss_value[0] === 'null' ? '' : attacker_ss_value[0];
             }
 
+            let victim_id = false;
             const victim_ss_value = victim_ss.getSelected();
             if (victim_ss_value.length && victim_ss_value[0] !== '') {
-                const victim_id = victim_ss_value[0] === 'null' ? '' : victim_ss_value[0];
-                rules.push('tbody tr:not([data-victim-id=' + victim_id + ']) { display: none; }');
+                victim_id = victim_ss_value[0] === 'null' ? '' : victim_ss_value[0];
             }
 
             const event_ss_value = event_ss.getSelected();
-            const event_rules = event_ss_value.map(ev => '[data-event-name=' + ev + ']');
-            if (event_rules.length) {
-                rules.push('tbody tr:not(' + event_rules.join(',') + ') { display: none; }');
-            }
 
-            stylesheet.replace(rules.join(' ')).then(() => {
-                console.log(stylesheet.cssRules);//debug
-            });
+            const rows = document.querySelectorAll('#events-table tbody tr');
+            for (const tr of rows) {
+                if (event_ss_value.length > 0) {
+                    if (!event_ss_value.includes(tr.dataset.eventName)) {
+                        tr.classList.add('dnone');
+                        continue;
+                    }
+                }
+
+                if (attacker_id !== false && attacker_id !== tr.dataset.attackerId) {
+                    tr.classList.add('dnone');
+                    continue;
+                }
+
+                if (victim_id !== false && victim_id !== tr.dataset.victimId) {
+                    tr.classList.add('dnone');
+                    continue;
+                }
+
+                tr.classList.remove('dnone');
+            }
         }
 
         events_filters.classList.remove('dnone');
