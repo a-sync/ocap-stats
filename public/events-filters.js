@@ -87,7 +87,8 @@ if (events_filters && entities && sides && events_num) {
         'select': attacker_select,
         'settings': {
             showSearch: true,
-            allowDeselect: true
+            allowDeselect: true,
+            closeOnSelect: false
         },
         'data': [
             {
@@ -117,7 +118,8 @@ if (events_filters && entities && sides && events_num) {
         'select': victim_select,
         'settings': {
             showSearch: true,
-            allowDeselect: true
+            allowDeselect: true,
+            closeOnSelect: false
         },
         'data': [
             {
@@ -242,5 +244,5 @@ if (events_filters && entities && sides && events_num) {
         }
     }
 
-    events_filters.classList.remove('dnone');
+    setTimeout(()=>{events_filters.classList.remove('dnone');},20);
 }
