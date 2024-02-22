@@ -331,6 +331,8 @@ class App extends CI_Controller
                         $attacker_player_ids = array_column($op_events, 'attacker_player_id', 'attacker_player_id');
                         $victim_player_ids = array_column($op_events, 'victim_player_id', 'victim_player_id');
                         $op_player_ids = array_unique(array_merge($attacker_player_ids, $victim_player_ids), SORT_NUMERIC);
+
+                        $op_entities = $this->additional_data->get_op_entities($op['id']);
                     }
                 } elseif ($tab === 'weapons') {
                     $op_weapons = $this->operations->get_weapons_by_id($op['id']);
@@ -370,7 +372,8 @@ class App extends CI_Controller
                     ], true),
                     'op_commanders' => $op_commanders,
                     'op_id' => $op['id'],
-                    'players_first_op' => $players_first_op
+                    'players_first_op' => $players_first_op,
+                    'op_entities' => $op_entities
                 ]);
             } elseif ($tab === 'weapons') {
                 $this->load->view('op-weapons', [

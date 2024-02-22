@@ -290,7 +290,7 @@ if (count($items) === 0) {
 <script>
     const ss_css = document.createElement('link');
     ss_css.rel = 'stylesheet';
-    ss_css.href = 'https://unpkg.com/slim-select@2.8.1/dist/slimselect.css';
+    ss_css.href = '<?php echo base_url('public/slimselect2.css'); ?>';
     document.head.appendChild(ss_css);
 
     const entities = <?php echo json_encode($op_entities); ?>;

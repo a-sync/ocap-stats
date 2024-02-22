@@ -234,6 +234,15 @@ img.ocap-link {
     text-decoration: underline;
 }
 
+.attacker-filter-ss, .victim-filter-ss {
+    min-width: 200px;
+    font-size: 0.8rem;
+}
+
+.event-filter-ss {
+    font-size: 0.8rem;
+}
+
 .dnone {
     display: none;
 }
