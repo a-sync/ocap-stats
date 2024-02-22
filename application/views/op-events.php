@@ -255,7 +255,13 @@ $deduped_items = array_reduce($items, function ($acc, $next) {
                     value: 'null'
                 },
                 ...ss_entities_data_field
-            ]
+            ],
+            events: {
+                afterChange: () => {
+                    update_events_ss_dataset();
+                    update_events_table_classes();
+                }
+            }
         });
 
         const victim_select = document.createElement('select');
@@ -277,7 +283,13 @@ $deduped_items = array_reduce($items, function ($acc, $next) {
                     value: 'null'
                 },
                 ...ss_entities_data_field
-            ]
+            ],
+            events: {
+                afterChange: () => {
+                    update_events_ss_dataset();
+                    update_events_table_classes();
+                }
+            }
         });
 
         const ss_events_data_field = Object.keys(events_num).sort().map(ev => {
@@ -295,7 +307,8 @@ $deduped_items = array_reduce($items, function ($acc, $next) {
             'select': event_select,
             'settings': {
                 showSearch: true,
-                allowDeselect: true
+                allowDeselect: true,
+                closeOnSelect: false
             },
             'data': [
                 {
@@ -303,31 +316,36 @@ $deduped_items = array_reduce($items, function ($acc, $next) {
                     placeholder: true
                 },
                 ...ss_events_data_field
-            ]
+            ],
+            events: {
+                afterChange: () => {
+                    update_events_table_classes();
+                }
+            }
         });
 
-        function update_events_ss_dataset () {//TODO
+        function update_events_ss_dataset () {
             if (!event_ss) return;
 
-            const conditions = [];
+            const rules = [];
 
             const attacker_ss_value = attacker_ss.getSelected();
             if (attacker_ss_value.length && attacker_ss_value[0] !== '') {
                 const id = attacker_ss_value[0] === 'null' ? '' : attacker_ss_value[0];
-                conditions.push('[data-attacker-id="' + attacker_ss_value + '"]');
+                rules.push('[data-attacker-id="' + attacker_ss_value + '"]');
             }
 
             const victim_ss_value = victim_ss.getSelected();
             if (victim_ss_value.length && victim_ss_value[0] !== '') {
                 const id = victim_ss_value[0] === 'null' ? '' : victim_ss_value[0];
-                conditions.push('[data-victim-id="' + victim_ss_value + '"]');
+                rules.push('[data-victim-id="' + victim_ss_value + '"]');
             }
 
             const event_ss_value = event_ss.getSelected();
 
             const ss_events_data_field_new = Object.keys(events_num).sort().map(ev => {
 
-                const count = document.querySelectorAll('#events-table tbody tr[data-event-name="' + ev + '"]' + conditions.join('')).length;
+                const count = document.querySelectorAll('#events-table tbody tr[data-event-name="' + ev + '"]' + rules.join('')).length;
                 return {
                     text: ev + ' (' + count + ')',
                     value: ev,
@@ -338,9 +356,33 @@ $deduped_items = array_reduce($items, function ($acc, $next) {
             event_ss.setData(ss_events_data_field_new);
         }
 
-        function update_events_table_classes () {
-            //set / remove classes based on current filters
-            //TODO
+        const stylesheet = new CSSStyleSheet();
+        const events_table = document.getElementById('events-table');
+        events_table.adoptedStyleSheets = [stylesheet];
+        function update_events_table_classes() {
+            const rules = [];
+
+            const attacker_ss_value = attacker_ss.getSelected();
+            if (attacker_ss_value.length && attacker_ss_value[0] !== '') {
+                const attacker_id = attacker_ss_value[0] === 'null' ? '' : attacker_ss_value[0];
+                rules.push('tbody tr:not([data-attacker-id=' + attacker_id + ']) { display: none; }');
+            }
+
+            const victim_ss_value = victim_ss.getSelected();
+            if (victim_ss_value.length && victim_ss_value[0] !== '') {
+                const victim_id = victim_ss_value[0] === 'null' ? '' : victim_ss_value[0];
+                rules.push('tbody tr:not([data-victim-id=' + victim_id + ']) { display: none; }');
+            }
+
+            const event_ss_value = event_ss.getSelected();
+            const event_rules = event_ss_value.map(ev => '[data-event-name=' + ev + ']');
+            if (event_rules.length) {
+                rules.push('tbody tr:not(' + event_rules.join(',') + ') { display: none; }');
+            }
+
+            stylesheet.replace(rules.join(' ')).then(() => {
+                console.log(stylesheet.cssRules);//debug
+            });
         }
 
         events_filters.classList.remove('dnone');
