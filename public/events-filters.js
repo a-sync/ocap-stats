@@ -92,7 +92,8 @@ function init_events_filters(entities, sides, events_num) {
         },
         'data': [
             {
-                text: '',
+                text: 'Filter by attacker',
+                value: '',
                 placeholder: true
             },
             {
@@ -123,7 +124,8 @@ function init_events_filters(entities, sides, events_num) {
         },
         'data': [
             {
-                text: '',
+                text: 'Filter by victim',
+                value: '',
                 placeholder: true
             },
             {
@@ -162,7 +164,8 @@ function init_events_filters(entities, sides, events_num) {
         },
         'data': [
             {
-                text: '',
+                text: 'Filter by events',
+                value: '',
                 placeholder: true
             },
             ...ss_events_data_field
