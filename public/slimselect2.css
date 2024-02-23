@@ -1,13 +1,14 @@
 :root{
     --ss-primary-color: var(--mdc-theme-secondary);
     --ss-bg-color: var(--mdc-theme-surface);
-    --ss-font-color: var(--mdc-theme-on-surface);
+    --ss-font-color: var(--mdc-theme-text-primary-on-background);
     --ss-font-placeholder-color: var(--mdc-theme-text-hint-on-background);
-    --ss-disabled-color: var(--mdc-theme-text-disabled-on-background);
-    --ss-border-color: var(--mdc-theme-text-secondary-on-background);
+    --ss-disabled-color: var(--mdc-theme-surface);
+    --ss-border-color: var(--mdc-theme-text-hint-on-background);
     --ss-highlight-color: var(--mdc-theme-primary);
+    --ss-highlight-font-color: var(--mdc-theme-text-primary-on-background);
     --ss-success-color: #00b755;
-    --ss-error-color: #dc3545;
+    --ss-error-color: var(--mdc-theme-error);
     --ss-focus-color: #5897fb;
     --ss-main-height: 30px;
     --ss-content-height: 300px;
@@ -63,10 +64,11 @@
 }
 .ss-main.ss-disabled{
     background-color:var(--ss-disabled-color);
-    cursor:not-allowed
+    cursor:not-allowed;
+    color:var(--ss-font-placeholder-color)
 }
 .ss-main.ss-disabled .ss-values .ss-disabled{
-    color:var(--ss-font-color)
+    color:var(--ss-font-placeholder-color)
 }
 .ss-main.ss-disabled .ss-values .ss-value .ss-value-delete{
     cursor:not-allowed
@@ -132,19 +134,28 @@
 }
 .ss-main .ss-values .ss-value .ss-value-text{
     font-size:12px;
-    color:var(--ss-bg-color);
+    color:var(--ss-highlight-font-color);
     line-height:1;
     padding:var(--ss-spacing-s) var(--ss-spacing-m)
 }
 .ss-main .ss-values .ss-value .ss-value-delete{
-    display:flex;
-    align-items:center;
-    height:var(--ss-spacing-l);
-    width:var(--ss-spacing-l);
-    padding:var(--ss-spacing-s) var(--ss-spacing-m);
-    cursor:pointer;
-    border-left:solid 1px var(--ss-bg-color);
-    box-sizing:content-box
+    margin: 0 1px 0 0px;
+    cursor: pointer;
+    color: var(--mdc-theme-on-error);
+    background-color: maroon;
+    width: 1rem;
+    height: 1rem;
+    font-family: monospace;
+    font-size: 0.75rem;
+    font-weight: bold;
+    line-height: 1rem;
+    text-align: center;
+    vertical-align: middle;
+    display: inline-block;
+    border-radius: 50%;
+}
+.ss-main .ss-values .ss-value .ss-value-delete:hover{
+    background-color: var(--mdc-theme-error);
 }
 .ss-main .ss-values .ss-value .ss-value-delete svg{
     height:var(--ss-spacing-l);
@@ -152,7 +163,7 @@
 }
 .ss-main .ss-values .ss-value .ss-value-delete svg path{
     fill:none;
-    stroke:var(--ss-bg-color);
+    stroke:var(--ss-font-color);
     stroke-width:18;
     stroke-linecap:round;
     stroke-linejoin:round
@@ -397,20 +408,19 @@
     user-select:none
 }
 .ss-content .ss-list .ss-option:hover{
-    color:var(--ss-bg-color);
+    color:var(--highlight-font-color);
     background-color:var(--ss-primary-color)
 }
 .ss-content .ss-list .ss-option.ss-highlighted,.ss-content .ss-list .ss-option:not(.ss-disabled).ss-selected{
-    color:var(--ss-bg-color);
+    color:var(--ss-highlight-font-color);
     background-color:var(--ss-primary-color)
 }
 .ss-content .ss-list .ss-option.ss-disabled{
     cursor:not-allowed;
-    background-color:var(--ss-disabled-color)
-}
-.ss-content .ss-list .ss-option.ss-disabled:hover{
-    color:var(--ss-font-color)
+    background-color:var(--ss-disabled-color);
+    color:var(--ss-font-placeholder-color)
 }
 .ss-content .ss-list .ss-option .ss-search-highlight{
-    background-color:var(--ss-highlight-color)
+    background-color:var(--ss-highlight-color);
+    color:var(--ss-highlight-font-color)
 }

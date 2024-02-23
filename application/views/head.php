@@ -19,8 +19,8 @@ $icon_url = base_url($this->config->item('site_logo'));
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/4.0.0/github-markdown.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
 
     <link rel="stylesheet" href="<?php echo base_url('public/mdc.min.css'); ?>">
-
     <link rel="stylesheet" href="<?php echo base_url('public/sortable.css'); ?>">
+    <link rel="stylesheet" href="<?php echo base_url('public/slimselect2.css'); ?>">
     <link rel="stylesheet" href="<?php echo base_url('public/app.css'); ?>">
 </head>
 

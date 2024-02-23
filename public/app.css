@@ -323,7 +323,7 @@ img.ocap-link {
 
     .ss-main .ss-multi-selected .ss-values .ss-value .ss-value-delete {
         color: var(--mdc-theme-text-primary-on-dark);
-        background-color: var(--mdc-theme-on-error);
+        background-color: var(--mdc-theme-error);
     }
 
     .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover .mdc-notched-outline .mdc-notched-outline__leading, .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover .mdc-notched-outline .mdc-notched-outline__notch, .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover .mdc-notched-outline .mdc-notched-outline__trailing {

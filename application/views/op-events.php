@@ -162,11 +162,6 @@ $deduped_items = array_reduce($items, function ($acc, $next) {
 <script src="https://unpkg.com/slim-select@2.8.1/dist/slimselect.min.js"></script>
 <script src="<?php echo base_url('public/events-filters.js'); ?>"></script>
 <script>
-    const ss_css = document.createElement('link');
-    ss_css.rel = 'stylesheet';
-    ss_css.href = '<?php echo base_url('public/slimselect2.css'); ?>';
-    document.head.appendChild(ss_css);
-
     const entities = <?php echo json_encode($op_entities); ?>;
     const sides = <?php echo json_encode($sides); ?>;
     const events_num = <?php echo json_encode($events_num); ?>;

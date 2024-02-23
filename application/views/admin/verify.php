@@ -418,10 +418,13 @@ foreach ($op_player_entities as $e) {
 
 <script src="<?php echo base_url('public/slimselect.min.js'); ?>"></script>
 <script>
+    const ss2css = document.head.querySelector('link[href$="slimselect2.css"]');
+    ss2css.remove();
     const ss_css = document.createElement('link');
     ss_css.rel = 'stylesheet';
     ss_css.href = '<?php echo base_url('public/slimselect.css'); ?>';
     document.head.appendChild(ss_css);
+    // TODO: upd to slimselect2
 
     <?php
     foreach ($op_sides as $s => $pc) :
