@@ -239,6 +239,10 @@ img.ocap-link {
     font-size: 0.8rem;
 }
 
+.event-filter-ss {
+    max-width: 300px;
+}
+
 .dnone {
     display: none;
 }
