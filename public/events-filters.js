@@ -138,7 +138,9 @@ function init_events_filters(entities, sides) {
     function update_filters_dataset(update_events) {
         if (!entity_ss || !event_ss) return;
 
-        const entity_ss_value = entity_ss.getSelected();
+        const entity_ss_value = entity_ss.getSelected().map(e => {
+            return e === 'null' ? '' : e;
+        });
         const event_ss_value = event_ss.getSelected();
 
         const events_num = [];
@@ -157,9 +159,8 @@ function init_events_filters(entities, sides) {
                 const rules = [];
                 if (entity_ss_value.length > 0) {
                     for (const entity_id of entity_ss_value) {
-                        const id = entity_id === 'null' ? '' : entity_id;
-                        rules.push('#events-table tbody tr[data-event-name="' + ev + '"][data-attacker-id="' + id + '"]');
-                        rules.push('#events-table tbody tr[data-event-name="' + ev + '"][data-victim-id="' + id + '"]');
+                        rules.push('#events-table tbody tr[data-event-name="' + ev + '"][data-attacker-id="' + entity_id + '"]');
+                        rules.push('#events-table tbody tr[data-event-name="' + ev + '"][data-victim-id="' + entity_id + '"]');
                     }
                 } else {
                     rules.push('#events-table tbody tr[data-event-name="' + ev + '"]');
