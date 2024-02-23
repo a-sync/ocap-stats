@@ -46,15 +46,17 @@ if (defined('OCAP_ODATA_URL')) {
     document.addEventListener('MDCAutoInit:End', () => {
         console.log('🖼️');
 
-        const odata_snack_ok = localStorage.getItem('odata_snack');
-        if (!odata_snack_ok) {
-            const snackbar = document.querySelector('.mdc-snackbar').MDCSnackbar;
-            snackbar.timeoutMs = -1;
-            snackbar.foundation.open();
-            snackbar.listen("MDCSnackbar:closed", () => {
-                localStorage.setItem('odata_snack', Date.now());
-            });
-        }
+        <?php if ($odata_link !== ''): ?>
+            const odata_snack_ok = localStorage.getItem('odata_snack');
+            if (!odata_snack_ok) {
+                const snackbar = document.querySelector('.mdc-snackbar').MDCSnackbar;
+                snackbar.timeoutMs = -1;
+                snackbar.foundation.open();
+                snackbar.listen("MDCSnackbar:closed", () => {
+                    localStorage.setItem('odata_snack', Date.now());
+                });
+            }
+        <?php endif; ?>
     });
 
     window.mdc.autoInit();

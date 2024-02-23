@@ -59,7 +59,7 @@ jobs:
 
     steps:
       - name: 🚚 Get latest code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: ✏️ Replace config[base_url]
         uses: jacobtomlinson/gha-find-replace@v3
