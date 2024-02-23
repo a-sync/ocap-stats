@@ -189,18 +189,10 @@ if ($entity_id !== false) {
                 <div class="mdc-data-table mdc-elevation--z2" id="events-table">
                     <div class="mdc-data-table__table-container">
 
+                        <div class="dnone" id="events-filters"></div>
+
                         <table class="mdc-data-table__table sortable">
                             <thead>
-                                <?php if (count($items) > 0) : ?>
-                                    <tr class="mdc-data-table__header-row dnone" id="events-filters">
-                                        <td class="mdc-data-table__header-cell"></td>
-                                        <td class="mdc-data-table__header-cell" id="attacker-filter"></td>
-                                        <td class="mdc-data-table__header-cell" id="event-filter"></td>
-                                        <td class="mdc-data-table__header-cell" id="victim-filter"></td>
-                                        <td class="mdc-data-table__header-cell"></td>
-                                        <td class="mdc-data-table__header-cell"></td>
-                                    </tr>
-                                <?php endif; ?>
                                 <tr class="mdc-data-table__header-row">
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="ascending" data-column-id="time">Time</th>
                                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="attacker" title="Player name / Entity ID">Attacker</th>
@@ -214,15 +206,7 @@ if ($entity_id !== false) {
                                 </tr>
                             </thead>
                             <tbody class="mdc-data-table__content">
-                                <?php 
-                                $events_num = [];
-                                foreach ($items as $i) :
-                                    if (isset($events_num[$i['event']])) {
-                                        $events_num[$i['event']] += 1;
-                                    } else {
-                                        $events_num[$i['event']] = 1;
-                                    }
-
+                                <?php foreach ($items as $i) :
                                     $time = gmdate('H:i:s', $i['frame']);
 
                                     $attacker_name = html_escape($i['attacker_name']);
@@ -309,7 +293,6 @@ if ($entity_id !== false) {
 <script>
     const entities = <?php echo json_encode($op_entities); ?>;
     const sides = <?php echo json_encode($sides); ?>;
-    const events_num = <?php echo json_encode($events_num); ?>;
 
     async function editAttackerAction(btn) {
         const btn_icon = btn.querySelector('i');
@@ -534,7 +517,7 @@ if ($entity_id !== false) {
 
     const domLoaded = () => {
         console.log('DOM loaded');
-        init_events_filters(entities, sides, events_num);
+        init_events_filters(entities, sides);
 
         const edit_btns = document.querySelectorAll('.edit-attacker-btn');
         for (const b of edit_btns) {

@@ -234,13 +234,17 @@ img.ocap-link {
     text-decoration: underline;
 }
 
-.attacker-filter-ss, .event-filter-ss, .victim-filter-ss {
-    min-width: 200px;
-    font-size: 0.8rem;
+#events-filters {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    padding: 1rem;
 }
 
-.event-filter-ss {
+.entity-filter-ss, .event-filter-ss {
+    min-width: 200px;
     max-width: 300px;
+    font-size: 0.8rem;
 }
 
 .dnone {
