@@ -529,18 +529,26 @@ class Data extends CI_Controller
                                 $errors = array_merge($errors, $err);
 
                                 log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] event (' . $op['id'] . ' - ' . $event_id . ') delete finished (errors: ' . count($errors) . ')');
-                            } elseif ($action === 'edit-attacker') {
+                            } elseif ($action === 'edit-event') {
                                 $new_attacker_id = $this->input->post('new_attacker_id');
-                                if (!is_numeric($new_attacker_id)) {
-                                    $new_attacker_id = null;
+                                if ($new_attacker_id !== null) {
+                                    if ($new_attacker_id === '') {
+                                        $new_attacker_id = null;
+                                    }
+
+                                    $err = $this->additional_data->edit_op_event_attacker($op['id'], $event_id, $new_attacker_id);
+                                    $errors = array_merge($errors, $err);
+
+                                    log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] event (' . $op['id'] . ' - ' . $event_id . ') edit-attacker (' . $new_attacker_id . ') finished (errors: ' . count($errors) . ')');
                                 }
 
-                                $err = $this->additional_data->edit_op_event_attacker($op['id'], $event_id, $new_attacker_id);
-                                $errors = array_merge($errors, $err);
+                                $new_weapon = $this->input->post('new_weapon');
+                                if ($new_weapon !== null) {
+                                    $err = $this->additional_data->update_op_event($op['id'], $event_id, ['weapon' => $new_weapon]);
+                                    $errors = array_merge($errors, $err);
 
-                                log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] event (' . $op['id'] . ' - ' . $event_id . ') edit-attacker (' . $new_attacker_id . ') finished (errors: ' . count($errors) . ')');
-                            } elseif ($action === 'edit-weapon') {
-                                $errors[] = '🚧 Not implemented yet.';
+                                    log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] event (' . $op['id'] . ' - ' . $event_id . ') edit-weapon (' . $new_weapon . ') finished (errors: ' . count($errors) . ')');
+                                }
                             } else {
                                 $errors[] = 'Invalid action.';
                             }

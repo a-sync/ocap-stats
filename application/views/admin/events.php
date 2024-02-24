@@ -25,7 +25,7 @@ $fixed_icon = '<span class="material-icons">check</span>';
             $verified_attr = $verified ? ' disabled' : '';
             $verified_class = $verified ? ' mdc-text-field--disabled' : '';
         ?>
-            <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center">
+            <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 margin--center">
                 <div class="mdc-data-table mdc-elevation--z2">
                     <div class="mdc-data-table__table-container">
                         <div class="mdc-tab-bar">
@@ -185,7 +185,7 @@ if ($entity_id !== false) {
 ?>
     <div class="mdc-layout-grid">
         <div class="mdc-layout-grid__inner">
-            <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center">
+            <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 margin--center">
                 <div class="mdc-data-table mdc-elevation--z2" id="events-table">
                     <div class="mdc-data-table__table-container">
 
@@ -249,24 +249,22 @@ if ($entity_id !== false) {
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $time; ?></td>
                                         <td class="mdc-data-table__cell cell__title">
                                             <span class="<?php echo $attacker_side_class; ?>"<?php echo $attacker_title; ?>><?php echo $attacker_name; ?></span>
-                                            <?php if (!$verified && in_array($i['event'], ['hit', 'killed'])) : ?>
-                                                <button type="button" class="mdc-icon-button edit-attacker-btn" title="Change attacker entity" disabled="disabled">
-                                                    <span class="mdc-icon-button__ripple"></span>
-                                                    <span class="mdc-icon-button__focus-ring"></span>
-                                                    <i class="material-icons mdc-icon-button__icon" aria-hidden="true">edit</i>
-                                                </button>
-                                            <?php endif; ?>
                                         </td>
-                                        <td class="mdc-data-table__cell" data-sort="<?php echo html_escape($i['event']); ?>">
-                                            <?php echo $event; ?>
-                                        </td>
+                                        <td class="mdc-data-table__cell" data-sort="<?php echo html_escape($i['event']); ?>"><?php echo $event; ?></td>
                                         <td class="mdc-data-table__cell cell__title">
                                             <span class="<?php echo $victim_side_class; ?>"<?php echo $victim_title; ?>><?php echo $victim_name; ?></span>
                                         </td>
-                                        <td class="mdc-data-table__cell"><?php echo html_escape($i['weapon']); ?></td>
+                                        <td class="mdc-data-table__cell"><span><?php echo html_escape($i['weapon']); ?></span></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo html_escape($i['distance']); ?>"><?php echo $distance; ?></td>
                                         <?php if (!$verified) : ?>
                                             <td class="mdc-data-table__cell mdc-data-table__cell--numeric">
+                                                <?php if (in_array($i['event'], ['hit', 'killed'])) : ?>
+                                                    <button type="button" class="mdc-icon-button edit-event-btn" title="Edit event" disabled="disabled">
+                                                        <span class="mdc-icon-button__ripple"></span>
+                                                        <span class="mdc-icon-button__focus-ring"></span>
+                                                        <i class="material-icons mdc-icon-button__icon" aria-hidden="true">edit</i>
+                                                    </button>
+                                                <?php endif; ?>
                                                 <button type="button" class="mdc-icon-button delete-event-btn" title="Delete event" disabled="disabled">
                                                     <span class="mdc-icon-button__ripple"></span>
                                                     <span class="mdc-icon-button__focus-ring"></span>
@@ -293,18 +291,37 @@ if ($entity_id !== false) {
 <script>
     const entities = <?php echo json_encode($op_entities); ?>;
     const sides = <?php echo json_encode($sides); ?>;
+    const weapons = Object.keys(getWeapons());
 
-    async function editAttackerAction(btn) {
+    function getWeapons() {
+        const rows = document.querySelectorAll('#events-table tbody tr');
+
+        const weapons_num = {};
+        for (const tr of rows) {
+            const weapon = tr.querySelector('td:nth-child(5) span').textContent.trim();
+            if (weapons_num[weapon] === undefined) {
+                weapons_num[weapon] = 1;
+            } else {
+                weapons_num[weapon] += 1;
+            }
+        }
+
+        return weapons_num;
+    }                         
+
+    async function editEventAction(btn) {
         const btn_icon = btn.querySelector('i');
-        const td = btn.closest('td');
         const tr = btn.closest('tr');
         const event_id = tr.dataset.eventId;
+        const event_name = tr.dataset.eventName;
+        const attacker_td = tr.querySelector('td:nth-child(2)');
+        const attacker_id = tr.dataset.attackerId;
+        const victim_entity = entities.find(e => e.id === tr.dataset.victimId);
+        const weapon_td = tr.querySelector('td:nth-child(5)');
+        const weapon_span = weapon_td.querySelector('span');
+        const weapon = weapon_span.textContent.trim();
 
         try {
-            const attacker_id = tr.dataset.attackerId;
-            const victim_entity = entities.find(e => e.id === tr.dataset.victimId);
-            const event_name = tr.dataset.eventName;
-
             if (btn_icon.textContent === 'edit') {
                 btn_icon.textContent = 'done';
 
@@ -347,16 +364,16 @@ if ($entity_id !== false) {
                     }
                 });
 
-                const select = document.createElement('select');
-                select.classList.add('edit-attacker-ss');
-                td.appendChild(select);
+                const attacker_select = document.createElement('select');
+                attacker_select.classList.add('edit-attacker-ss');
+                attacker_td.appendChild(attacker_select);
                 new SlimSelect({
-                    'select': select,
-                    'settings': {
+                    select: attacker_select,
+                    settings: {
                         showSearch: true,
                         allowDeselect: true
                     },
-                    'data': [
+                    data: [
                         {
                             text: 'nobody / "something"',
                             placeholder: 'true',
@@ -369,20 +386,64 @@ if ($entity_id !== false) {
                         ...ss_entities_data_field
                     ]
                 });
+
+                const weapon_select = document.createElement('select');
+                weapon_select.classList.add('edit-weapon-ss');
+                weapon_td.appendChild(weapon_select);
+                new SlimSelect({
+                    select: weapon_select,
+                    settings: {
+                        showSearch: true,
+                        allowDeselect: true
+                    },
+                    data: [
+                        {
+                            text: '(empty)',
+                            placeholder: 'true',
+                            value: ''
+                        },
+                        ...weapons.filter(w => w !== '').map(w => {
+                            return {
+                                text: w,
+                                value: w,
+                                selected: w === weapon
+                            };
+                        })
+                    ],
+                    events: {
+                        addable: (value) => {
+                            if (value.trim() === '' || weapons.includes(value.trim())) {
+                                return false;
+                            }
+
+                            return value.trim();
+                        }
+                    }
+                });
             } else {
-                const select = td.querySelector('select');
-                if (select && select.slim) {
-                    select.slim.close();
+                const attacker_select = attacker_td.querySelector('select.edit-attacker-ss');
+                const weapon_select = weapon_td.querySelector('select.edit-weapon-ss');
+                if (attacker_select && attacker_select.slim && weapon_select && weapon_select.slim) {
+                    attacker_select.slim.close();
+                    weapon_select.slim.close();
 
-                    const new_attacker_id = select.value;
+                    const form_data = new FormData();
+
+                    const new_attacker_id = attacker_select.value;
                     if (new_attacker_id !== attacker_id) {
-                        btn.disabled = true;
+                        form_data.append('new_attacker_id', new_attacker_id);
+                    }
 
-                        const form_data = new FormData();
-                        form_data.append('action', 'edit-attacker');
+                    const new_weapon = weapon_select.value;
+                    if (new_weapon !== weapon) {
+                        form_data.append('new_weapon', new_weapon);
+                    }
+
+                    btn.disabled = true;
+                    if (Array.from(form_data).length > 0) {
+                        form_data.append('action', 'edit-event');
                         form_data.append('operation_id', <?php echo $op['id']; ?>);
                         form_data.append('event_id', event_id);
-                        form_data.append('new_attacker_id', new_attacker_id);
 
                         const response = await fetch('<?php echo base_url('edit-event'); ?>', {
                             method: 'POST',
@@ -395,24 +456,32 @@ if ($entity_id !== false) {
                         if (response.ok) {
                             const res_json = await response.json();
                             if (res_json.errors.length === 0) {
-                                if (res_json.action === 'edit-attacker') {
-                                    tr.dataset.attackerId = new_attacker_id;
+                                if (res_json.action === 'edit-event') {
+                                    if (new_attacker_id !== attacker_id) {
+                                        tr.dataset.attackerId = new_attacker_id;
 
-                                    const span = td.querySelector('span');
-                                    if (span) {
-                                        span.textContent = '';
-                                        span.className = '';
-                                        span.title = '';
-                                    }
+                                        const span = attacker_td.querySelector('span');
+                                        if (span) {
+                                            span.textContent = '';
+                                            span.className = '';
+                                            span.title = '';
+                                        }
 
-                                    const new_attacker_entity = entities.find(e => e.id === new_attacker_id);
-                                    if (new_attacker_entity) {
-                                        span.className = 'side__' + String(new_attacker_entity.side).toLowerCase();
-                                        span.title = '#' + new_attacker_entity.id;
-                                        const a = document.createElement('a');
-                                        a.textContent = new_attacker_entity.name;
-                                        a.href = '<?php echo base_url('manage/' . $op['id'] . '/events'); ?>?entity_id=' + new_attacker_entity.id;
-                                        span.appendChild(a);
+                                        const new_attacker_entity = entities.find(e => e.id === new_attacker_id);
+                                        if (new_attacker_entity) {
+                                            span.className = 'side__' + String(new_attacker_entity.side).toLowerCase();
+                                            span.title = '#' + new_attacker_entity.id;
+                                            const a = document.createElement('a');
+                                            a.textContent = new_attacker_entity.name;
+                                            a.href = '<?php echo base_url('manage/' . $op['id'] . '/events'); ?>?entity_id=' + new_attacker_entity.id;
+                                            span.appendChild(a);
+                                        }
+                                    } else if (new_weapon !== weapon) {
+                                        if (!weapons.includes(new_weapon)) {
+                                            weapons.unshift(new_weapon);
+                                        }
+
+                                        weapon_span.textContent = new_weapon;
                                     }
                                 } else {
                                     throw new Error('Unknown response action 😵');
@@ -425,12 +494,14 @@ if ($entity_id !== false) {
                         }
                     }
 
-                    select.slim.destroy();
+                    attacker_select.slim.destroy();
+                    weapon_select.slim.destroy();
                 } else {
                     throw new Error('SlimSelect instance not available');
                 }
 
-                select.remove();
+                attacker_select.remove();
+                weapon_select.remove();
                 btn_icon.textContent = 'edit';
                 btn.disabled = false;
             }
@@ -438,12 +509,19 @@ if ($entity_id !== false) {
             console.error(err);
             alert(err.message || JSON.stringify(err));
 
-            const select = td.querySelector('select');
-            if (select) {
-                if (select.slim) {
-                    select.slim.destroy();
+            const attacker_select = attacker_td.querySelector('select.edit-attacker-ss');
+            if (attacker_select) {
+                if (attacker_select.slim) {
+                    attacker_select.slim.destroy();
                 }
-                select.remove();
+                attacker_select.remove();
+            }
+            const weapon_select = weapon_td.querySelector('select.edit-weapon-ss');
+            if (weapon_select) {
+                if (weapon_select.slim) {
+                    weapon_select.slim.destroy();
+                }
+                weapon_select.remove();
             }
 
             btn_icon.textContent = 'edit';
@@ -462,7 +540,7 @@ if ($entity_id !== false) {
 
         const event_time = tr.querySelector('td:nth-child(1)').textContent.trim();
 
-        const confirmation = confirm('🗑️ Removing event: \n\n[' + event_time + '] ' + attacker_string + ' <' + event_name + '>  ' + victim_string + ' \n\nAre you sure?');
+        const confirmation = confirm('🗑️ Deleting event: \n\n[' + event_time + '] ' + attacker_string + ' <' + event_name + '>  ' + victim_string + ' \n\nAre you sure?');
         if (!confirmation) return;
 
         const form_data = new FormData();
@@ -515,30 +593,23 @@ if ($entity_id !== false) {
         }
     }
 
-    const domLoaded = () => {
-        console.log('DOM loaded');
-        init_events_filters(entities, sides);
+    init_events_filters(entities, sides);
 
-        const edit_btns = document.querySelectorAll('.edit-attacker-btn');
-        for (const b of edit_btns) {
-            b.addEventListener('click', (ev) => {
-                ev.preventDefault();
-                editAttackerAction(b);
-            });
-            b.disabled = false;
-        }
+    const edit_btns = document.querySelectorAll('.edit-event-btn');
+    for (const b of edit_btns) {
+        b.addEventListener('click', (ev) => {
+            ev.preventDefault();
+            editEventAction(b);
+        });
+        b.disabled = false;
+    }
 
-        const delete_btns = document.querySelectorAll('.delete-event-btn');
-        for (const b of delete_btns) {
-            b.addEventListener('click', (ev) => {
-                ev.preventDefault();
-                deleteEventAction(b);
-            });
-            b.disabled = false;
-        }
-    };
-
-    if (document.readyState === 'complete' ||
-        (document.readyState !== 'loading' && !document.documentElement.doScroll)) domLoaded();
-    else document.addEventListener('DOMContentLoaded', domLoaded);
+    const delete_btns = document.querySelectorAll('.delete-event-btn');
+    for (const b of delete_btns) {
+        b.addEventListener('click', (ev) => {
+            ev.preventDefault();
+            deleteEventAction(b);
+        });
+        b.disabled = false;
+    }
 </script>

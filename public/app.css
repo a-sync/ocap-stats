@@ -90,20 +90,13 @@ footer .render-stats {
     color: var(--mdc-theme-error);
 }
 
-.flex--center {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: column;
-    justify-content: center;
-    justify-self: center;
+.margin--center {
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.flex--center-row {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-    justify-content: center;
-    justify-self: center;
+.text--center {
+    text-align: center;
 }
 
 .filters_submit {
@@ -177,6 +170,8 @@ img.ocap-link {
 .array-table {
     margin: 1.25rem;
     max-width: 100%;
+    display: inline-block;
+    text-align: center;
 }
 
 .ss-container {

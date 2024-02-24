@@ -17,7 +17,7 @@ $sides = $this->config->item('sides');
         <?php if ($op) :
             $duration_min = floor(intval($op['mission_duration']) / 60);
         ?>
-            <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center">
+            <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 margin--center">
                 <div class="mdc-data-table mdc-elevation--z2">
                     <div class="mdc-data-table__table-container">
                         <table class="mdc-data-table__table">

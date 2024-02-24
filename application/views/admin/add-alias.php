@@ -7,7 +7,7 @@ $event_types = $this->config->item('event_types');
     <div class="mdc-layout-grid__inner">
 
 
-        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center update_field">
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 margin--center">
             <?php echo form_open(base_url('clearcache'), ['id' => 'clear_cache'], ['redirect' => 'add-alias']); ?>
             <button type="submit" name="clear_cache" value="1" class="mdc-button mdc-button--outlined">
                 <span class="mdc-button__ripple"></span>
@@ -29,7 +29,7 @@ $event_types = $this->config->item('event_types');
             </div>
         <?php endif; ?>
 
-        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center">
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 margin--center">
             <div class="mdc-data-table mdc-elevation--z2">
                 <div class="mdc-data-table__table-container">
                     <?php echo form_open(base_url('add-alias') . '?past_ops=' . $past_ops); ?>
@@ -95,7 +95,7 @@ $event_types = $this->config->item('event_types');
             </div>
         </div>
 
-        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center mdc-typography--body1">
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 margin--center mdc-typography--body1">
             <div id="new_names" class="mdc-elevation--z2 mdc-theme--surface mdc-theme--on-surface">
                 <h3>👶 New names from the past <?php echo $past_ops; ?> ops <a href="?past_ops=<?php echo $past_ops + 6; ?>" title="Show 6 more">➕</a></h3>
                 <?php

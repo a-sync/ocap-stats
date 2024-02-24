@@ -26,7 +26,7 @@ $fixed_icon = '<span class="material-icons">check</span>';
             $verified_attr = $verified ? ' disabled' : '';
             $verified_class = $verified ? ' mdc-text-field--disabled' : '';
         ?>
-            <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center">
+            <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 margin--center">
                 <div class="mdc-data-table mdc-elevation--z2">
                     <div class="mdc-data-table__table-container">
                         <div class="mdc-tab-bar">
@@ -183,7 +183,7 @@ if (count($items) === 0) {
 ?>
     <div class="mdc-layout-grid">
         <div class="mdc-layout-grid__inner">
-            <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center">
+            <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 margin--center">
                 <div class="mdc-data-table mdc-elevation--z2" id="entities-table">
                     <div class="mdc-data-table__table-container">
 

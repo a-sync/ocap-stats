@@ -5,7 +5,7 @@ $event_types = $this->config->item('event_types');
 
 <div class="mdc-layout-grid">
     <div class="mdc-layout-grid__inner">
-        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6 flex--center update_field">
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6 margin--center">
             <?php echo form_open(base_url('update'), ['id' => 'update_operations']); ?>
             <button type="submit" name="update_operations" value="1" class="mdc-button mdc-button--raised mdc-button--leading">
                 <span class="mdc-button__ripple"></span>
@@ -21,7 +21,7 @@ $event_types = $this->config->item('event_types');
             </i>
             <?php echo form_close(); ?>
         </div>
-        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6 flex--center update_field">
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6 margin--center">
             <?php echo form_open(base_url('clearcache'), ['id' => 'clear_cache']); ?>
             <button type="submit" name="clear_cache" value="1" class="mdc-button mdc-button--outlined">
                 <span class="mdc-button__ripple"></span>

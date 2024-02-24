@@ -12,7 +12,7 @@ $sides = $this->config->item('sides');
 ?>
 <div class="mdc-layout-grid">
     <div class="mdc-layout-grid__inner">
-        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center">
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 margin--center">
             <div class="mdc-data-table mdc-elevation--z2">
                 <div class="mdc-data-table__table-container">
 

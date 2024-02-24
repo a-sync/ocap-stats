@@ -23,20 +23,18 @@ function deepMerge(obj1, obj2) {
 function init_events_filters(entities, sides) {
     const events_filters = document.getElementById('events-filters');
 
-    const tab_bar = document.querySelector('#events-table .mdc-tab-bar');
-    const tabs = tab_bar ? tab_bar.querySelectorAll('.mdc-tab') : [];
-    function update_tabs () {
-        return !tab_bar ? () => {} : () => {
-            for (const t of tabs) {
-                if (entity_ss.settings.isOpen || event_ss.settings.isOpen) {
-                    t.style.opacity = '0.5';
-                    t.style.pointerEvents = 'none';
-                } else {
-                    t.style.opacity = '1';
-                    t.style.pointerEvents = 'auto';
-                }
+    const tabs = Array.from(document.querySelectorAll('#events-table .mdc-tab-bar .mdc-tab'));
+    const headers = Array.from(document.querySelectorAll('#events-table table.sortable th'));
+    function update_tabs_headers () {
+        for (const t of [...tabs, ...headers]) {
+            if (entity_ss.settings.isOpen || event_ss.settings.isOpen) {
+                t.style.opacity = '0.5';
+                t.style.pointerEvents = 'none';
+            } else {
+                t.style.opacity = '1';
+                t.style.pointerEvents = 'auto';
             }
-        };
+        }
     }
 
     const side_player_entities = {};
@@ -103,8 +101,8 @@ function init_events_filters(entities, sides) {
             afterChange: () => {
                 update_filters_dataset(true);
             },
-            beforeOpen: update_tabs(),
-            afterClose: update_tabs()
+            beforeOpen: update_tabs_headers,
+            afterClose: update_tabs_headers
         }
     });
 
@@ -130,8 +128,8 @@ function init_events_filters(entities, sides) {
             afterChange: () => {
                 update_filters_dataset(false);
             },
-            beforeOpen: update_tabs(),
-            afterClose: update_tabs()
+            beforeOpen: update_tabs_headers,
+            afterClose: update_tabs_headers
         }
     });
 

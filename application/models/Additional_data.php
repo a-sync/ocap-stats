@@ -1071,7 +1071,7 @@ class Additional_data extends CI_Model
         }
     }
 
-    private function update_op_event($op_id, $event_id, $data)
+    public function update_op_event($op_id, $event_id, $data)
     {
         $errors = [];
 

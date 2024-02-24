@@ -9,7 +9,7 @@ $fixed_icon = '<span class="material-icons">check</span>';
 <div class="mdc-layout-grid">
     <div class="mdc-layout-grid__inner">
 
-        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center update_field">
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 margin--center">
             <?php echo form_open(base_url('clearcache'), ['id' => 'clear_cache'], ['redirect' => 'fix-data' . ($tab === 'unverified' ? '/unverified' : '')]); ?>
             <button type="submit" name="clear_cache" value="1" class="mdc-button mdc-button--outlined">
                 <span class="mdc-button__ripple"></span>
@@ -24,7 +24,7 @@ $fixed_icon = '<span class="material-icons">check</span>';
             <?php echo form_close(); ?>
         </div>
 
-        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center">
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 margin--center">
             <?php
             if ($tab === 'verified') {
                 $items_type = ' verified ops';
@@ -40,7 +40,7 @@ $fixed_icon = '<span class="material-icons">check</span>';
             <?php endif; ?>
         </div>
 
-        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 flex--center">
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 margin--center">
             <div class="mdc-data-table mdc-elevation--z2">
                 <div class="mdc-data-table__table-container">
                     <div class="mdc-tab-bar">
