@@ -46,3 +46,8 @@ UPDATE `events` JOIN `entities` AS `attacker` ON `attacker`.`id` = `events`.`att
 -- 2024-02-16
 --
 ALTER TABLE `entities` DROP `invalid`;
+
+--
+-- 2024-02-27
+--
+UPDATE `entities` SET `hits` = (`hits` - `fhits`), `kills` = (`kills` - `fkills`) ;

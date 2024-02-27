@@ -563,15 +563,17 @@ class Operations extends CI_Model
                     $ff = ($entities[$aid]['side'] === $entities[$vid]['side']) ? true : false;
 
                     if ($e['event'] === 'hit') {
-                        $entities[$aid]['hits']++;
                         if ($ff) {
                             $entities[$aid]['fhits']++;
+                        } else {
+                            $entities[$aid]['hits']++;
                         }
                     } elseif ($e['event'] === 'killed') {
                         if ($entities[$vid]['type'] === 'unit') {
-                            $entities[$aid]['kills']++;
                             if ($ff) {
                                 $entities[$aid]['fkills']++;
+                            } else {
+                                $entities[$aid]['kills']++;
                             }
                         } else {
                             $entities[$aid]['vkills']++;

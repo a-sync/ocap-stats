@@ -1097,21 +1097,25 @@ class Additional_data extends CI_Model
                     if ($new_attacker_id === null || $new_attacker) {
                         if ($event['attacker_id'] !== null && $event['attacker_id'] !== $event['victim_id']) {
                             if ($ev === 'hit') {
-                                $hits_upd_errors = $this->update_op_entity($op_id, $event['attacker_id'], ['hits' => $event['attacker_hits'] - 1]);
+                                $hits_upd_errors = [];
                                 $fhits_upd_errors = [];
 
                                 if ($event['attacker_side'] === $event['victim_side']) {
                                     $fhits_upd_errors = $this->update_op_entity($op_id, $event['attacker_id'], ['fhits' => $event['attacker_fhits'] - 1]);
+                                } else {
+                                    $hits_upd_errors = $this->update_op_entity($op_id, $event['attacker_id'], ['hits' => $event['attacker_hits'] - 1]);
                                 }
 
                                 $errors = array_merge($errors, $hits_upd_errors, $fhits_upd_errors);
                             } elseif ($ev === 'killed') {
                                 if ($event['victim_type'] === 'unit') {
-                                    $kills_upd_errors = $this->update_op_entity($op_id, $event['attacker_id'], ['kills' => $event['attacker_kills'] - 1]);
+                                    $kills_upd_errors = [];
                                     $fkills_upd_errors = [];
 
                                     if ($event['attacker_side'] === $event['victim_side']) {
                                         $fkills_upd_errors = $this->update_op_entity($op_id, $event['attacker_id'], ['fkills' => $event['attacker_fkills'] - 1]);
+                                    } else {
+                                        $kills_upd_errors = $this->update_op_entity($op_id, $event['attacker_id'], ['kills' => $event['attacker_kills'] - 1]);
                                     }
 
                                     $errors = array_merge($errors, $kills_upd_errors, $fkills_upd_errors);
@@ -1125,21 +1129,25 @@ class Additional_data extends CI_Model
 
                         if ($new_attacker && $new_attacker_id !== $event['victim_id']) {
                             if ($ev === 'hit') {
-                                $new_hits_upd_errors = $this->update_op_entity($op_id, $new_attacker_id, ['hits' => $new_attacker['hits'] + 1]);
+                                $new_hits_upd_errors = [];
                                 $new_fhits_upd_errors = [];
 
                                 if ($new_attacker['side'] === $event['victim_side']) {
                                     $new_fhits_upd_errors = $this->update_op_entity($op_id, $new_attacker_id, ['fhits' => $new_attacker['fhits'] + 1]);
+                                } else {
+                                    $new_hits_upd_errors = $this->update_op_entity($op_id, $new_attacker_id, ['hits' => $new_attacker['hits'] + 1]);
                                 }
 
                                 $errors = array_merge($errors, $new_hits_upd_errors, $new_fhits_upd_errors);
                             } elseif ($ev === 'killed') {
                                 if ($event['victim_type'] === 'unit') {
-                                    $new_kills_upd_errors = $this->update_op_entity($op_id, $new_attacker_id, ['kills' => $new_attacker['kills'] + 1]);
+                                    $new_kills_upd_errors = [];
                                     $new_fkills_upd_errors = [];
 
                                     if ($new_attacker['side'] === $event['victim_side']) {
                                         $new_fkills_upd_errors = $this->update_op_entity($op_id, $new_attacker_id, ['fkills' => $new_attacker['fkills'] + 1]);
+                                    } else {
+                                        $new_kills_upd_errors = $this->update_op_entity($op_id, $new_attacker_id, ['kills' => $new_attacker['kills'] + 1]);
                                     }
 
                                     $errors = array_merge($errors, $new_kills_upd_errors, $new_fkills_upd_errors);

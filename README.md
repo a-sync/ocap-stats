@@ -46,23 +46,23 @@ CTRL+F
     nr. of framesFired events (only counts main weapon and sidearm rounds afaik.)  
   \+ nr. of projectile markers tied to a _unit_ (grenades, rockets, mines, etc.)  
   * **Hits**  
-    nr. of `hit` events as attacker, where victim is any _unit_ or _vehicle_ (asset)  
+    nr. of `hit` events as attacker, where victim is a _unit_ on a different side or a _vehicle_ (asset)  
   * **Kills**  
-    nr. of `killed` events as attacker, where victim is any _unit_ or _vehicle_ (asset)  
+    nr. of `killed` events as attacker, where victim is a _unit_ on a different side  
   * **Deaths**  
     MAX( nr. of `killed` events, nr. of `_dead` events ) as victim  
   * **Frienldy fire**  
-    nr. of `hit` events as attacker, where victim is any _unit_ on the same side  
+    nr. of `hit` events as attacker, where victim is a _unit_ on the same side  
   * **Teamkills**  
-    nr. of `killed` events as attacker, where victim is any _unit_ on the same side  
+    nr. of `killed` events as attacker, where victim is a _unit_ on the same side  
   * **Destroyed assets**  
     nr. of `killed` events as attacker, where victim is a _vehicle_ (asset)  
   * **Distance traveled**  
-    the delta sum of all the position coordinates of an entity 
+    the delta sum of all the position coordinates of an entity  
   * **Time in game**  
     the nr. of frames recorded of an entity in game (including spectator), adjusted by the ops capture delay configuration  
 
-Self inflicted and environmental hits / kills (_something_) are omitted! (except for deaths)  
+Self inflicted and environmental hits / kills (_something_) are omitted! (except when counting deaths)  
 
 
 ## Aggregated events
