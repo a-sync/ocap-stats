@@ -399,6 +399,7 @@ class Data extends CI_Controller
     {
         $this->load->model('operations');
         $this->load->model('additional_data');
+        $this->load->model('players');
 
         $errors = [];
         $op = false;
@@ -407,6 +408,8 @@ class Data extends CI_Controller
         $op_events = [];
         $op_entities = [];
         $entity_id = false;
+        $player_id = false;
+        $player = false;
         if (filter_var($op_id, FILTER_VALIDATE_INT) || filter_var($op_id, FILTER_VALIDATE_INT) === 0) {
             $op = $this->operations->get_by_id($op_id);
 
@@ -423,7 +426,14 @@ class Data extends CI_Controller
                     $entity_id = false;
                 }
 
-                $op_events = $this->operations->get_events_by_id($op['id'], $entity_id);
+                $player_id = filter_var($this->input->get('player_id'), FILTER_VALIDATE_INT);
+                if (!$player_id && $player_id !== 0) {
+                    $player_id = false;
+                } else {
+                    $player = $this->players->get_by_id($player_id);
+                }
+
+                $op_events = $this->operations->get_events_by_id($op['id'], $entity_id, $player_id);
 
                 $op_entities = $this->additional_data->get_op_entities($op['id']);
             } else {
@@ -446,7 +456,8 @@ class Data extends CI_Controller
             'op_sides' => $op_sides,
             'op_commanders' => $op_commanders,
             'op_entities' => $op_entities,
-            'entity_id' => $entity_id
+            'entity_id' => $entity_id,
+            'player' => $player
         ]);
 
         $this->_foot();

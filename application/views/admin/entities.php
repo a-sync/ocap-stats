@@ -272,6 +272,11 @@ if (count($items) === 0) {
                                     if ($player_entities_num > 1) {
                                         $highlight = ' onmouseover="highlightPlayer(' . $i['player_id'] . ')" onmouseout="highlightPlayer()"';
                                     }
+
+                                    $player_entities = strval($player_entities_num);
+                                    if ($player_entities_num > 1) {
+                                        $player_entities = '<a href="' . base_url('manage/' . $op['id'] . '/events') . '?player_id=' . $i['player_id'] . '&events=connected,disconnected,killed,_dead">' . $player_entities_num . '</a>';
+                                    }
                                 ?>
                                     <tr class="mdc-data-table__row" data-entity-id="<?php echo $i['id']; ?>" data-player-id="<?php echo $i['player_id']; ?>"<?php echo $highlight; ?>>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $i['id']; ?></td>
@@ -281,7 +286,7 @@ if (count($items) === 0) {
                                         <td class="mdc-data-table__cell side__<?php echo html_escape(strtolower($i['side'])); ?>"><?php echo html_escape($group); ?></td>
                                         <td class="mdc-data-table__cell"><?php echo html_escape($role); ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric">
-                                            <span title="<?php echo html_escape(implode(', ', $i['player_entities'])); ?>"><?php echo $player_entities_num; ?></span>
+                                            <span title="<?php echo html_escape(implode(', ', $i['player_entities'])); ?>"><?php echo $player_entities; ?></span>
                                         </td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric"><?php echo $join_time; ?></td>
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric" data-sort="<?php echo intval($i['seconds_in_game']); ?>"><?php echo $time; ?></td>

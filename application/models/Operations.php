@@ -915,7 +915,19 @@ class Operations extends CI_Model
             ->get()->row()->name;
     }
 
-    public function get_events_by_id($id, $entity_id = false)
+    private function get_names_of_player($id, $player_id) {
+        $this->db->select([
+                'entities.id',
+                'entities.name'
+            ])
+            ->from('entities')
+            ->where('operation_id', $id)
+            ->where('player_id', $player_id);
+
+        return array_column($this->db->get()->result_array(), 'name', 'id');
+    }
+
+    public function get_events_by_id($id, $entity_id = false, $player_id = false)
     {
         if ($entity_id !== false) {
             $entity_name = $this->get_name_of_entity($id, $entity_id);
@@ -928,6 +940,21 @@ class Operations extends CI_Model
                     ->or_group_start()
                         ->where_in('events.event', ['connected', 'disconnected'])
                         ->where('events.data', $entity_name)
+                    ->group_end()
+                ->group_end();
+        }
+
+        if ($player_id !== false) {
+            $entity_names = $this->get_names_of_player($id, $player_id);
+
+            $this->db->group_start()
+                    ->group_start()
+                        ->where('victim.player_id', $player_id)
+                        ->or_where('attacker.player_id', $player_id)
+                    ->group_end()
+                    ->or_group_start()
+                        ->where_in('events.event', ['connected', 'disconnected'])
+                        ->where_in('events.data', $entity_names)
                     ->group_end()
                 ->group_end();
         }

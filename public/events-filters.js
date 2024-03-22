@@ -133,13 +133,22 @@ function init_events_filters(entities, sides) {
         }
     });
 
+    const url_params = new URLSearchParams(window.location.search);
+    const entities_param = url_params.get('entities');
+    const events_param = url_params.get('events');
+    const initial_entities_filters = entities_param ? entities_param.split(',') : [];
+    const initial_events_filters = events_param ? events_param.split(',') : [];
+
     function update_filters_dataset(update_events) {
         if (!entity_ss || !event_ss) return;
 
-        const entity_ss_value = entity_ss.getSelected().map(e => {
+        const entity_ss_value = initial_entities_filters.length ? [...initial_entities_filters] : entity_ss.getSelected().map(e => {
             return e === 'null' ? '' : e;
         });
-        const event_ss_value = event_ss.getSelected();
+        initial_entities_filters.length = 0;
+
+        const event_ss_value = initial_events_filters.length ? [...initial_events_filters] : event_ss.getSelected();
+        initial_events_filters.length = 0;
 
         const events_num = [];
         const ss_events_data_field = [

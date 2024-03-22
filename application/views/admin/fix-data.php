@@ -49,7 +49,7 @@ $fixed_icon = '<span class="material-icons">check</span>';
                                 <div class="mdc-tab-scroller__scroll-content">
                                     <a href="<?php echo base_url('fix-data'); ?>" class="mdc-tab<?php if ($tab === 'missing') echo ' mdc-tab--active';  ?>" role="tab" aria-selected="true" tabindex="5">
                                         <span class="mdc-tab__content">
-                                            <span class="mdc-tab__text-label">Missing data</span>
+                                            <span class="mdc-tab__text-label">Sus data</span>
                                         </span>
                                         <span class="mdc-tab-indicator<?php if ($tab === 'missing') echo ' mdc-tab-indicator--active';  ?>">
                                             <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
@@ -91,6 +91,7 @@ $fixed_icon = '<span class="material-icons">check</span>';
                                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="author">Author</th>
                                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="winner" title="End message">Winner</th>
                                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="commanders">Commanders</th>
+                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="multi_death_players__extra_deaths" title="Players with more then one death / Additional deaths">⛼👻</th>
                                 </tr>
                             </thead>
                             <tbody class="mdc-data-table__content">
@@ -160,6 +161,13 @@ $fixed_icon = '<span class="material-icons">check</span>';
                                             }
 
                                             echo implode(', ', $commanders_list) . ' ' . $commanders_icon;
+                                            ?>
+                                        </td>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric">
+                                            <?php
+                                            if ($i['multi_death_players_count'] > 0) {
+                                                echo html_escape($i['multi_death_players_count']) . ' / ' . html_escape($i['extra_deaths_count']) . ' ' . $warn_icon;
+                                            }
                                             ?>
                                         </td>
                                     </tr>

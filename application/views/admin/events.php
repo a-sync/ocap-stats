@@ -176,7 +176,9 @@ $fixed_icon = '<span class="material-icons">check</span>';
 <?php
 if ($entity_id !== false) {
     $ent = $op_entities[array_search($entity_id, array_column($op_entities, 'id'))];
-    echo '<div class="mdc-typography--caption list__total">' . count($items) . ' events for <span class="selected-entity">#' . $ent['id'] . ' <span class="side__' . html_escape(strtolower($ent['side'])) . '">' . $ent['name'] . '</span></span></div>';
+    echo '<div class="mdc-typography--caption list__total">' . count($items) . ' events for entity <span class="selected-entity">#' . $ent['id'] . ' <span class="side__' . html_escape(strtolower($ent['side'])) . '">' . $ent['name'] . '</span></span></div>';
+} elseif ($player !== false) {
+    echo '<div class="mdc-typography--caption list__total">' . count($items) . ' events for player <span class="selected-entity">#' . $player['id'] . ' ' . $player['name'] . '</span></div>';
 } elseif (count($items) === 0) {
     echo '<div class="mdc-typography--body1 list__no_items">No events found...</div>';
 } else {

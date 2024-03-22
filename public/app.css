@@ -191,10 +191,6 @@ img.ocap-link {
     margin-left: 4px;
 }
 
-.verified-icon {
-    vertical-align: middle;
-}
-
 .selected-entity {
     color: var(--mdc-theme-text-primary-on-background);
 }
@@ -244,6 +240,10 @@ img.ocap-link {
 
 .dnone {
     display: none;
+}
+
+.mdc-data-table__cell .material-icons {
+    vertical-align: text-bottom;
 }
 
 @keyframes spin {

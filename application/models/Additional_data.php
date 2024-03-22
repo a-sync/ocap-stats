@@ -600,9 +600,12 @@ class Additional_data extends CI_Model
                 'operations.start_time',
                 'operations.end_winner',
                 'operations.end_message',
-                '(SELECT COUNT(DISTINCT ents.side) FROM entities AS ents WHERE ents.operation_id = operations.id AND ents.is_player = 1) AS sides_total'
+                '(SELECT COUNT(DISTINCT ents.side) FROM entities AS ents WHERE ents.operation_id = operations.id AND ents.is_player = 1) AS sides_total',
+                'IFNULL(dupe_deaths.multi_death_players_count, 0) AS multi_death_players_count',
+                'IFNULL(dupe_deaths.extra_deaths_count, 0) AS extra_deaths_count'
             ])
             ->from('operations')
+            ->join('( SELECT player_deaths.id, COUNT(player_deaths.player_id) AS multi_death_players_count, SUM(player_deaths.extra_deaths) AS extra_deaths_count FROM ( SELECT o.id, e.player_id, SUM(e.deaths) - 1 AS extra_deaths FROM operations AS o INNER JOIN entities AS e ON o.id = e.operation_id AND e.player_id != 0 GROUP BY o.id, e.player_id HAVING SUM(e.deaths) > 1 ) AS player_deaths GROUP BY player_deaths.id ) AS dupe_deaths', 'dupe_deaths.id = operations.id', 'LEFT')
             ->where('operations.event !=', '')
             ->where('IFNULL(operations.verified, 0) =', $verified ? 1 : 0)
             ->order_by('operations.id DESC');
@@ -613,6 +616,7 @@ class Additional_data extends CI_Model
                 ->or_where('operations.start_time LIKE', '%00:00:00')
                 ->or_where('operations.end_winner', '')
                 ->or_where_not_in('operations.id', $op_ids_with_unambiguous_cmd)
+                ->or_where('multi_death_players_count >', 0)
                 ->group_end();
         }
 
