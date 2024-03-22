@@ -275,7 +275,7 @@ if (count($items) === 0) {
 
                                     $player_entities = strval($player_entities_num);
                                     if ($player_entities_num > 1) {
-                                        $player_entities = '<a href="' . base_url('manage/' . $op['id'] . '/events') . '?player_id=' . $i['player_id'] . '&events=connected,disconnected,killed,_dead">' . $player_entities_num . '</a>';
+                                        $player_entities = '<a href="' . base_url('manage/' . $op['id'] . '/events') . '?player_id=' . $i['player_id'] . '">' . $player_entities_num . '</a>';
                                     }
                                 ?>
                                     <tr class="mdc-data-table__row" data-entity-id="<?php echo $i['id']; ?>" data-player-id="<?php echo $i['player_id']; ?>"<?php echo $highlight; ?>>
