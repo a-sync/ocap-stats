@@ -193,6 +193,15 @@ function init_events_filters(entities, sides) {
         }
 
         if (update_events) event_ss.setData(ss_events_data_field);
+
+        if (entity_ss_value.length > 0) url_params.set('entities', entity_ss_value.join(','));
+        else url_params.delete('entities');
+
+        if (event_ss_value.length > 0) url_params.set('events', event_ss_value.join(','));
+        else url_params.delete('events');
+
+        const new_url = new URL(window.location.protocol + "//" + window.location.host + window.location.pathname + (url_params.toString() ? '?' + url_params.toString() : ''));
+        history.replaceState(null, '', new_url);
     }
 
     update_filters_dataset(true);
