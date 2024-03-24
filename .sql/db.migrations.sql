@@ -55,4 +55,4 @@ UPDATE `entities` SET `hits` = (`hits` - `fhits`), `kills` = (`kills` - `fkills`
 --
 -- 2024-03-24
 --
-CREATE INDEX `events_victim_aid_IDX` USING BTREE ON `events` (`victim_aid`);
+CREATE INDEX `events_victim_aid_IDX` ON `events` (`victim_aid`);

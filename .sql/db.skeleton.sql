@@ -59,7 +59,8 @@ CREATE TABLE IF NOT EXISTS `events` (
   `victim_aid` int(10) unsigned DEFAULT NULL,
   `attacker_aid` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `operation_id` (`operation_id`)
+  KEY `operation_id` (`operation_id`),
+  KEY `events_victim_aid_IDX` (`victim_aid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=1 ;
 --
 -- RELATIONS FOR TABLE `events`:
