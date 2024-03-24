@@ -153,12 +153,12 @@ class Data extends CI_Controller
 
         if ($tab === 'verified') {
             $ops = $this->additional_data->get_ops_to_fix_data(true);
-            $ops_sus_suicides = array_column($this->additional_data->get_ops_sus_suicides(array_column($ops, 'id')), null, 'operation_id');
+            $ops_sus_suicides = $this->additional_data->get_ops_sus_suicides(array_column($ops, 'id'));
         } elseif ($tab === 'unverified') {
             $ops = $this->additional_data->get_ops_to_fix_data(false);
-            $ops_sus_suicides = array_column($this->additional_data->get_ops_sus_suicides(array_column($ops, 'id')), null, 'operation_id');
+            $ops_sus_suicides = $this->additional_data->get_ops_sus_suicides(array_column($ops, 'id'));
         } else { // sus
-            $ops_sus_suicides = array_column($this->additional_data->get_ops_sus_suicides(), null, 'operation_id');
+            $ops_sus_suicides = $this->additional_data->get_ops_sus_suicides();
             $op_ids_with_sus_suicides = array_keys($ops_sus_suicides);
             $ops = $this->additional_data->get_ops_to_fix_data(false, $op_ids_with_resolved_cmd, $op_ids_with_sus_suicides);
         }
@@ -442,7 +442,10 @@ class Data extends CI_Controller
                 }
 
                 $op_events = $this->operations->get_events_by_id($op['id'], $entity_id, $player_id);
-                $op_sus_suicides = array_column($this->additional_data->get_ops_sus_suicides([$op['id']]), 'id');
+
+                $op_sus_suicides = array_reduce($this->additional_data->get_ops_sus_suicides([$op['id']]), function ($carry, $value) {
+                    return array_merge($carry, $value);
+                }, []);
 
                 $op_entities = $this->additional_data->get_op_entities($op['id']);
             } else {

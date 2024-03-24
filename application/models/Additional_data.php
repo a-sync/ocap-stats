@@ -660,7 +660,13 @@ class Additional_data extends CI_Model
             $this->db->where_in('killed.operation_id', $op_ids);
         }
 
-        return $this->db->get()->result_array();
+        $res = $this->db->get()->result_array();
+        $re = [];
+        foreach ($res as $r) {
+            $re[$r['operation_id']][] = $r['id'];
+        }
+
+        return $re;
     }
 
     public function get_op_sides($id)
