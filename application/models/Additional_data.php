@@ -602,10 +602,43 @@ class Additional_data extends CI_Model
                 'operations.end_message',
                 '(SELECT COUNT(DISTINCT ents.side) FROM entities AS ents WHERE ents.operation_id = operations.id AND ents.is_player = 1) AS sides_total',
                 'IFNULL(dupe_deaths.multi_death_players_count, 0) AS multi_death_players_count',
-                'IFNULL(dupe_deaths.extra_deaths_count, 0) AS extra_deaths_count'
+                'IFNULL(dupe_deaths.extra_deaths_count, 0) AS extra_deaths_count',
+                "(SELECT COUNT(evs.id) FROM events AS evs INNER JOIN entities AS ents ON evs.attacker_aid = ents.aid AND ents.is_player = 1 WHERE evs.operation_id = operations.id AND evs.attacker_id = evs.victim_id AND evs.event = 'killed') AS suicides_total",
+                'IFNULL(sus_suicides.sus_suicides_count, 0) AS sus_suicides_count'
             ])
             ->from('operations')
-            ->join('( SELECT player_deaths.id, COUNT(player_deaths.player_id) AS multi_death_players_count, SUM(player_deaths.extra_deaths) AS extra_deaths_count FROM ( SELECT o.id, e.player_id, SUM(e.deaths) - 1 AS extra_deaths FROM operations AS o INNER JOIN entities AS e ON o.id = e.operation_id AND e.player_id != 0 GROUP BY o.id, e.player_id HAVING SUM(e.deaths) > 1 ) AS player_deaths GROUP BY player_deaths.id ) AS dupe_deaths', 'dupe_deaths.id = operations.id', 'LEFT')
+            ->join("(
+                SELECT 
+                    player_deaths.id, 
+                    COUNT(player_deaths.player_id) AS multi_death_players_count, 
+                    SUM(player_deaths.extra_deaths) AS extra_deaths_count 
+                FROM (
+                    SELECT o.id, e.player_id, SUM(e.deaths) - 1 AS extra_deaths 
+                    FROM operations AS o 
+                    INNER JOIN entities AS e ON o.id = e.operation_id AND e.player_id != 0 
+                    GROUP BY o.id, e.player_id 
+                    HAVING SUM(e.deaths) > 1 
+                    ) AS player_deaths 
+                GROUP BY player_deaths.id
+                ) AS dupe_deaths",
+                'dupe_deaths.id = operations.id', 'LEFT')
+            ->join("(
+                SELECT sus_suicide_events.operation_id, COUNT(sus_suicide_events.operation_id) AS sus_suicides_count
+                FROM (
+                    SELECT e.operation_id, e.victim_aid
+                    FROM events AS e
+                    INNER JOIN entities AS victim ON victim.aid = e.victim_aid
+                    LEFT JOIN (
+                        SELECT ee.operation_id, ee.victim_id, frame
+                        FROM events AS ee
+                        WHERE ee.victim_id = ee.attacker_id AND ee.victim_id IS NOT NULL AND ee.event = 'hit'
+                        GROUP BY ee.operation_id, ee.victim_id
+                        ) AS hits ON hits.operation_id = e.operation_id AND hits.victim_id = e.victim_id AND hits.frame = e.frame
+                    WHERE e.victim_aid = e.attacker_aid AND hits.victim_id IS NULL AND victim.is_player = 1 AND e.event = 'killed'
+                    ) AS sus_suicide_events
+                GROUP BY sus_suicide_events.operation_id
+                ) AS sus_suicides",
+                'sus_suicides.operation_id = operations.id', 'LEFT')
             ->where('operations.event !=', '')
             ->where('IFNULL(operations.verified, 0) =', $verified ? 1 : 0)
             ->order_by('operations.id DESC');
@@ -617,12 +650,29 @@ class Additional_data extends CI_Model
                 ->or_where('operations.end_winner', '')
                 ->or_where_not_in('operations.id', $op_ids_with_unambiguous_cmd)
                 ->or_where('multi_death_players_count >', 0)
+                ->or_where('sus_suicides_count >', 0)
                 ->group_end();
         }
 
         return $this->db
             ->get()
             ->result_array();
+    }
+
+    public function get_op_sus_suicides($id)
+    {
+        $this->db->select('e.id')
+            ->from('events AS e')
+            ->join('entities AS victim', 'victim.aid = e.victim_aid')
+            ->join("(SELECT ee.operation_id, ee.victim_id, frame
+                FROM events AS ee
+                WHERE ee.victim_id = ee.attacker_id AND ee.victim_id IS NOT NULL AND ee.event = 'hit'
+                GROUP BY ee.operation_id, ee.victim_id
+            ) AS hits", 'hits.operation_id = e.operation_id AND hits.victim_id = e.victim_id AND hits.frame = e.frame', 'LEFT')
+            ->where("e.victim_aid = e.attacker_aid AND hits.victim_id IS NULL AND victim.is_player = 1 AND e.event = 'killed'")
+            ->where('e.operation_id', $id);
+
+        return array_column($this->db->get()->result_array(), 'id');
     }
 
     public function get_op_sides($id)

@@ -92,6 +92,7 @@ $fixed_icon = '<span class="material-icons">check</span>';
                                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="winner" title="End message">Winner</th>
                                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col" aria-sort="none" data-column-id="commanders">Commanders</th>
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="multi_death_players__extra_deaths" title="Players with more then one death / Additional deaths">⛼👻</th>
+                                    <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col" aria-sort="none" data-column-id="suicides__sus_suicides" title="Suicides / Sus suicides">💀☠</th>
                                 </tr>
                             </thead>
                             <tbody class="mdc-data-table__content">
@@ -167,6 +168,16 @@ $fixed_icon = '<span class="material-icons">check</span>';
                                             <?php
                                             if ($i['multi_death_players_count'] > 0) {
                                                 echo html_escape($i['multi_death_players_count']) . ' / ' . html_escape($i['extra_deaths_count']) . ' ' . $warn_icon;
+                                            }
+                                            ?>
+                                        </td>
+                                        <td class="mdc-data-table__cell mdc-data-table__cell--numeric">
+                                            <?php
+                                            if ($i['suicides_total'] > 0) {
+                                                echo html_escape($i['suicides_total']) . ' / ' . html_escape($i['sus_suicides_count']);
+                                                if ($i['sus_suicides_count'] > 0) {
+                                                    echo' ' . $warn_icon;
+                                                }
                                             }
                                             ?>
                                         </td>

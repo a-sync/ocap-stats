@@ -153,7 +153,7 @@ class Data extends CI_Controller
             $ops = $this->additional_data->get_ops_to_fix_data(true);
         } elseif ($tab === 'unverified') {
             $ops = $this->additional_data->get_ops_to_fix_data(false);
-        } else { // missing
+        } else { // sus
             $ops = $this->additional_data->get_ops_to_fix_data(false, $op_ids_with_resolved_cmd);
         }
 
@@ -410,6 +410,7 @@ class Data extends CI_Controller
         $entity_id = false;
         $player_id = false;
         $player = false;
+        $op_sus_suicides = [];
         if (filter_var($op_id, FILTER_VALIDATE_INT) || filter_var($op_id, FILTER_VALIDATE_INT) === 0) {
             $op = $this->operations->get_by_id($op_id);
 
@@ -434,6 +435,7 @@ class Data extends CI_Controller
                 }
 
                 $op_events = $this->operations->get_events_by_id($op['id'], $entity_id, $player_id);
+                $op_sus_suicides = $this->additional_data->get_op_sus_suicides($op['id']);
 
                 $op_entities = $this->additional_data->get_op_entities($op['id']);
             } else {
@@ -457,7 +459,8 @@ class Data extends CI_Controller
             'op_commanders' => $op_commanders,
             'op_entities' => $op_entities,
             'entity_id' => $entity_id,
-            'player' => $player
+            'player' => $player,
+            'op_sus_suicides' => $op_sus_suicides
         ]);
 
         $this->_foot();

@@ -233,7 +233,13 @@ if ($entity_id !== false) {
                                     }
 
                                     $event = html_escape($i['event']);
-                                    if ($i['event'] === 'connected' || $i['event'] === 'disconnected') {
+                                    if ($i['event'] === 'killed' && $i['victim_player_id'] !== null && $i['victim_id'] === $i['attacker_id']) {
+                                        if (in_array($i['id'], $op_sus_suicides)) {
+                                            $event .= ' ' . $warn_icon;
+                                        } else {
+                                            $event .= ' ' . $flaky_icon;
+                                        }
+                                    } elseif ($i['event'] === 'connected' || $i['event'] === 'disconnected') {
                                         $event = html_escape($i['data']) . ' ' . $event;
                                     } elseif ($i['event'] === 'captured') {
                                         $d = json_decode($i['data']);
