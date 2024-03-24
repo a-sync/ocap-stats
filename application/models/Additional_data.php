@@ -653,7 +653,7 @@ class Additional_data extends CI_Model
                 AND hit.victim_aid = hit.attacker_aid
                 AND hit.victim_aid = killed.victim_aid
                 AND hit.operation_id = killed.operation_id 
-                AND (hit.frame = killed.frame OR hit.frame = (killed.frame - 1) OR hit.frame = (killed.frame + 1))", 'LEFT')
+                AND hit.frame IN (killed.frame, GREATEST(killed.frame, 1) - 1, killed.frame + 1)", 'LEFT')
             ->where("hit.id IS NULL AND killed.event = 'killed' AND killed.victim_aid IS NOT NULL AND killed.victim_aid = killed.attacker_aid");
 
         if ($op_ids !== false) {
