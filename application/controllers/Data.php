@@ -160,7 +160,6 @@ class Data extends CI_Controller
         } else { // sus
             $ops_sus_suicides = array_column($this->additional_data->get_ops_sus_suicides(), null, 'operation_id');
             $op_ids_with_sus_suicides = array_keys($ops_sus_suicides);
-            $op_ids_with_sus_suicides = [];
             $ops = $this->additional_data->get_ops_to_fix_data(false, $op_ids_with_resolved_cmd, $op_ids_with_sus_suicides);
         }
 
