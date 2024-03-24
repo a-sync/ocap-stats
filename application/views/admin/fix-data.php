@@ -98,6 +98,11 @@ $fixed_icon = '<span class="material-icons">check</span>';
                             <tbody class="mdc-data-table__content">
                                 <?php foreach ($items as $i) :
                                     $duration_min = floor(intval($i['mission_duration']) / 60);
+
+                                    $sus_suicides_count = 0;
+                                    if (isset($ops_sus_suicides[$i['id']])) {
+                                        $sus_suicides_count = count($ops_sus_suicides[$i['id']]);
+                                    }
                                 ?>
                                     <tr class="mdc-data-table__row">
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric">
@@ -174,8 +179,8 @@ $fixed_icon = '<span class="material-icons">check</span>';
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric">
                                             <?php
                                             if ($i['suicides_total'] > 0) {
-                                                echo html_escape($i['suicides_total']) . ' / ' . html_escape($i['sus_suicides_count']);
-                                                if ($i['sus_suicides_count'] > 0) {
+                                                echo html_escape($i['suicides_total']) . ' / ' . html_escape($sus_suicides_count);
+                                                if ($sus_suicides_count > 0) {
                                                     echo' ' . $warn_icon;
                                                 }
                                             }

@@ -583,7 +583,7 @@ class Additional_data extends CI_Model
         ];
     }
 
-    public function get_ops_to_fix_data($verified = false, $op_ids_with_unambiguous_cmd = [])
+    public function get_ops_to_fix_data($verified = false, $op_ids_with_unambiguous_cmd = [], $op_ids_with_sus_suicides = [])
     {
         $this->db
             ->select([
@@ -603,8 +603,7 @@ class Additional_data extends CI_Model
                 '(SELECT COUNT(DISTINCT ents.side) FROM entities AS ents WHERE ents.operation_id = operations.id AND ents.is_player = 1) AS sides_total',
                 'IFNULL(dupe_deaths.multi_death_players_count, 0) AS multi_death_players_count',
                 'IFNULL(dupe_deaths.extra_deaths_count, 0) AS extra_deaths_count',
-                "(SELECT COUNT(evs.id) FROM events AS evs INNER JOIN entities AS ents ON evs.attacker_aid = ents.aid AND ents.is_player = 1 WHERE evs.operation_id = operations.id AND evs.attacker_id = evs.victim_id AND evs.event = 'killed') AS suicides_total",
-                'IFNULL(sus_suicides.sus_suicides_count, 0) AS sus_suicides_count'
+                "(SELECT COUNT(evs.id) FROM events AS evs INNER JOIN entities AS ents ON evs.attacker_aid = ents.aid AND ents.is_player = 1 WHERE evs.operation_id = operations.id AND evs.attacker_id = evs.victim_id AND evs.event = 'killed') AS suicides_total"
             ])
             ->from('operations')
             ->join("(
@@ -622,23 +621,6 @@ class Additional_data extends CI_Model
                 GROUP BY player_deaths.id
                 ) AS dupe_deaths",
                 'dupe_deaths.id = operations.id', 'LEFT')
-            ->join("(
-                SELECT sus_suicide_events.operation_id, COUNT(sus_suicide_events.operation_id) AS sus_suicides_count
-                FROM (
-                    SELECT e.operation_id, e.victim_aid
-                    FROM events AS e
-                    INNER JOIN entities AS victim ON victim.aid = e.victim_aid
-                    LEFT JOIN (
-                        SELECT ee.operation_id, ee.victim_id, ee.frame, (ee.frame + 1) AS frame_plus, (GREATEST(ee.frame, 1) - 1) AS frame_minus
-                        FROM events AS ee
-                        WHERE ee.victim_id = ee.attacker_id AND ee.victim_id IS NOT NULL AND ee.event = 'hit'
-                        GROUP BY ee.operation_id, ee.victim_id
-                        ) AS hits ON hits.operation_id = e.operation_id AND hits.victim_id = e.victim_id AND (hits.frame = e.frame OR hits.frame_plus = e.frame OR hits.frame_minus = e.frame)
-                    WHERE e.victim_aid = e.attacker_aid AND hits.victim_id IS NULL AND victim.is_player = 1 AND e.event = 'killed'
-                    ) AS sus_suicide_events
-                GROUP BY sus_suicide_events.operation_id
-                ) AS sus_suicides",
-                'sus_suicides.operation_id = operations.id', 'LEFT')
             ->where('operations.event !=', '')
             ->where('IFNULL(operations.verified, 0) =', $verified ? 1 : 0)
             ->order_by('operations.id DESC');
@@ -649,9 +631,11 @@ class Additional_data extends CI_Model
                 ->or_where('operations.start_time LIKE', '%00:00:00')
                 ->or_where('operations.end_winner', '')
                 ->or_where_not_in('operations.id', $op_ids_with_unambiguous_cmd)
-                ->or_where('multi_death_players_count >', 0)
-                ->or_where('sus_suicides_count >', 0)
-                ->group_end();
+                ->or_where('multi_death_players_count >', 0);
+                if (count($op_ids_with_sus_suicides) !== 0) {
+                    $this->db->or_where_in('operations.id', $op_ids_with_sus_suicides);
+                }
+            $this->db->group_end();
         }
 
         return $this->db
@@ -659,20 +643,24 @@ class Additional_data extends CI_Model
             ->result_array();
     }
 
-    public function get_op_sus_suicides($id)
+    public function get_ops_sus_suicides($op_ids = false)
     {
-        $this->db->select('e.id')
-            ->from('events AS e')
-            ->join('entities AS victim', 'victim.aid = e.victim_aid')
-            ->join("(SELECT ee.operation_id, ee.victim_id, ee.frame, (ee.frame + 1) AS frame_plus, (GREATEST(ee.frame, 1) - 1) AS frame_minus
-                FROM events AS ee
-                WHERE ee.victim_id = ee.attacker_id AND ee.victim_id IS NOT NULL AND ee.event = 'hit'
-                GROUP BY ee.operation_id, ee.victim_id
-            ) AS hits", 'hits.operation_id = e.operation_id AND hits.victim_id = e.victim_id AND (hits.frame = e.frame OR hits.frame_plus = e.frame OR hits.frame_minus = e.frame)', 'LEFT')
-            ->where("e.victim_aid = e.attacker_aid AND hits.victim_id IS NULL AND victim.is_player = 1 AND e.event = 'killed'")
-            ->where('e.operation_id', $id);
+        $this->db->select(['killed.id', 'killed.operation_id'])
+            ->from('events AS killed')
+            ->join('entities AS victim', 'victim.aid = killed.victim_aid AND victim.is_player = 1 AND victim.operation_id = killed.operation_id')
+            ->join('events AS hit', "hit.event = 'hit'
+                AND hit.victim_aid IS NOT NULL
+                AND hit.victim_aid = hit.attacker_aid
+                AND hit.victim_aid = killed.victim_aid
+                AND hit.operation_id = killed.operation_id 
+                AND (hit.frame = killed.frame OR hit.frame = (killed.frame - 1) OR hit.frame = (killed.frame + 1))", 'LEFT')
+            ->where("hit.id IS NULL AND killed.event = 'killed' AND killed.victim_aid IS NOT NULL AND killed.victim_aid = killed.attacker_aid");
 
-        return array_column($this->db->get()->result_array(), 'id');
+        if ($op_ids !== false) {
+            $this->db->where_in('killed.operation_id', $op_ids);
+        }
+
+        return $this->db->get()->result_array();
     }
 
     public function get_op_sides($id)
