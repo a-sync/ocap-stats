@@ -1004,7 +1004,7 @@ class Additional_data extends CI_Model
         }
     }
 
-    private function get_op_entities_events($op_id, $entity_ids, $events = ['killed', '_dead']) {
+    private function get_op_entities_events($op_id, $entity_ids, $events = ['killed']) {
         $this->db
             ->select([
                 'events.id',
@@ -1030,7 +1030,7 @@ class Additional_data extends CI_Model
         if ($event) {
             $ev = $event['event'];
 
-            if (in_array($ev, ['hit', 'killed', '_dead'])) {
+            if (in_array($ev, ['hit', 'killed'])) {
                 if ($ev === 'hit' && $event['attacker_id'] !== null && $event['attacker_id'] !== $event['victim_id']) {
                     $hits_upd_errors = $this->update_op_entity($op_id, $event['attacker_id'], ['hits' => $event['attacker_hits'] - 1]);
                     $fhits_upd_errors = [];
@@ -1040,7 +1040,7 @@ class Additional_data extends CI_Model
                     }
 
                     $errors = array_merge($errors, $hits_upd_errors, $fhits_upd_errors);
-                } elseif (in_array($ev,['killed', '_dead'])) {
+                } elseif (in_array($ev,['killed'])) {
                     if ($event['attacker_id'] !== null && $ev === 'killed' && $event['attacker_id'] !== $event['victim_id']) {
                         if ($event['victim_type'] === 'unit') {
                             $kills_upd_errors = $this->update_op_entity($op_id, $event['attacker_id'], ['kills' => $event['attacker_kills'] - 1]);
@@ -1059,22 +1059,18 @@ class Additional_data extends CI_Model
                     }
 
                     if ($event['victim_id'] !== null) {
-                        $knd_events = $this->get_op_entities_events($op_id, [$event['victim_id']], ['killed', '_dead']);
+                        $knd_events = $this->get_op_entities_events($op_id, [$event['victim_id']], ['killed']);
 
                         $killed = 0;
-                        $_dead = 0;
                         foreach ($knd_events as $e) {
                             if (intval($e['id']) !== $event_id && $e['victim_id'] === $event['victim_id']) {
                                 if ($e['event'] === 'killed') {
                                     $killed++;
-                                } elseif ($e['event'] === '_dead') {
-                                    $_dead++;
                                 }
                             }
                         }
 
-                        $deaths = max($killed, $_dead);
-                        $deaths_upd_errors = $this->update_op_entity($op_id, $event['victim_id'], ['deaths' => $deaths]);
+                        $deaths_upd_errors = $this->update_op_entity($op_id, $event['victim_id'], ['deaths' => $killed]);
 
                         $errors = array_merge($errors, $deaths_upd_errors);
                     }

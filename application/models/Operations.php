@@ -117,7 +117,6 @@ class Operations extends CI_Model
                 'fkills' => 0,
                 'vkills' => 0,
                 'deaths' => 0,
-                '_deaths' => 0,
                 'distance_traveled' => 0,
                 'uid' => element('uid', $e, null)
             ];
@@ -216,7 +215,6 @@ class Operations extends CI_Model
                     $event_name = '';
                     if ($last_state === 0) {
                         $event_name = '_dead';
-                        $entities[$e['id']]['_deaths']++;
                     } elseif ($last_state === 1) {
                         $event_name = '_awake';
                     } elseif ($last_state === 2) {
@@ -589,9 +587,6 @@ class Operations extends CI_Model
             $alias_reassignments = [];
             foreach ($entities as $i => $e) {
                 $entities[$i]['operation_id'] = $details['id'];
-
-                $entities[$i]['deaths'] = max($e['deaths'], $e['_deaths']);
-                unset($entities[$i]['_deaths']);
 
                 if ($e['is_player']) {
                     if ($e['uid'] !== null && $e['uid'] !== '' && $e['uid'] !== 0) {

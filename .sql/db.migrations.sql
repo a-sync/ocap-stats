@@ -56,3 +56,4 @@ UPDATE `entities` SET `hits` = (`hits` - `fhits`), `kills` = (`kills` - `fkills`
 -- 2024-03-24
 --
 CREATE INDEX `events_victim_aid_IDX` ON `events` (`victim_aid`);
+UPDATE `entities` INNER JOIN (SELECT `events`.`victim_aid`, COUNT(`events`.`id`) AS `total`	FROM `events` WHERE `events`.`event` = 'killed' GROUP BY `events`.`victim_aid`)	AS `kills` ON	`kills`.`victim_aid` = `entities`.`aid` SET	`entities`.`deaths` = `kills`.`total` ;

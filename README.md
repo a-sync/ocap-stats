@@ -50,7 +50,7 @@ CTRL+F
   * **Kills**  
     nr. of `killed` events as attacker, where victim is a _unit_ on a different side  
   * **Deaths**  
-    MAX( nr. of `killed` events, nr. of `_dead` events ) as victim  
+    nr. of `killed` events as victim  
   * **Frienldy fire**  
     nr. of `hit` events as attacker, where victim is a _unit_ on the same side  
   * **Teamkills**  
