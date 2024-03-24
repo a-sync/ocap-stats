@@ -629,11 +629,11 @@ class Additional_data extends CI_Model
                     FROM events AS e
                     INNER JOIN entities AS victim ON victim.aid = e.victim_aid
                     LEFT JOIN (
-                        SELECT ee.operation_id, ee.victim_id, ee.frame
+                        SELECT ee.operation_id, ee.victim_id, ee.frame, (ee.frame + 1) AS frame_plus, (GREATEST(ee.frame, 1) - 1) AS frame_minus
                         FROM events AS ee
                         WHERE ee.victim_id = ee.attacker_id AND ee.victim_id IS NOT NULL AND ee.event = 'hit'
                         GROUP BY ee.operation_id, ee.victim_id
-                        ) AS hits ON hits.operation_id = e.operation_id AND hits.victim_id = e.victim_id AND (hits.frame = e.frame OR hits.frame = e.frame - 1 OR hits.frame = e.frame + 1)
+                        ) AS hits ON hits.operation_id = e.operation_id AND hits.victim_id = e.victim_id AND (hits.frame = e.frame OR hits.frame_plus = e.frame OR hits.frame_minus = e.frame)
                     WHERE e.victim_aid = e.attacker_aid AND hits.victim_id IS NULL AND victim.is_player = 1 AND e.event = 'killed'
                     ) AS sus_suicide_events
                 GROUP BY sus_suicide_events.operation_id
@@ -664,11 +664,11 @@ class Additional_data extends CI_Model
         $this->db->select('e.id')
             ->from('events AS e')
             ->join('entities AS victim', 'victim.aid = e.victim_aid')
-            ->join("(SELECT ee.operation_id, ee.victim_id, frame
+            ->join("(SELECT ee.operation_id, ee.victim_id, ee.frame, (ee.frame + 1) AS frame_plus, (GREATEST(ee.frame, 1) - 1) AS frame_minus
                 FROM events AS ee
                 WHERE ee.victim_id = ee.attacker_id AND ee.victim_id IS NOT NULL AND ee.event = 'hit'
                 GROUP BY ee.operation_id, ee.victim_id
-            ) AS hits", 'hits.operation_id = e.operation_id AND hits.victim_id = e.victim_id AND (hits.frame = e.frame OR hits.frame = e.frame - 1 OR hits.frame = e.frame + 1)', 'LEFT')
+            ) AS hits", 'hits.operation_id = e.operation_id AND hits.victim_id = e.victim_id AND (hits.frame = e.frame OR hits.frame_plus = e.frame OR hits.frame_minus = e.frame)', 'LEFT')
             ->where("e.victim_aid = e.attacker_aid AND hits.victim_id IS NULL AND victim.is_player = 1 AND e.event = 'killed'")
             ->where('e.operation_id', $id);
 
