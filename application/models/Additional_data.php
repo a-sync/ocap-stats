@@ -656,7 +656,7 @@ class Additional_data extends CI_Model
                 AND hit.frame IN (killed.frame, GREATEST(killed.frame, 1) - 1, killed.frame + 1)", 'LEFT')
             ->where("hit.id IS NULL AND killed.event = 'killed' AND killed.victim_aid IS NOT NULL AND killed.victim_aid = killed.attacker_aid");
 
-        if ($op_ids !== false) {
+        if ($op_ids !== false && count($op_ids) !== 0) {
             $this->db->where_in('killed.operation_id', $op_ids);
         }
 
