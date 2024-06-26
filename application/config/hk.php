@@ -9,23 +9,29 @@ $config['site_logo'] = 'public/hk_logo.png';
 
 $config['event_types'] = [
     's1' => 'Season One',
-    's1tb' => 'S1 Tiebreaker'
+    's2' => 'Season Two',
+    'tb' => 'Tiebreaker'
 ];
 
 $config['default_selected_event_types'] = [
-    's1'
+    's2'
 ];
 
 $config['tag_event_types'] = [
-    'Season One' => 's1'
+    'Season One' => 's1',
+    'Season Two' => 's2'
 ];
 
 // Keep these ordered by rank
-$config['cmd_group_names'] = [];
+$config['cmd_group_names'] = [
+    'Blue Lead',
+    'Red Lead'
+];
 
 // Keep these ordered by rank
 $config['cmd_role_names'] = [
-    'Platoon Leader'
+    'Platoon Leader',
+    'Platoon Commander'
 ];
 
 $config['sides'] = [

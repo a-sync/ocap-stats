@@ -17,7 +17,7 @@ $config['event_types'] = [
     'vssud' => 'FNF vs AS'
 ];
 
-$config['default_selected_event_types'] = ['eu', 'na', 'titans', 'tnt', 'vsofcra', 'soon', 'vssud'];
+$config['default_selected_event_types'] = ['eu', 'na'];
 
 $config['tag_event_types'] = [
     'fnfeu' => 'eu',
