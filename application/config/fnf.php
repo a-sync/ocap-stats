@@ -74,6 +74,7 @@ $config['cmd_group_names'] = [
 $config['cmd_role_names'] = [
     'Company Commander',
     'Company Sergeant',
+    'Platoon Command',
     'Platoon Leader',
     'Platoon Sergeant',
     'Squad Leader',
