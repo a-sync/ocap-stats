@@ -8,12 +8,12 @@ $config['site_title'] = 'FNF Stats';
 $config['site_logo'] = 'public/fnf_logo.png';
 
 $config['event_types'] = [
-    'eu' => 'FNF EU',
+    'eu' => 'FNF',
     'na' => 'FNF NA',
-    'titans' => 'Titans',
+    'soon' => 'Wargames',
     'tnt' => 'TNT',
+    'titans' => 'Titans',
     'vsofcra' => 'FNF vs OFCRA',
-    'soon' => 'SOON',
     'vssud' => 'FNF vs AS'
 ];
 
@@ -30,7 +30,10 @@ $config['tag_event_types'] = [
     'fnfvofcra' => 'vsofcra',
     'SOON' => 'soon',
     'fnfEarly' => 'eu',
-    'fnfLate' => 'na'
+    'fnfLate' => 'na',
+    'fnfWargames' => 'soon',
+    'FNF Main' => 'eu',
+    'FNF WG' => 'soon',
 ];
 
 // Keep these ordered by rank
