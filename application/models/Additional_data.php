@@ -12,16 +12,20 @@ class Additional_data extends CI_Model
      * all the players with entities matching cmd group/role name ordered 
      * by rank
      */
-    private function _get_commander_prospects($events_filter, $op_ids = false)
+    private function _get_commander_prospects($events_filter, $op_ids = false, $year = false)
     {
-        if ($op_ids !== false) {
-            $this->db->where_in('operations.id', $op_ids);
-        }
-
         if (is_array($events_filter) && count($events_filter) > 0) {
             $this->db->where_in('operations.event', $events_filter);
         } elseif ($events_filter !== false) {
             $this->db->where('operations.event !=', '');
+        }
+
+        if ($op_ids !== false) {
+            $this->db->where_in('operations.id', $op_ids);
+        }
+
+        if ($year !== false) {
+            $this->db->where('YEAR(operations.start_time)', $year);
         }
 
         $cmd_group_names = $this->config->item('cmd_group_names');
@@ -67,16 +71,20 @@ class Additional_data extends CI_Model
         return $this->db->get()->result_array();
     }
 
-    private function _get_verified_commanders($events_filter, $op_ids = false)
+    private function _get_verified_commanders($events_filter, $op_ids = false, $year = false)
     {
-        if ($op_ids !== false) {
-            $this->db->where_in('operations.id', $op_ids);
-        }
-
         if (is_array($events_filter) && count($events_filter) > 0) {
             $this->db->where_in('operations.event', $events_filter);
         } elseif ($events_filter !== false) {
             $this->db->where('operations.event !=', '');
+        }
+
+        if ($op_ids !== false) {
+            $this->db->where_in('operations.id', $op_ids);
+        }
+
+        if ($year !== false) {
+            $this->db->where('YEAR(operations.start_time)', $year);
         }
 
         $this->db->select([
@@ -120,7 +128,7 @@ class Additional_data extends CI_Model
         return $verified_op_leads;
     }
 
-    public function get_commanders($events_filter, $op_ids = false, $return_ops_data = false)
+    public function get_commanders($events_filter, $op_ids = false, $return_ops_data = false, $year = false)
     {
         if ($op_ids !== false) {
             if (!is_array($op_ids)) {
@@ -128,7 +136,7 @@ class Additional_data extends CI_Model
             }
         }
 
-        $prospects = $this->_get_commander_prospects($events_filter, $op_ids);
+        $prospects = $this->_get_commander_prospects($events_filter, $op_ids, $year);
 
         $op_leads = [];
         $ambiguous_op_leads = [];
@@ -171,7 +179,7 @@ class Additional_data extends CI_Model
         $prospects = null;
         $unambiguous_op_leads = $op_leads;
 
-        $verified_op_leads = $this->_get_verified_commanders($events_filter, $op_ids);
+        $verified_op_leads = $this->_get_verified_commanders($events_filter, $op_ids, $year);
         foreach ($verified_op_leads as $op_id => $ol) {
             foreach ($ol as $side => $l) {
                 $op_leads[$op_id][$side] = $l;

@@ -8,7 +8,7 @@ class Players extends CI_Model
         $this->load->database();
     }
 
-    public function get_players($events_filter, $id = false)
+    public function get_players($events_filter, $id = false, $year = false)
     {
         if (is_array($events_filter) && count($events_filter) > 0) {
             $this->db->where_in('operations.event', $events_filter);
@@ -22,6 +22,10 @@ class Players extends CI_Model
             }
 
             $this->db->where_in('players.id', $id);
+        }
+
+        if ($year !== false) {
+            $this->db->where('YEAR(operations.start_time)', $year);
         }
 
         $this->db->select(['players.name', 'players.id'])
@@ -69,6 +73,10 @@ class Players extends CI_Model
                 ->join('operations', 'operations.id = entities.operation_id')
                 ->where('players.alias_of', 0)
                 ->group_by('players.id');
+
+            if ($year !== false) {
+                $this->db->where('YEAR(operations.start_time)', $year);
+            }
 
             $players_adjusted_stats = $this->db->get()->result_array();
             $players_adjusted_stats = array_column($players_adjusted_stats, null, 'id');

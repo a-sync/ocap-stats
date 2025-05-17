@@ -812,7 +812,7 @@ class Operations extends CI_Model
         return $errors;
     }
 
-    public function get_ops($events_filter, $id = false)
+    public function get_ops($events_filter, $id = false, $year = false)
     {
         if (is_array($events_filter) && count($events_filter) > 0) {
             $this->db->where_in('operations.event', $events_filter);
@@ -826,6 +826,10 @@ class Operations extends CI_Model
             }
 
             $this->db->where_in('operations.id', $id);
+        }
+
+        if ($year !== false) {
+            $this->db->where('YEAR(operations.start_time)', $year);
         }
 
         $this->db

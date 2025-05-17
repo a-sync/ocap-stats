@@ -127,7 +127,7 @@ class App extends CI_Controller
         $this->ops();
     }
 
-    public function players()
+    public function players($year = false)
     {
         $this->_cache();
 
@@ -135,7 +135,7 @@ class App extends CI_Controller
 
         $this->load->model('players');
 
-        $players = $this->players->get_players($events_filter);
+        $players = $this->players->get_players($events_filter, false, $year);
 
         $this->_head('players', 'Players');
 
@@ -150,7 +150,7 @@ class App extends CI_Controller
         $this->_foot();
     }
 
-    public function ops()
+    public function ops($year = false)
     {
         $this->_cache();
 
@@ -158,7 +158,7 @@ class App extends CI_Controller
 
         $this->load->model('operations');
 
-        $ops = $this->operations->get_ops($events_filter);
+        $ops = $this->operations->get_ops($events_filter, false, $year);
 
         $this->_head('ops');
 
@@ -400,7 +400,7 @@ class App extends CI_Controller
         $this->_foot();
     }
 
-    public function commanders()
+    public function commanders($year = false)
     {
         $this->_cache();
 
@@ -408,7 +408,7 @@ class App extends CI_Controller
 
         $this->load->model('additional_data');
 
-        $commanders = $this->additional_data->get_commanders($events_filter);
+        $commanders = $this->additional_data->get_commanders($events_filter, false, false, $year);
 
         $this->_head('commanders', 'Commanders');
 
@@ -422,7 +422,7 @@ class App extends CI_Controller
         $this->_foot();
     }
 
-    public function assorted_data()
+    public function assorted_data($year = false)
     {
         $this->_cache();
 
@@ -432,14 +432,14 @@ class App extends CI_Controller
 
         $this->load->view('arrays-to-tables', [
             'tables' => [
-                'Winners' => $this->assorted->get_winners(),
-                'End messages' => $this->assorted->get_end_messages(),
-                'Mission authors' => $this->assorted->get_mission_authors(),
-                'Maps' => $this->assorted->get_maps(),
-                'Groups' => $this->assorted->get_groups(),
-                'Roles' => $this->assorted->get_roles(),
-                'Weapons' => $this->assorted->get_weapons(),
-                'Assets' => $this->assorted->get_vehicles()
+                'Winners' => $this->assorted->get_winners($year),
+                'End messages' => $this->assorted->get_end_messages($year),
+                'Mission authors' => $this->assorted->get_mission_authors($year),
+                'Maps' => $this->assorted->get_maps($year),
+                'Groups' => $this->assorted->get_groups($year),
+                'Roles' => $this->assorted->get_roles($year),
+                'Weapons' => $this->assorted->get_weapons($year),
+                'Assets' => $this->assorted->get_vehicles($year)
             ]
         ]);
 

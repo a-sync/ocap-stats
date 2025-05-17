@@ -7,8 +7,12 @@ class Assorted extends CI_Model
         $this->load->database();
     }
 
-    public function get_mission_authors()
+    public function get_mission_authors($year = false)
     {
+        if ($year) {
+            $this->db->where('YEAR(operations.start_time)', $year);
+        }
+
         $this->db
             ->select([
                 'mission_author',
@@ -21,8 +25,12 @@ class Assorted extends CI_Model
         return $this->db->get()->result_array();
     }
 
-    public function get_maps()
+    public function get_maps($year = false)
     {
+        if ($year) {
+            $this->db->where('YEAR(operations.start_time)', $year);
+        }
+
         $this->db
             ->select([
                 'world_name',
@@ -35,8 +43,12 @@ class Assorted extends CI_Model
         return $this->db->get()->result_array();
     }
 
-    public function get_winners()
+    public function get_winners($year = false)
     {
+        if ($year) {
+            $this->db->where('YEAR(operations.start_time)', $year);
+        }
+
         $this->db
             ->select([
                 'end_winner',
@@ -49,8 +61,12 @@ class Assorted extends CI_Model
         return $this->db->get()->result_array();
     }
 
-    public function get_end_messages()
+    public function get_end_messages($year = false)
     {
+        if ($year) {
+            $this->db->where('YEAR(operations.start_time)', $year);
+        }
+
         $this->db
             ->select([
                 'end_message',
@@ -63,8 +79,14 @@ class Assorted extends CI_Model
         return $this->db->get()->result_array();
     }
 
-    public function get_groups()
+    public function get_groups($year = false)
     {
+        if ($year) {
+            $this->db
+                ->join('operations', 'operations.id = entities.operation_id')
+                ->where('YEAR(operations.start_time)', $year);
+        }
+
         $this->db
             ->select([
                 'group_name',
@@ -77,8 +99,14 @@ class Assorted extends CI_Model
         return $this->db->get()->result_array();
     }
 
-    public function get_roles()
+    public function get_roles($year = false)
     {
+        if ($year) {
+            $this->db
+                ->join('operations', 'operations.id = entities.operation_id')
+                ->where('YEAR(operations.start_time)', $year);
+        }
+
         $this->db
             ->select([
                 "TRIM(SUBSTRING_INDEX(role, '@', 1)) AS role_name",
@@ -91,14 +119,20 @@ class Assorted extends CI_Model
         return $this->db->get()->result_array();
     }
 
-    public function get_weapons()
+    public function get_weapons($year = false)
     {
+        if ($year) {
+            $this->db
+                ->join('operations', 'operations.id = events.operation_id')
+                ->where('YEAR(operations.start_time)', $year);
+        }
+
         $this->db
             ->select('weapon')
-            ->select_sum("CASE WHEN event = 'hit' THEN 1 ELSE NULL END", 'hits')
-            ->select_avg("CASE WHEN event = 'hit' THEN distance ELSE NULL END", 'avg_hit_dist')
-            ->select_sum("CASE WHEN event = 'killed' THEN 1 ELSE NULL END", 'kills')
-            ->select_avg("CASE WHEN event = 'killed' THEN distance ELSE NULL END", 'avg_kill_dist')
+            ->select_sum("CASE WHEN events.event = 'hit' THEN 1 ELSE NULL END", 'hits')
+            ->select_avg("CASE WHEN events.event = 'hit' THEN events.distance ELSE NULL END", 'avg_hit_dist')
+            ->select_sum("CASE WHEN events.event = 'killed' THEN 1 ELSE NULL END", 'kills')
+            ->select_avg("CASE WHEN events.event = 'killed' THEN events.distance ELSE NULL END", 'avg_kill_dist')
             ->from('events')
             ->where_in('events.event', ['hit', 'killed'])
             ->group_by('weapon')
@@ -107,8 +141,14 @@ class Assorted extends CI_Model
         return $this->db->get()->result_array();
     }
 
-    public function get_vehicles()
+    public function get_vehicles($year = false)
     {
+        if ($year) {
+            $this->db
+                ->join('operations', 'operations.id = entities.operation_id')
+                ->where('YEAR(operations.start_time)', $year);
+        }
+
         $this->db
             ->select([
                 'name',
