@@ -1234,4 +1234,21 @@ class Additional_data extends CI_Model
 
         return $errors;
     }
+
+    public function get_ops_event_type_ids($year = false)
+    {
+        if ($year !== false) {
+            $this->db->where('YEAR(operations.start_time)', $year);
+        }
+
+        $results = $this->db
+            ->distinct()
+            ->select('event')
+            ->from('operations')
+            ->where('event !=', '')
+            ->get()
+            ->result_array();
+
+        return array_column($results, 'event');
+    }
 }

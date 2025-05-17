@@ -85,7 +85,7 @@ class App extends CI_Controller
         show_404('', false);
     }
 
-    private function _filters()
+    private function _event_type_selection()
     {
         $events = $this->input->get('events');
         $event_type_ids = array_keys($this->config->item('event_types'));
@@ -131,16 +131,18 @@ class App extends CI_Controller
     {
         $this->_cache();
 
-        $events_filter = $this->_filters();
-
         $this->load->model('players');
+        $this->load->model('additional_data');
 
-        $players = $this->players->get_players($events_filter, false, $year);
+        $event_types = $this->additional_data->get_ops_event_type_ids($year);
+        $selected_event_types = $this->_event_type_selection($year);
+        $players = $this->players->get_players($selected_event_types, false, $year);
 
         $this->_head('players', 'Players');
 
         $this->load->view('filters', [
-            'events_filter' => $events_filter
+            'event_types' => $event_types,
+            'selected_event_types' => $selected_event_types
         ]);
 
         $this->load->view('players', [
@@ -154,16 +156,18 @@ class App extends CI_Controller
     {
         $this->_cache();
 
-        $events_filter = $this->_filters();
-
         $this->load->model('operations');
+        $this->load->model('additional_data');
 
-        $ops = $this->operations->get_ops($events_filter, false, $year);
+        $event_types = $this->additional_data->get_ops_event_type_ids($year);
+        $selected_event_types = $this->_event_type_selection($year);
+        $ops = $this->operations->get_ops($selected_event_types, false, $year);
 
         $this->_head('ops');
 
         $this->load->view('filters', [
-            'events_filter' => $events_filter
+            'event_types' => $event_types,
+            'selected_event_types' => $selected_event_types
         ]);
         $this->load->view('ops', [
             'items' => $ops
@@ -404,16 +408,17 @@ class App extends CI_Controller
     {
         $this->_cache();
 
-        $events_filter = $this->_filters();
-
         $this->load->model('additional_data');
 
-        $commanders = $this->additional_data->get_commanders($events_filter, false, false, $year);
+        $event_types = $this->additional_data->get_ops_event_type_ids($year);
+        $selected_event_types = $this->_event_type_selection($year);
+        $commanders = $this->additional_data->get_commanders($selected_event_types, false, false, $year);
 
         $this->_head('commanders', 'Commanders');
 
         $this->load->view('filters', [
-            'events_filter' => $events_filter
+            'event_types' => $event_types,
+            'selected_event_types' => $selected_event_types
         ]);
         $this->load->view('commanders', [
             'items' => $commanders
