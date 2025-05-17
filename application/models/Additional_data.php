@@ -56,6 +56,7 @@ class Additional_data extends CI_Model
                 $order_by_role_name .= 'WHEN role_name LIKE ' . $this->db->escape($rn . '%') . ' THEN ' . strval($i + 1) . ' ';
             }
             $this->db->or_where('entities.role', '');
+            $this->db->or_where_in('entities.role', $cmd_role_names);
             $this->db->group_end();
             $order_by_role_name .= 'ELSE ' . strval(count($cmd_role_names) + 1) . ' END';
             $this->db->order_by($order_by_role_name, 'ASC', false);
