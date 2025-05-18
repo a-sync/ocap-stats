@@ -1,8 +1,10 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
+$year_prefix = '';
 $year_text = '';
 if ($year !== false) {
+    $year_prefix = $year . '/';
     $year_text = ' in ' . $year;
 }
 
@@ -46,7 +48,7 @@ $sides = $this->config->item('sides');
                             foreach ($items as $index => $i) :
                                 $name = html_escape($i['name']);
                                 if (isset($i['player_id']) && !is_null($i['player_id'])) {
-                                    $name = '<a href="' . base_url('player/') . $i['player_id'] . '">' . $name . '</a>';
+                                    $name = '<a href="' . base_url($year_prefix . 'player/') . $i['player_id'] . '">' . $name . '</a>';
                                 } else {
                                     $name = '<span title="' . html_escape($i['class']) . '">' . $name . '</span>';
                                 }
