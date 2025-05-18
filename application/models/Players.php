@@ -190,10 +190,10 @@ class Players extends CI_Model
                 "TRIM(SUBSTRING_INDEX(entities.role, '@', 1)) AS role_name",
                 'COUNT(entities.role) AS total_count'
             ])
-            ->select_sum("CASE WHEN side = 'WEST' THEN 1 ELSE 0 END", 'west_count')
-            ->select_sum("CASE WHEN side = 'EAST' THEN 1 ELSE 0 END", 'east_count')
-            ->select_sum("CASE WHEN side = 'GUER' THEN 1 ELSE 0 END", 'guer_count')
-            ->select_sum("CASE WHEN side = 'CIV' THEN 1 ELSE 0 END", 'civ_count')
+            ->select_sum("CASE WHEN entities.side = 'WEST' THEN 1 ELSE 0 END", 'west_count')
+            ->select_sum("CASE WHEN entities.side = 'EAST' THEN 1 ELSE 0 END", 'east_count')
+            ->select_sum("CASE WHEN entities.side = 'GUER' THEN 1 ELSE 0 END", 'guer_count')
+            ->select_sum("CASE WHEN entities.side = 'CIV' THEN 1 ELSE 0 END", 'civ_count')
             ->select_sum('shots')
             ->select_sum('hits')
             ->select_sum('fhits')
@@ -338,12 +338,12 @@ class Players extends CI_Model
 
     public function get_attackers_by_id($id, $year = false)
     {
-        return $this->get_opponents_by_id($id, 'attackers');
+        return $this->get_opponents_by_id($id, 'attackers', $year);
     }
 
     public function get_victims_by_id($id, $year = false)
     {
-        return $this->get_opponents_by_id($id, 'victims');
+        return $this->get_opponents_by_id($id, 'victims', $year);
     }
 
     public function get_weapons_by_id($id, $year = false)
