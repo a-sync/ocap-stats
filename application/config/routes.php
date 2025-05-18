@@ -75,6 +75,7 @@ $route['fix-data/verified'] = 'data/fix_data/verified';
 
 $route['players'] = 'app/players';
 $route['(:num)/players'] = 'app/players/$1';
+
 $route['player/(:num)'] = 'app/player/$1';
 $route['player/(:num)/ops'] = 'app/player/$1/ops';
 $route['player/(:num)/roles'] = 'app/player/$1/roles';
@@ -86,6 +87,7 @@ $route['player/(:num)/rivals'] = 'app/player/$1/rivals';
 $route['ops'] = 'app/ops';
 $route['(:num)'] = 'app/ops/$1';
 $route['(:num)/ops'] = 'app/ops/$1';
+
 $route['op/(:num)'] = 'app/op/$1';
 $route['op/(:num)/entities'] = 'app/op/$1/entities';
 $route['op/(:num)/events'] = 'app/op/$1/events';
@@ -96,4 +98,6 @@ $route['(:num)/commanders'] = 'app/commanders/$1';
 
 $route['assorted-data'] = 'app/assorted_data';
 $route['(:num)/assorted-data'] = 'app/assorted_data/$1';
+
 $route['about'] = 'app/readme_md';
+$route['(:num)/about'] = 'app/readme_md/$1';

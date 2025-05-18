@@ -48,17 +48,17 @@ class App extends CI_Controller
         return $this->load->view('admin/login');
     }
 
-    private function _head($active = 'ops', $prefix = '', $postfix = '')
+    private function _head($active = 'ops', $prefix = '', $postfix = '', $year = false)
     {
         return $this->load->view('head', [
             'title' => ($prefix ? $prefix . ' - ' : '') . $this->config->item('site_title') . ($postfix ? ' - ' . $postfix : ''),
-            'main_menu' => $this->load->view('menu', ['active' => $active], true)
+            'main_menu' => $this->load->view('menu', ['active' => $active, 'year' => $year], true)
         ]);
     }
 
-    private function _foot()
+    private function _foot($year = false)
     {
-        return $this->load->view('foot');
+        return $this->load->view('foot', ['year' => $year]);
     }
 
     private function _cache()
@@ -142,7 +142,7 @@ class App extends CI_Controller
         $selected_event_types = $this->_event_type_selection($available_event_types);
         $players = $this->players->get_players($selected_event_types, false, $year);
 
-        $this->_head('players', 'Players');
+        $this->_head('players', 'Players', '', $year);
 
         $this->load->view('filters', [
             'available_event_types' => $available_event_types,
@@ -150,10 +150,11 @@ class App extends CI_Controller
         ]);
 
         $this->load->view('players', [
+            'year' => $year,
             'items' => $players
         ]);
 
-        $this->_foot();
+        $this->_foot($year);
     }
 
     public function ops($year = false)
@@ -167,17 +168,18 @@ class App extends CI_Controller
         $selected_event_types = $this->_event_type_selection($available_event_types);
         $ops = $this->operations->get_ops($selected_event_types, false, $year);
 
-        $this->_head('ops');
+        $this->_head('ops', 'Opeations', '', $year);
 
         $this->load->view('filters', [
             'available_event_types' => $available_event_types,
             'selected_event_types' => $selected_event_types
         ]);
         $this->load->view('ops', [
+            'year' => $year,
             'items' => $ops
         ]);
 
-        $this->_foot();
+        $this->_foot($year);
     }
 
     public function player($id, $tab = 'ops')
@@ -418,17 +420,18 @@ class App extends CI_Controller
         $selected_event_types = $this->_event_type_selection($available_event_types);
         $commanders = $this->additional_data->get_commanders($selected_event_types, false, false, $year);
 
-        $this->_head('commanders', 'Commanders');
+        $this->_head('commanders', 'Commanders', '', $year);
 
         $this->load->view('filters', [
             'available_event_types' => $available_event_types,
             'selected_event_types' => $selected_event_types
         ]);
         $this->load->view('commanders', [
+            'year' => $year,
             'items' => $commanders
         ]);
 
-        $this->_foot();
+        $this->_foot($year);
     }
 
     public function assorted_data($year = false)
@@ -437,9 +440,10 @@ class App extends CI_Controller
 
         $this->load->model('assorted');
 
-        $this->_head('', 'Assorted data');
+        $this->_head('', 'Assorted data', '', $year);
 
         $this->load->view('arrays-to-tables', [
+            'title' => 'Assorted data' . ($year !== false ? ' for ' . $year : ''),
             'tables' => [
                 'Winners' => $this->assorted->get_winners($year),
                 'End messages' => $this->assorted->get_end_messages($year),
@@ -452,21 +456,21 @@ class App extends CI_Controller
             ]
         ]);
 
-        $this->_foot();
+        $this->_foot($year);
     }
 
-    public function readme_md()
+    public function readme_md($year)
     {
         $this->_cache();
 
         $this->load->library('markdown');
 
-        $this->_head('', 'About');
+        $this->_head('', 'About', '', $year);
 
         $this->load->view('md', [
             'markdown' => $this->markdown->transform_file(APPPATH . '../README.md')
         ]);
 
-        $this->_foot();
+        $this->_foot($year);
     }
 }

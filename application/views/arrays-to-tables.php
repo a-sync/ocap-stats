@@ -4,7 +4,11 @@
 <div class="mdc-layout-grid">
     <div class="mdc-layout-grid__inner">
         <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 margin--center text--center">
-            <?php foreach ($tables as $title => $arr) :
+            <?php if ($title) {
+                echo '<h1 class="mdc-typography--headline4">' . html_escape($title) . '</h1>';
+            }
+
+            foreach ($tables as $title => $arr) :
                 $head = '';
                 $body = '';
 

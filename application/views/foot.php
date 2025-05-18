@@ -7,6 +7,10 @@ if (defined('OCAP_ODATA_URL')) {
     $odata_link ='<a href="' . OCAP_ODATA_URL . '">' . $odata_short_url . '</a>';
 }
 
+$year_prefix = '';
+if ($year !== false) {
+    $year_prefix = $year . '/';
+}
 ?>
 </main>
 
@@ -24,9 +28,9 @@ if (defined('OCAP_ODATA_URL')) {
 <?php endif; ?>
 
 <footer class="mdc-typography--caption">
-    <a href="<?php echo base_url('about'); ?>">About</a>
+    <a href="<?php echo base_url($year_prefix . 'about'); ?>">About</a>
     &nbsp;&bull;&nbsp;
-    <a href="<?php echo base_url('assorted-data'); ?>">Assorted data</a>
+    <a href="<?php echo base_url($year_prefix . 'assorted-data'); ?>">Assorted data</a>
     <?php if ($odata_link !== ''): ?>
     &nbsp;&bull;&nbsp;
     <a href="<?php echo OCAP_ODATA_URL; ?>">OData</a>

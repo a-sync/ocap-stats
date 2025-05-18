@@ -1,10 +1,17 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
+$year_prefix = '';
+$year_text = '';
+if ($year !== false) {
+    $year_prefix = $year . '/';
+    $year_text = ' in ' . $year;
+}
+
 if (count($items) === 0) :
-    echo '<div class="mdc-typography--body1 list__no_items">No ops matching the selected filters...</div>';
+    echo '<div class="mdc-typography--body1 list__no_items">No ops matching the selected filters' . $year_text . '...</div>';
 else :
-    echo '<div class="mdc-typography--caption list__total">' . count($items) . ' ops</div>';
+    echo '<div class="mdc-typography--caption list__total">' . count($items) . ' ops' . $year_text . '</div>';
 
     $event_types = $this->config->item('event_types');
     $sides = $this->config->item('sides');
@@ -33,7 +40,7 @@ else :
                                 ?>
                                     <tr class="mdc-data-table__row">
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric">
-                                            <a href="<?php echo base_url('op/') . $i['id']; ?>"><?php echo $i['id']; ?></a>
+                                            <a href="<?php echo base_url($year_prefix . 'op/') . $i['id']; ?>"><?php echo $i['id']; ?></a>
                                         </td>
                                         <td class="mdc-data-table__cell"><span title="<?php echo $i['date']; ?>"><?php echo $i['start_time']; ?></span></td>
                                         <td class="mdc-data-table__cell"><span title="<?php echo html_escape($i['tag']); ?>"><?php echo $event_types[$i['event']]; ?></span></td>

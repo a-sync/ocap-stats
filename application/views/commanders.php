@@ -1,10 +1,17 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
+$year_prefix = '';
+$year_text = '';
+if ($year !== false) {
+    $year_prefix = $year . '/';
+    $year_text = ' in ' . $year;
+}
+
 if (count($items) === 0) :
-    echo '<div class="mdc-typography--body1 list__no_items">No commanders matching the selected filters...</div>';
+    echo '<div class="mdc-typography--body1 list__no_items">No commanders matching the selected filters' . $year_text . '...</div>';
 else :
-    echo '<div class="mdc-typography--caption list__total">' . count($items) . ' commanders</div>';
+    echo '<div class="mdc-typography--caption list__total">' . count($items) . ' commanders' . $year_text . '</div>';
 
     $sides = $this->config->item('sides');
     $item0 = $items[0];
@@ -38,7 +45,7 @@ else :
                             <tbody class="mdc-data-table__content">
                                 <?php
                                 foreach ($items as $i) :
-                                    $name = '<a href="' . base_url('player/') . $i['player_id'] . '">' . html_escape($i['name']) . '</a>';
+                                    $name = '<a href="' . base_url($year_prefix . 'player/') . $i['player_id'] . '">' . html_escape($i['name']) . '</a>';
 
                                     $side_ratios = [];
                                     foreach ($sides as $s => $n) {

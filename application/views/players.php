@@ -1,10 +1,17 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
+$year_prefix = '';
+$year_text = '';
+if ($year !== false) {
+    $year_prefix = $year . '/';
+    $year_text = ' in ' . $year;
+}
+
 if (count($items) === 0) :
-    echo '<div class="mdc-typography--body1 list__no_items">No players matching the selected filters...</div>';
+    echo '<div class="mdc-typography--body1 list__no_items">No players matching the selected filters' . $year_text . '...</div>';
 else :
-    echo '<div class="mdc-typography--caption list__total">' . count($items) . ' players</div>';
+    echo '<div class="mdc-typography--caption list__total">' . count($items) . ' players' . $year_text . '</div>';
 
     $show_hit_data = (!defined('ADJUST_HIT_DATA') || ADJUST_HIT_DATA >= 0) ? true : false;
 ?>
@@ -81,7 +88,7 @@ else :
                                         $kills_attendance_ratio = number_format($i['kills'] / $i['attendance'], 1);
                                     }
 
-                                    $name = '<a href="' . base_url('player/') . $i['id'] . '">' . html_escape($i['name']) . '</a>';
+                                    $name = '<a href="' . base_url($year_prefix . 'player/') . $i['id'] . '">' . html_escape($i['name']) . '</a>';
                                 ?>
                                     <tr class="mdc-data-table__row">
                                         <td class="mdc-data-table__cell cell__title"><?php echo $name; ?></td>
