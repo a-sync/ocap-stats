@@ -56,14 +56,15 @@ class App extends CI_Controller
         ]);
     }
 
-    private function _foot($year = false)
+    private function _foot($active = 'ops', $year = false)
     {
         $this->load->model('additional_data');
         $years = $this->additional_data->get_ops_years();
 
         return $this->load->view('foot', [
             'year' => $year,
-            'years' => $years
+            'years' => $years,
+            'active' => $active
         ]);
     }
 
@@ -160,7 +161,7 @@ class App extends CI_Controller
             'items' => $players
         ]);
 
-        $this->_foot($year);
+        $this->_foot('players', $year);
     }
 
     public function ops($year = false)
@@ -185,7 +186,7 @@ class App extends CI_Controller
             'items' => $ops
         ]);
 
-        $this->_foot($year);
+        $this->_foot('ops', $year);
     }
 
     public function player($id, $tab = 'ops', $year = false)
@@ -319,7 +320,7 @@ class App extends CI_Controller
             }
         }
 
-        $this->_foot($year);
+        $this->_foot('players', $year);
     }
 
     public function op($id, $tab = 'entities', $year = false)
@@ -426,7 +427,7 @@ class App extends CI_Controller
             }
         }
 
-        $this->_foot($year);
+        $this->_foot('ops', $year);
     }
 
     public function commanders($year = false)
@@ -450,7 +451,7 @@ class App extends CI_Controller
             'items' => $commanders
         ]);
 
-        $this->_foot($year);
+        $this->_foot('commanders', $year);
     }
 
     public function assorted_data($year = false)
@@ -475,7 +476,7 @@ class App extends CI_Controller
             ]
         ]);
 
-        $this->_foot($year);
+        $this->_foot('assorted-data', $year);
     }
 
     public function readme_md($year)
@@ -484,12 +485,12 @@ class App extends CI_Controller
 
         $this->load->library('markdown');
 
-        $this->_head('', 'About', '', $year);
+        $this->_head('about', 'About', '', $year);
 
         $this->load->view('md', [
             'markdown' => $this->markdown->transform_file(APPPATH . '../README.md')
         ]);
 
-        $this->_foot($year);
+        $this->_foot('about', $year);
     }
 }
