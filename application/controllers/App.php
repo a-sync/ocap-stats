@@ -56,7 +56,7 @@ class App extends CI_Controller
         ]);
     }
 
-    private function _foot($active = 'ops', $year = false)
+    private function _foot($path = '', $year = false)
     {
         $this->load->model('additional_data');
         $years = $this->additional_data->get_ops_years();
@@ -64,7 +64,7 @@ class App extends CI_Controller
         return $this->load->view('foot', [
             'year' => $year,
             'years' => $years,
-            'active' => $active
+            'path' => $path
         ]);
     }
 
@@ -186,7 +186,7 @@ class App extends CI_Controller
             'items' => $ops
         ]);
 
-        $this->_foot('ops', $year);
+        $this->_foot('', $year);
     }
 
     public function player($id, $tab = 'ops', $year = false)
@@ -209,10 +209,10 @@ class App extends CI_Controller
             'commanded_ops' => []
         ];
         $year_prefix = $year !== false ? $year . '/' : '';
-        $active = 'players';
+        $path = 'players';
 
         if (filter_var($id, FILTER_VALIDATE_INT)) {
-            $active = 'player/' . $id . '/' . $tab;
+            $path = 'player/' . $id . '/' . $tab;
             $player = $this->players->get_by_id($id, $year);
 
             if ($player) {
@@ -327,7 +327,7 @@ class App extends CI_Controller
             }
         }
 
-        $this->_foot($active, $year);
+        $this->_foot($path, $year);
     }
 
     public function op($id, $tab = 'entities', $year = false)
@@ -434,7 +434,7 @@ class App extends CI_Controller
             }
         }
 
-        $this->_foot('ops', $year);
+        $this->_foot('', $year);
     }
 
     public function commanders($year = false)

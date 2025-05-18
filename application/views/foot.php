@@ -29,8 +29,8 @@ if ($year !== false) {
 
 <footer class="mdc-typography--caption">
     <?php if (is_array($years) && count($years) > 1) {
-        if (!isset($active)) $active = 'ops';
-        echo '<a href="' . base_url($active) . '">';
+        if (!isset($path)) $path = '';
+        echo '<a href="' . base_url($path) . '">';
         if ($year === false) {
             echo '<b>All seasons</b>';
         } else {
@@ -38,7 +38,7 @@ if ($year !== false) {
         }
         echo '</a> &nbsp;&bull;&nbsp; ';
         foreach ($years as $y) {
-            echo '<a href="' . base_url($y . '/' . $active) . '">';
+            echo '<a href="' . base_url($y . '/' . $path) . '">';
             if ($year === $y) {
                 echo '<b>' . $y . '</b>';
             } else {
