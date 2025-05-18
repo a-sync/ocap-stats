@@ -4,7 +4,7 @@
 <div class="mdc-layout-grid">
     <div class="mdc-layout-grid__inner">
         <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 margin--center text--center">
-            <?php if ($title) {
+            <?php if (isset($title) && $title !== '') {
                 echo '<h1 class="mdc-typography--headline4">' . html_escape($title) . '</h1>';
             }
 

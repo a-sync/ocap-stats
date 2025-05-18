@@ -1251,4 +1251,18 @@ class Additional_data extends CI_Model
 
         return array_column($results, 'event');
     }
+
+    public function get_ops_years()
+    {
+        $results = $this->db
+            ->distinct()
+            ->select('YEAR(start_time) AS year')
+            ->from('operations')
+            ->where('event !=', '')
+            ->order_by('year', 'DESC')
+            ->get()
+            ->result_array();
+
+        return array_column($results, 'year');
+    }
 }

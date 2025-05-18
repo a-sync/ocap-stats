@@ -11,6 +11,7 @@ $year_prefix = '';
 if ($year !== false) {
     $year_prefix = $year . '/';
 }
+
 ?>
 </main>
 
@@ -28,6 +29,28 @@ if ($year !== false) {
 <?php endif; ?>
 
 <footer class="mdc-typography--caption">
+    <?php if (is_array($years) && count($years) > 1) {
+        echo '<a href="' . base_url('/ops') . '">';
+        if ($year === false) {
+            echo '<b>All seasons</b>';
+        } else {
+            echo 'All seasons';
+        }
+        echo '</a>&nbsp;&bull;&nbsp;';
+        foreach ($years as $y) {
+            echo '<a href="' . base_url($y . '/ops') . '">';
+            if ($year === $y) {
+                echo '<b>' . $y . '</b>';
+            } else {
+                echo $y;
+            }
+            echo '</a>';
+            if ($y !== end($years)) {
+                echo '&nbsp;&bull;&nbsp;';
+            }
+        }
+        echo '<br><br>';
+    }?>
     <a href="<?php echo base_url($year_prefix . 'about'); ?>">About</a>
     &nbsp;&bull;&nbsp;
     <a href="<?php echo base_url($year_prefix . 'assorted-data'); ?>">Assorted data</a>

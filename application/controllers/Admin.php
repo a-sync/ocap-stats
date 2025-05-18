@@ -49,7 +49,7 @@ class Admin extends CI_Controller
 
     private function _foot()
     {
-        return $this->load->view('foot');
+        return $this->load->view('foot', ['year' => false, 'years' => []]);
     }
 
     public function clearcache()

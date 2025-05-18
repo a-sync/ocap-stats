@@ -58,7 +58,13 @@ class App extends CI_Controller
 
     private function _foot($year = false)
     {
-        return $this->load->view('foot', ['year' => $year]);
+        $this->load->model('additional_data');
+        $years = $this->additional_data->get_ops_years();
+
+        return $this->load->view('foot', [
+            'year' => $year,
+            'years' => $years
+        ]);
     }
 
     private function _cache()
