@@ -232,12 +232,17 @@ class App extends CI_Controller
                     $player_ops = $this->players->get_ops_by_id($id, $year);
                 }
             } else {
-                $alias_of = $this->players->get_alias_of_by_id($id);
-                if ($alias_of) {
-                    return redirect(base_url($year_prefix . 'player/' . $alias_of));
+                $player_recheck = $year === false ? false : $this->players->get_by_id($id);
+                if ($player_recheck) {
+                    $errors[] = 'No data available for this player in ' . $year;
+                } else {
+                    $alias_of = $this->players->get_alias_of_by_id($id);
+                    if ($alias_of) {
+                        return redirect(base_url($year_prefix . 'player/' . $alias_of));
+                    } else {
+                        $errors[] = 'Unknown player ID given.';
+                    }
                 }
-
-                $errors[] = 'Unknown player ID given.';
             }
         } else {
             $errors[] = 'Invalid ID given.';
