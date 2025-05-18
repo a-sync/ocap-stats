@@ -861,9 +861,9 @@ class Operations extends CI_Model
             ->result_array();
     }
 
-    public function get_by_id($id, $only_parsed = true)
+    public function get_by_id($id, $only_parsed = true, $year = false)
     {
-        $re = $this->get_ops($only_parsed, $id);
+        $re = $this->get_ops($only_parsed, $id, $year);
 
         if (count($re) === 0) {
             return false;

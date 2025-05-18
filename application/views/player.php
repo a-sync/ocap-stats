@@ -87,6 +87,12 @@ $show_hit_data = (!defined('ADJUST_HIT_DATA') || ADJUST_HIT_DATA >= 0) ? true : 
                                         </td>
                                     </tr>
                                 <?php endif; ?>
+                                <?php if ($year !== false) : ?>
+                                    <tr class="mdc-data-table__row">
+                                        <td class="mdc-data-table__cell">Season</td>
+                                        <td class="mdc-data-table__cell"><?php echo $year; ?></td>
+                                    </tr>
+                                <?php endif; ?>
                                 <?php if (count($commanded_ops) > 0) : ?>
                                     <tr class="mdc-data-table__row">
                                         <td class="mdc-data-table__cell">Commander</td>

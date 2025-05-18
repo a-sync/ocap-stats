@@ -3,6 +3,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 $sides = $this->config->item('sides');
 
+$year_prefix = '';
+if ($year !== false) {
+    $year_prefix = $year . '/';
+}
+
 if (count($items) === 0) {
     echo '<div class="mdc-typography--body1 list__no_items">No events found...</div>';
 } else {
@@ -60,7 +65,7 @@ $deduped_items = array_reduce($items, function ($acc, $next) {
                                 $attacker_side_class = $i['attacker_side'] ? 'side__' . html_escape(strtolower($i['attacker_side'])) : '';
                                 $attacker_title = '';
                                 if ($i['attacker_player_id']) {
-                                    $attacker_name = '<a href="' . base_url('player/') . $i['attacker_player_id'] . '">' . $attacker_name . '</a>';
+                                    $attacker_name = '<a href="' . base_url($year_prefix . 'player/') . $i['attacker_player_id'] . '">' . $attacker_name . '</a>';
                                     if ($attacker_player_name !== '' && $i['attacker_name'] !== $attacker_player_name) {
                                         $attacker_title = ' title="' . html_escape($attacker_player_name) . '"';
                                     }
@@ -80,7 +85,7 @@ $deduped_items = array_reduce($items, function ($acc, $next) {
                                 $victim_side_class = $i['victim_side'] ? 'side__' . html_escape(strtolower($i['victim_side'])) : '';
                                 $victim_title = '';
                                 if ($i['victim_player_id']) {
-                                    $victim_name = '<a href="' . base_url('player/') . $i['victim_player_id'] . '">' . $victim_name . '</a>';
+                                    $victim_name = '<a href="' . base_url($year_prefix . 'player/') . $i['victim_player_id'] . '">' . $victim_name . '</a>';
                                     if ($victim_player_name !== '' && $i['victim_name'] !== $victim_player_name) {
                                         $victim_title = ' title="' . html_escape($victim_player_name) . '"';
                                     }

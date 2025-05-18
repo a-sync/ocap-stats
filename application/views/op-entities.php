@@ -1,6 +1,11 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
+$year_prefix = '';
+if ($year !== false) {
+    $year_prefix = $year . '/';
+}
+
 if (count($items) === 0) {
     echo '<div class="mdc-typography--body1 list__no_items">No entities found...</div>';
 } else {
@@ -56,7 +61,7 @@ $sides = $this->config->item('sides');
                                 $name = html_escape($i['name']);
                                 $pname_or_class = 'n/a';
                                 if ($i['player_id']) {
-                                    $name = '<a href="' . base_url('player/') . $i['player_id'] . '">' . $name . '</a>';
+                                    $name = '<a href="' . base_url($year_prefix . 'player/') . $i['player_id'] . '">' . $name . '</a>';
                                     $pname_or_class = $i['player_name'];
                                 } elseif ($i['class']) {
                                     $pname_or_class = $i['class'];

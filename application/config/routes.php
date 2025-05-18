@@ -95,10 +95,14 @@ $route['ops'] = 'app/ops';
 $route['(:num)'] = 'app/ops/$1';
 $route['(:num)/ops'] = 'app/ops/$1';
 
-$route['op/(:num)'] = 'app/op/$1';
+$route['op/(:num)'] = 'app/op/$1/entities';
 $route['op/(:num)/entities'] = 'app/op/$1/entities';
 $route['op/(:num)/events'] = 'app/op/$1/events';
 $route['op/(:num)/weapons'] = 'app/op/$1/weapons';
+$route['(:num)/op/(:num)'] = 'app/op/$2/entities/$1';
+$route['(:num)/op/(:num)/entities'] = 'app/op/$2/entities/$1';
+$route['(:num)/op/(:num)/events'] = 'app/op/$2/events/$1';
+$route['(:num)/op/(:num)/weapons'] = 'app/op/$2/weapons/$1';
 
 $route['commanders'] = 'app/commanders';
 $route['(:num)/commanders'] = 'app/commanders/$1';

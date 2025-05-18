@@ -249,6 +249,7 @@ class App extends CI_Controller
 
             if ($tab === 'roles') {
                 $this->load->view('player-roles', [
+                    'year' => $year,
                     'items' => $player_roles,
                     'player_menu' => $this->load->view('player-menu', [
                         'active' => 'roles',
@@ -258,6 +259,7 @@ class App extends CI_Controller
                 ]);
             } elseif ($tab === 'weapons') {
                 $this->load->view('player-weapons', [
+                    'year' => $year,
                     'items' => $player_weapons,
                     'player_menu' => $this->load->view('player-menu', [
                         'active' => 'weapons',
@@ -267,6 +269,7 @@ class App extends CI_Controller
                 ]);
             } elseif ($tab === 'attackers') {
                 $this->load->view('player-attackers-victims', [
+                    'year' => $year,
                     'items' => $player_attackers,
                     'player_menu' => $this->load->view('player-menu', [
                         'active' => 'attackers',
@@ -277,6 +280,7 @@ class App extends CI_Controller
                 ]);
             } elseif ($tab === 'victims') {
                 $this->load->view('player-attackers-victims', [
+                    'year' => $year,
                     'items' => $player_victims,
                     'player_menu' => $this->load->view('player-menu', [
                         'active' => 'victims',
@@ -287,6 +291,7 @@ class App extends CI_Controller
                 ]);
             } elseif ($tab === 'rivals') {
                 $this->load->view('player-rivals', [
+                    'year' => $year,
                     'items' => $player_cmd_stats['rivals'],
                     'player_menu' => $this->load->view('player-menu', [
                         'active' => 'rivals',
@@ -296,6 +301,7 @@ class App extends CI_Controller
                 ]);
             } else { // ops
                 $this->load->view('player-ops', [
+                    'year' => $year,
                     'items' => $player_ops,
                     'player_menu' => $this->load->view('player-menu', [
                         'active' => 'ops',
@@ -310,7 +316,7 @@ class App extends CI_Controller
         $this->_foot($year);
     }
 
-    public function op($id, $tab = 'entities')
+    public function op($id, $tab = 'entities', $year = false)
     {
         $this->_cache();
 
@@ -325,11 +331,12 @@ class App extends CI_Controller
         $op_weapons = [];
         $op_entities = [];
         $players_first_op = [];
+        $year_prefix = $year !== false ? $year . '/' : '';
         if (filter_var($id, FILTER_VALIDATE_INT) || filter_var($id, FILTER_VALIDATE_INT) === 0) {
-            $op = $this->operations->get_by_id($id);
+            $op = $this->operations->get_by_id($id, true, $year);
 
             if ($op) {
-                $op_commanders_data = $this->additional_data->get_commanders(true, $op['id'], true);
+                $op_commanders_data = $this->additional_data->get_commanders(true, $op['id'], true, $year);
                 if (isset($op_commanders_data['resolved'][$op['id']])) {
                     $op_commanders = $op_commanders_data['resolved'][$op['id']];
                 }
@@ -365,9 +372,10 @@ class App extends CI_Controller
             $errors[] = 'Invalid ID given.';
         }
 
-        $this->_head('ops', $op ? str_replace('_', ' ', $op['mission_name']) : '');
+        $this->_head('ops', $op ? str_replace('_', ' ', $op['mission_name']) : '', '', $year);
 
         $this->load->view('op', [
+            'year' => $year,
             'op' => $op,
             'errors' => $errors,
             'op_commanders' => $op_commanders,
@@ -377,10 +385,11 @@ class App extends CI_Controller
         if ($op) {
             if ($tab === 'events') {
                 $this->load->view('op-events', [
+                    'year' => $year,
                     'items' => $op_events,
                     'op_menu' => $this->load->view('op-menu', [
                         'active' => 'events',
-                        'op_url' => base_url('op/' . $op['id'])
+                        'op_url' => base_url($year_prefix . 'op/' . $op['id'])
                     ], true),
                     'op_commanders' => $op_commanders,
                     'op_id' => $op['id'],
@@ -389,18 +398,20 @@ class App extends CI_Controller
                 ]);
             } elseif ($tab === 'weapons') {
                 $this->load->view('op-weapons', [
+                    'year' => $year,
                     'items' => $op_weapons,
                     'op_menu' => $this->load->view('op-menu', [
                         'active' => 'weapons',
-                        'op_url' => base_url('op/' . $op['id'])
+                        'op_url' => base_url($year_prefix . 'op/' . $op['id'])
                     ], true)
                 ]);
             } else { // entities
                 $this->load->view('op-entities', [
+                    'year' => $year,
                     'items' => $op_entities,
                     'op_menu' => $this->load->view('op-menu', [
                         'active' => 'entities',
-                        'op_url' => base_url('op/' . $op['id'])
+                        'op_url' => base_url($year_prefix . 'op/' . $op['id'])
                     ], true),
                     'op_commanders' => $op_commanders,
                     'op_id' => $op['id'],
@@ -409,7 +420,7 @@ class App extends CI_Controller
             }
         }
 
-        $this->_foot();
+        $this->_foot($year);
     }
 
     public function commanders($year = false)

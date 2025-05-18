@@ -2,6 +2,11 @@
 
 $event_types = $this->config->item('event_types');
 $sides = $this->config->item('sides');
+
+$year_prefix = '';
+if ($year !== false) {
+    $year_prefix = $year . '/';
+}
 ?>
 
 <div class="mdc-layout-grid">
@@ -99,7 +104,7 @@ $sides = $this->config->item('sides');
                                             if ($c['entity_name'] !== $c['name']) {
                                                 $name_title = ' title="' . html_escape($c['name']) . '"';
                                             }
-                                            echo '<a href="' . base_url('player/') . $c['player_id'] . '"' . $name_title . '>' . html_escape($c['entity_name']) . '</a> (<span class="side__' . html_escape(strtolower($c['side'])) . '">' . $sides[$c['side']] . '</span>)<br>';
+                                            echo '<a href="' . base_url($year_prefix . 'player/') . $c['player_id'] . '"' . $name_title . '>' . html_escape($c['entity_name']) . '</a> (<span class="side__' . html_escape(strtolower($c['side'])) . '">' . $sides[$c['side']] . '</span>)<br>';
                                         }
                                         ?>
                                     </td>
