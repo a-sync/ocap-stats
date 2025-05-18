@@ -487,7 +487,7 @@ class App extends CI_Controller
         $this->_foot('assorted-data', $year);
     }
 
-    public function readme_md($year)
+    public function readme_md($year = false)
     {
         $this->_cache();
 
