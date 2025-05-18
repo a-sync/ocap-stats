@@ -3,14 +3,17 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 $all_event_types = $this->config->item('event_types');
 
-if (count($event_types) > 0) :
+if (count($available_event_types) > 0) :
     echo form_open('', [
         'id' => 'filter-form',
         'method' => 'get'
     ]);
 
-    foreach ($event_types as $id) :
-        $name = $all_event_types[$id];
+    foreach ($all_event_types as $id => $name) :
+        if (!in_array($id, $available_event_types)) {
+            continue;
+        }
+
         $extra_attr = '';
         if (is_array($selected_event_types) && in_array($id, $selected_event_types)) {
             $extra_attr = ' checked';

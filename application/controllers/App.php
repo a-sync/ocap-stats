@@ -134,14 +134,14 @@ class App extends CI_Controller
         $this->load->model('players');
         $this->load->model('additional_data');
 
-        $event_types = $this->additional_data->get_ops_event_type_ids($year);
+        $available_event_types = $this->additional_data->get_ops_event_type_ids($year);
         $selected_event_types = $this->_event_type_selection($year);
         $players = $this->players->get_players($selected_event_types, false, $year);
 
         $this->_head('players', 'Players');
 
         $this->load->view('filters', [
-            'event_types' => $event_types,
+            'available_event_types' => $available_event_types,
             'selected_event_types' => $selected_event_types
         ]);
 
@@ -159,14 +159,14 @@ class App extends CI_Controller
         $this->load->model('operations');
         $this->load->model('additional_data');
 
-        $event_types = $this->additional_data->get_ops_event_type_ids($year);
+        $available_event_types = $this->additional_data->get_ops_event_type_ids($year);
         $selected_event_types = $this->_event_type_selection($year);
         $ops = $this->operations->get_ops($selected_event_types, false, $year);
 
         $this->_head('ops');
 
         $this->load->view('filters', [
-            'event_types' => $event_types,
+            'available_event_types' => $available_event_types,
             'selected_event_types' => $selected_event_types
         ]);
         $this->load->view('ops', [
@@ -410,14 +410,14 @@ class App extends CI_Controller
 
         $this->load->model('additional_data');
 
-        $event_types = $this->additional_data->get_ops_event_type_ids($year);
+        $available_event_types = $this->additional_data->get_ops_event_type_ids($year);
         $selected_event_types = $this->_event_type_selection($year);
         $commanders = $this->additional_data->get_commanders($selected_event_types, false, false, $year);
 
         $this->_head('commanders', 'Commanders');
 
         $this->load->view('filters', [
-            'event_types' => $event_types,
+            'available_event_types' => $available_event_types,
             'selected_event_types' => $selected_event_types
         ]);
         $this->load->view('commanders', [
