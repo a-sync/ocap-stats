@@ -1,10 +1,15 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
+$year_text = '';
+if ($year !== false) {
+    $year_text = ' in ' . $year;
+}
+
 if (count($items) === 0) {
-    echo '<div class="mdc-typography--body1 list__no_items">No ' . $tab . ' found...</div>';
+    echo '<div class="mdc-typography--body1 list__no_items">No ' . $tab . ' found' . $year_text . '...</div>';
 } else {
-    echo '<div class="mdc-typography--caption list__total">' . count($items) . ' ' . $tab . '</div>';
+    echo '<div class="mdc-typography--caption list__total">' . count($items) . ' ' . $tab . $year_text . '</div>';
 }
 
 $show_hit_data = (!defined('ADJUST_HIT_DATA') || ADJUST_HIT_DATA >= 0) ? true : false;

@@ -267,9 +267,9 @@ class Additional_data extends CI_Model
         return $commanders;
     }
 
-    public function get_player_cmd_stats($player_id)
+    public function get_player_cmd_stats($player_id, $year = false)
     {
-        $op_commanders_data = $this->get_commanders(true, false, true);
+        $op_commanders_data = $this->get_commanders(true, false, true, $year);
         $matching_sides = [];
 
         $commanded_ops = [];

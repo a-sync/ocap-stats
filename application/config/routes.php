@@ -76,13 +76,20 @@ $route['fix-data/verified'] = 'data/fix_data/verified';
 $route['players'] = 'app/players';
 $route['(:num)/players'] = 'app/players/$1';
 
-$route['player/(:num)'] = 'app/player/$1';
+$route['player/(:num)'] = 'app/player/$1/ops';
 $route['player/(:num)/ops'] = 'app/player/$1/ops';
 $route['player/(:num)/roles'] = 'app/player/$1/roles';
 $route['player/(:num)/weapons'] = 'app/player/$1/weapons';
 $route['player/(:num)/attackers'] = 'app/player/$1/attackers';
 $route['player/(:num)/victims'] = 'app/player/$1/victims';
 $route['player/(:num)/rivals'] = 'app/player/$1/rivals';
+$route['(:num)/player/(:num)'] = 'app/player/$2/ops/$1';
+$route['(:num)/player/(:num)/ops'] = 'app/player/$2/ops/$1';
+$route['(:num)/player/(:num)/roles'] = 'app/player/$2/roles/$1';
+$route['(:num)/player/(:num)/weapons'] = 'app/player/$2/weapons/$1';
+$route['(:num)/player/(:num)/attackers'] = 'app/player/$2/attackers/$1';
+$route['(:num)/player/(:num)/victims'] = 'app/player/$2/victims/$1';
+$route['(:num)/player/(:num)/rivals'] = 'app/player/$2/rivals/$1';
 
 $route['ops'] = 'app/ops';
 $route['(:num)'] = 'app/ops/$1';

@@ -182,7 +182,7 @@ class App extends CI_Controller
         $this->_foot($year);
     }
 
-    public function player($id, $tab = 'ops')
+    public function player($id, $tab = 'ops', $year = false)
     {
         $this->_cache();
 
@@ -201,29 +201,31 @@ class App extends CI_Controller
             'rivals' => [],
             'commanded_ops' => []
         ];
+        $year_prefix = $year !== false ? $year . '/' : '';
+
         if (filter_var($id, FILTER_VALIDATE_INT)) {
-            $player = $this->players->get_by_id($id);
+            $player = $this->players->get_by_id($id, $year);
 
             if ($player) {
                 $player_aliases = $this->additional_data->get_aliases($id);
                 // TODO: get aliases from entities if player has a uid
-                $player_cmd_stats = $this->additional_data->get_player_cmd_stats($player['id']);
+                $player_cmd_stats = $this->additional_data->get_player_cmd_stats($player['id'], $year);
 
                 if ($tab === 'roles') {
-                    $player_roles = $this->players->get_roles_by_id($id);
+                    $player_roles = $this->players->get_roles_by_id($id, $year);
                 } elseif ($tab === 'weapons') {
-                    $player_weapons = $this->players->get_weapons_by_id($id);
+                    $player_weapons = $this->players->get_weapons_by_id($id, $year);
                 } elseif ($tab === 'attackers') {
-                    $player_attackers = $this->players->get_attackers_by_id($id);
+                    $player_attackers = $this->players->get_attackers_by_id($id, $year);
                 } elseif ($tab === 'victims') {
-                    $player_victims = $this->players->get_victims_by_id($id);
+                    $player_victims = $this->players->get_victims_by_id($id, $year);
                 } else { // ops
-                    $player_ops = $this->players->get_ops_by_id($id);
+                    $player_ops = $this->players->get_ops_by_id($id, $year);
                 }
             } else {
                 $alias_of = $this->players->get_alias_of_by_id($id);
                 if ($alias_of) {
-                    return redirect(base_url('player/' . $alias_of));
+                    return redirect(base_url($year_prefix . 'player/' . $alias_of));
                 }
 
                 $errors[] = 'Unknown player ID given.';
@@ -232,9 +234,10 @@ class App extends CI_Controller
             $errors[] = 'Invalid ID given.';
         }
 
-        $this->_head('players', $player ? $player['name'] : '');
+        $this->_head('players', $player ? $player['name'] : '', '', $year);
 
         $this->load->view('player', [
+            'year' => $year,
             'player' => $player,
             'errors' => $errors,
             'aliases' => $player_aliases,
@@ -249,7 +252,7 @@ class App extends CI_Controller
                     'items' => $player_roles,
                     'player_menu' => $this->load->view('player-menu', [
                         'active' => 'roles',
-                        'player_url' => base_url('player/' . $player['id']),
+                        'player_url' => base_url($year_prefix . 'player/' . $player['id']),
                         'show_rivals' => $show_rivals
                     ], true)
                 ]);
@@ -258,7 +261,7 @@ class App extends CI_Controller
                     'items' => $player_weapons,
                     'player_menu' => $this->load->view('player-menu', [
                         'active' => 'weapons',
-                        'player_url' => base_url('player/' . $player['id']),
+                        'player_url' => base_url($year_prefix . 'player/' . $player['id']),
                         'show_rivals' => $show_rivals
                     ], true)
                 ]);
@@ -267,7 +270,7 @@ class App extends CI_Controller
                     'items' => $player_attackers,
                     'player_menu' => $this->load->view('player-menu', [
                         'active' => 'attackers',
-                        'player_url' => base_url('player/' . $player['id']),
+                        'player_url' => base_url($year_prefix . 'player/' . $player['id']),
                         'show_rivals' => $show_rivals
                     ], true),
                     'tab' => 'attackers'
@@ -277,7 +280,7 @@ class App extends CI_Controller
                     'items' => $player_victims,
                     'player_menu' => $this->load->view('player-menu', [
                         'active' => 'victims',
-                        'player_url' => base_url('player/' . $player['id']),
+                        'player_url' => base_url($year_prefix . 'player/' . $player['id']),
                         'show_rivals' => $show_rivals
                     ], true),
                     'tab' => 'victims'
@@ -287,17 +290,16 @@ class App extends CI_Controller
                     'items' => $player_cmd_stats['rivals'],
                     'player_menu' => $this->load->view('player-menu', [
                         'active' => 'rivals',
-                        'player_url' => base_url('player/' . $player['id']),
+                        'player_url' => base_url($year_prefix . 'player/' . $player['id']),
                         'show_rivals' => $show_rivals
-                    ], true),
-                    'tab' => 'victims'
+                    ], true)
                 ]);
             } else { // ops
                 $this->load->view('player-ops', [
                     'items' => $player_ops,
                     'player_menu' => $this->load->view('player-menu', [
                         'active' => 'ops',
-                        'player_url' => base_url('player/' . $player['id']),
+                        'player_url' => base_url($year_prefix . 'player/' . $player['id']),
                         'show_rivals' => $show_rivals
                     ], true),
                     'commanded_ops' => $player_cmd_stats['commanded_ops']
@@ -305,7 +307,7 @@ class App extends CI_Controller
             }
         }
 
-        $this->_foot();
+        $this->_foot($year);
     }
 
     public function op($id, $tab = 'entities')

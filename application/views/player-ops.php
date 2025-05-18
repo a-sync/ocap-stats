@@ -1,11 +1,17 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
+$year_prefix = '';
+$year_text = '';
+if ($year !== false) {
+    $year_prefix = $year . '/';
+    $year_text = ' in ' . $year;
+}
 if (count($items) === 0) {
-    echo '<div class="mdc-typography--body1 list__no_items">No ops found...</div>';
+    echo '<div class="mdc-typography--body1 list__no_items">No ops found' . $year_text . '...</div>';
 } else {
     $unique_count = count(array_unique(array_column($items, 'operation_id')));
-    echo '<div class="mdc-typography--caption list__total">' . $unique_count . ' ops</div>';
+    echo '<div class="mdc-typography--caption list__total">' . $unique_count . ' ops' . $year_text . '</div>';
 }
 
 $show_hit_data = (!defined('ADJUST_HIT_DATA') || ADJUST_HIT_DATA >= 0) ? true : false;
@@ -121,7 +127,7 @@ $sides = $this->config->item('sides');
                             ?>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell mdc-data-table__cell--numeric">
-                                        <a href="<?php echo base_url('op/') . $i['operation_id']; ?>" title="<?php echo html_escape($op_id_title); ?>"><?php echo $i['operation_id']; ?></a>
+                                        <a href="<?php echo base_url($year_prefix . 'op/') . $i['operation_id']; ?>" title="<?php echo html_escape($op_id_title); ?>"><?php echo $i['operation_id']; ?></a>
                                     </td>
                                     <td class="mdc-data-table__cell"><span title="<?php echo $i['start_time']; ?>"><?php echo html_escape($i['date']); ?></span></td>
                                     <td class="mdc-data-table__cell"><span title="<?php echo html_escape($i['tag']); ?>"><?php echo $event_types[$i['event']]; ?></span></td>

@@ -49,6 +49,10 @@ class Players extends CI_Model
         $players = $this->db->get()->result_array();
 
         if (defined('ADJUST_HIT_DATA') && ADJUST_HIT_DATA >= 0) {
+            if ($year !== false) {
+                $this->db->where('YEAR(operations.start_time)', $year);
+            }
+
             // Get adjusted hit stats for players
             if (is_array($events_filter) && count($events_filter) > 0) {
                 $this->db->where_in('operations.event', $events_filter);
@@ -73,10 +77,6 @@ class Players extends CI_Model
                 ->join('operations', 'operations.id = entities.operation_id')
                 ->where('players.alias_of', 0)
                 ->group_by('players.id');
-
-            if ($year !== false) {
-                $this->db->where('YEAR(operations.start_time)', $year);
-            }
 
             $players_adjusted_stats = $this->db->get()->result_array();
             $players_adjusted_stats = array_column($players_adjusted_stats, null, 'id');
@@ -104,9 +104,9 @@ class Players extends CI_Model
         return $players;
     }
 
-    public function get_by_id($id)
+    public function get_by_id($id, $year = false)
     {
-        $re = $this->get_players(true, $id);
+        $re = $this->get_players(true, $id, $year);
 
         if (count($re) === 0) {
             return false;
@@ -130,8 +130,12 @@ class Players extends CI_Model
         }
     }
 
-    public function get_ops_by_id($id)
+    public function get_ops_by_id($id, $year = false)
     {
+        if ($year !== false) {
+            $this->db->where('YEAR(operations.start_time)', $year);
+        }
+
         $this->db
             ->select([
                 'entities.operation_id',
@@ -175,8 +179,12 @@ class Players extends CI_Model
             ->result_array();
     }
 
-    public function get_roles_by_id($id)
+    public function get_roles_by_id($id, $year = false)
     {
+        if ($year !== false) {
+            $this->db->where('YEAR(operations.start_time)', $year);
+        }
+
         $this->db
             ->select([
                 "TRIM(SUBSTRING_INDEX(entities.role, '@', 1)) AS role_name",
@@ -205,6 +213,12 @@ class Players extends CI_Model
         $roles = $this->db->get()->result_array();
 
         if (defined('ADJUST_HIT_DATA') && ADJUST_HIT_DATA >= 0) {
+            if ($year !== false) {
+                $this->db
+                    ->join('operations', 'operations.id = entities.operation_id')
+                    ->where('YEAR(operations.start_time)', $year);
+            }
+
             // Get adjusted hit stats for roles
             $this->db
                 ->select([
@@ -246,11 +260,17 @@ class Players extends CI_Model
         return $roles;
     }
 
-    private function get_opponents_by_id($id, $type)
+    private function get_opponents_by_id($id, $type, $year = false)
     {
         $opponents = [];
         $entity_types = ['unit', 'vehicle'];
         foreach ($entity_types as $et) {
+            if ($year !== false) {
+                $this->db
+                    ->join('operations', 'operations.id = events.operation_id')
+                    ->where('YEAR(operations.start_time)', $year);
+            }
+
             $this->db
                 ->select_sum("CASE WHEN events.event = 'hit' THEN 1 ELSE 0 END", 'hits')
                 ->select_sum("CASE WHEN events.event = 'hit' AND attacker.side = victim.side THEN 1 ELSE 0 END", 'fhits')
@@ -316,18 +336,24 @@ class Players extends CI_Model
         return $opponents;
     }
 
-    public function get_attackers_by_id($id)
+    public function get_attackers_by_id($id, $year = false)
     {
         return $this->get_opponents_by_id($id, 'attackers');
     }
 
-    public function get_victims_by_id($id)
+    public function get_victims_by_id($id, $year = false)
     {
         return $this->get_opponents_by_id($id, 'victims');
     }
 
-    public function get_weapons_by_id($id)
+    public function get_weapons_by_id($id, $year = false)
     {
+        if ($year !== false) {
+            $this->db
+                ->join('operations', 'operations.id = events.operation_id')
+                ->where('YEAR(operations.start_time)', $year);
+        }
+
         $this->db
             ->select('events.weapon')
             ->select_sum("CASE WHEN events.event = 'hit' THEN 1 ELSE 0 END", 'hits')
