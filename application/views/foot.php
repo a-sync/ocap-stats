@@ -66,11 +66,13 @@ if ($year !== false) {
     <br>
     <span class="render-stats">{elapsed_time}s / {memory_usage}</span>
     <br>
-    <span class="render-stats" id="local-timezone"></span>
+    <span class="render-stats local-timezone"></span>
 </footer>
 
 <script>
-    document.getElementById('local-timezone').textContent = 'TimeZone: ' + Intl.DateTimeFormat().resolvedOptions().timeZone;
+    document.querySelectorAll('.local-timezone').forEach((el) => {
+        el.textContent = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    });
     document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('[data-ts]').forEach((el) => {
             const ts = el.getAttribute('data-ts');

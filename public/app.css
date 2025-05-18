@@ -81,6 +81,9 @@ footer .render-stats {
     font-size: 0.6rem;
     opacity: 0.6;
 }
+footer .local-timezone::before {
+    content: 'TZ: ';
+}
 
 #refresh_operations {
     text-align: center;

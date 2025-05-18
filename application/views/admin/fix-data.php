@@ -111,7 +111,7 @@ $fixed_icon = '<span class="material-icons">check</span>';
                                         <td class="mdc-data-table__cell"><?php echo html_escape($i['date']); ?></td>
                                         <td class="mdc-data-table__cell">
                                             <?php
-                                            echo $i['start_time'];
+                                            echo '<span data-ts="' . $i['start_time'] . '">' . $i['start_time'] . '</span>';
                                             if (substr($i['start_time'], -8) === '00:00:00') {
                                                 echo $warn_icon;
                                             } elseif (substr($i['start_time'], -2) === '00') {

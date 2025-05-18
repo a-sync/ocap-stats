@@ -82,7 +82,7 @@ $fixed_icon = '<span class="material-icons">check</span>';
                                 </tr>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Start time</td>
-                                    <td class="mdc-data-table__cell"><?php echo html_escape($op['start_time']); ?></td>
+                                    <td class="mdc-data-table__cell" data-ts="<?php echo $op['start_time']; ?>"><?php echo html_escape($op['start_time']); ?></td>
                                 </tr>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Event</td>
@@ -124,7 +124,7 @@ $fixed_icon = '<span class="material-icons">check</span>';
                                     <td class="mdc-data-table__cell">Updated</td>
                                     <td class="mdc-data-table__cell">
                                         <p>
-                                            <?php echo gmdate('Y-m-d H:i:s', $op['updated']); ?>
+                                            <span data-ts="<?php echo gmdate('Y-m-d H:i:s', $op['updated']); ?>"><?php echo gmdate('Y-m-d H:i:s', $op['updated']); ?></span>
                                             <br>
                                             <?php echo strtolower(timespan($op['updated'], '', 2)); ?> ago
                                         </p>

@@ -73,7 +73,7 @@ $event_types = $this->config->item('event_types');
                                             $label = '<i>ignored</i>';
                                         } else {
                                             $label = '<span>' . $event_types[$ops_in_db[$op['id']]['event']] . '</span>';
-                                            $start_time_title = ' title="' . html_escape($ops_in_db[$op['id']]['start_time']) . '"';
+                                            $start_time_title = ' title="' . html_escape($ops_in_db[$op['id']]['start_time']) . '" data-ts="' . $ops_in_db[$op['id']]['start_time'] . '" data-ts-title="true"';
                                         }
                                     }
                                 ?>
@@ -100,7 +100,7 @@ $event_types = $this->config->item('event_types');
                                                 <?php echo $label; ?>
                                             </td>
                                             <td class="mdc-data-table__cell mdc-data-table__cell--numeric">
-                                                <span title="<?php echo gmdate('Y-m-d H:i:s', $ops_in_db[$op['id']]['updated']); ?>">
+                                                <span title="<?php echo gmdate('Y-m-d H:i:s', $ops_in_db[$op['id']]['updated']); ?>" data-ts="<?php echo gmdate('Y-m-d H:i:s', $ops_in_db[$op['id']]['updated']); ?>" data-ts-title="true">
                                                     <?php echo strtolower(timespan($ops_in_db[$op['id']]['updated'], '', 1)); ?> ago
                                                 </span>
                                             </td>

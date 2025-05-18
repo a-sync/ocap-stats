@@ -125,6 +125,8 @@ foreach ($op_player_entities as $e) {
                                             &nbsp; &rdca; Europe/London
                                             <br>
                                             &nbsp; &rdca; America/New_York
+                                            <br>
+                                            &nbsp; &rdca; <span class="local-timezone">Local</span>
                                         </p>
                                     </td>
                                     <td class="mdc-data-table__cell">
@@ -141,6 +143,8 @@ foreach ($op_player_entities as $e) {
                                             &nbsp; &rdca; <?php echo (new \DateTime($op['start_time'], new \DateTimeZone('UTC')))->setTimezone(new \DateTimeZone('Europe/London'))->format('Y-m-d H:i:s'); ?>
                                             <br>
                                             &nbsp; &rdca; <?php echo (new \DateTime($op['start_time'], new \DateTimeZone('UTC')))->setTimezone(new \DateTimeZone('America/New_York'))->format('Y-m-d H:i:s'); ?>
+                                            <br>
+                                            &nbsp; &rdca; <span data-ts="<?php echo $op['start_time']; ?>">⏳</span>
                                         </p>
                                     </td>
                                 </tr>
@@ -362,7 +366,7 @@ foreach ($op_player_entities as $e) {
                                     <td class="mdc-data-table__cell">Updated</td>
                                     <td class="mdc-data-table__cell">
                                         <p>
-                                            <?php echo gmdate('Y-m-d H:i:s', $op['updated']); ?>
+                                            <span data-ts="<?php echo gmdate('Y-m-d H:i:s', $op['updated']); ?>"><?php echo gmdate('Y-m-d H:i:s', $op['updated']); ?></span>
                                             <br>
                                             <?php echo strtolower(timespan($op['updated'], '', 2)); ?> ago
                                         </p>

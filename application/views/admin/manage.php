@@ -187,7 +187,7 @@ $sides = $this->config->item('sides');
                                         <td class="mdc-data-table__cell">Updated</td>
                                         <td class="mdc-data-table__cell">
                                             <p>
-                                                <?php echo gmdate('Y-m-d H:i:s', $op['updated']); ?>
+                                                <span data-ts="<?php echo gmdate('Y-m-d H:i:s', $op['updated']); ?>"><?php echo gmdate('Y-m-d H:i:s', $op['updated']); ?></span>
                                                 <br>
                                                 <?php echo strtolower(timespan($op['updated'], '', 2)); ?> ago
                                             </p>
