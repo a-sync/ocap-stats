@@ -11,7 +11,6 @@ $year_prefix = '';
 if ($year !== false) {
     $year_prefix = $year . '/';
 }
-
 ?>
 </main>
 
@@ -36,7 +35,7 @@ if ($year !== false) {
         } else {
             echo 'All seasons';
         }
-        echo '</a>&nbsp;&bull;&nbsp;';
+        echo '</a> &nbsp;&bull;&nbsp; ';
         foreach ($years as $y) {
             echo '<a href="' . base_url($y . '/ops') . '">';
             if ($year === $y) {
@@ -46,7 +45,7 @@ if ($year !== false) {
             }
             echo '</a>';
             if ($y !== end($years)) {
-                echo '&nbsp;&bull;&nbsp;';
+                echo ' &nbsp;&bull;&nbsp; ';
             }
         }
         echo '<br><br>';
