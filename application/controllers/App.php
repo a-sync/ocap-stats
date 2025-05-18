@@ -85,7 +85,7 @@ class App extends CI_Controller
         show_404('', false);
     }
 
-    private function _event_type_selection()
+    private function _event_type_selection($available_event_types)
     {
         $events = $this->input->get('events');
         $event_type_ids = array_keys($this->config->item('event_types'));
@@ -115,7 +115,11 @@ class App extends CI_Controller
             }
 
             if (!is_array($events) || count($events) === 0) {
-                return $this->config->item('default_selected_event_types');
+                $default_selection = $this->config->item('default_selected_event_types');
+
+                return array_filter($default_selection, function ($v) use ($available_event_types) {
+                    return in_array($v, $available_event_types);
+                });
             } else {
                 return $events;
             }
@@ -135,7 +139,7 @@ class App extends CI_Controller
         $this->load->model('additional_data');
 
         $available_event_types = $this->additional_data->get_ops_event_type_ids($year);
-        $selected_event_types = $this->_event_type_selection($year);
+        $selected_event_types = $this->_event_type_selection($available_event_types);
         $players = $this->players->get_players($selected_event_types, false, $year);
 
         $this->_head('players', 'Players');
@@ -160,7 +164,7 @@ class App extends CI_Controller
         $this->load->model('additional_data');
 
         $available_event_types = $this->additional_data->get_ops_event_type_ids($year);
-        $selected_event_types = $this->_event_type_selection($year);
+        $selected_event_types = $this->_event_type_selection($available_event_types);
         $ops = $this->operations->get_ops($selected_event_types, false, $year);
 
         $this->_head('ops');
@@ -411,7 +415,7 @@ class App extends CI_Controller
         $this->load->model('additional_data');
 
         $available_event_types = $this->additional_data->get_ops_event_type_ids($year);
-        $selected_event_types = $this->_event_type_selection($year);
+        $selected_event_types = $this->_event_type_selection($available_event_types);
         $commanders = $this->additional_data->get_commanders($selected_event_types, false, false, $year);
 
         $this->_head('commanders', 'Commanders');

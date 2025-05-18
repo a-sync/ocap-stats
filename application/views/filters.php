@@ -10,7 +10,7 @@ if (count($available_event_types) > 0) :
     ]);
 
     foreach ($all_event_types as $id => $name) :
-        if (!in_array($id, $available_event_types)) {
+        if (!in_array($id, $available_event_types) && !in_array($id, $selected_event_types)) {
             continue;
         }
 
