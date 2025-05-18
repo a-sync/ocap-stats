@@ -65,8 +65,34 @@ if ($year !== false) {
         </svg></a>
     <br>
     <span class="render-stats">{elapsed_time}s / {memory_usage}</span>
+    <br>
+    <span class="render-stats" id="local-timezone"></span>
 </footer>
 
+<script>
+    document.getElementById('local-timezone').textContent = 'TimeZone: ' + Intl.DateTimeFormat().resolvedOptions().timeZone;
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('[data-ts]').forEach((el) => {
+            const ts = el.getAttribute('data-ts');
+            const date = new Date(ts);
+            if (!isNaN(date)) {
+                const options = {
+                    year: 'numeric', month: 'numeric', day: 'numeric',
+                    hour: 'numeric', minute: 'numeric', second: 'numeric',
+                    timeZoneName: 'short',
+                    hour12: false
+                };
+                const local = new Intl.DateTimeFormat(undefined, options).format(date);
+                const title = el.getAttribute('data-ts-title');
+                if (title) {
+                    el.title = local;
+                } else {
+                    el.textContent = local;
+                }
+            }
+        });
+    });
+</script>
 <script src="<?php echo base_url('public/sortable.min.js'); ?>"></script>
 <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
 <script type="text/javascript">

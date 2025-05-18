@@ -42,7 +42,7 @@ else :
                                         <td class="mdc-data-table__cell mdc-data-table__cell--numeric">
                                             <a href="<?php echo base_url($year_prefix . 'op/') . $i['id']; ?>"><?php echo $i['id']; ?></a>
                                         </td>
-                                        <td class="mdc-data-table__cell"><span title="<?php echo $i['date']; ?>"><?php echo $i['start_time']; ?></span></td>
+                                        <td class="mdc-data-table__cell"><span title="<?php echo $i['date']; ?>" data-ts="<?php echo $i['start_time']; ?>"><?php echo $i['start_time']; ?></span></td>
                                         <td class="mdc-data-table__cell"><span title="<?php echo html_escape($i['tag']); ?>"><?php echo $event_types[$i['event']]; ?></span></td>
                                         <td class="mdc-data-table__cell cell__title">
                                             <span title="<?php echo html_escape($i['world_name']); ?>">

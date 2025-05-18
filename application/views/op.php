@@ -37,7 +37,7 @@ if ($year !== false) {
                                 </tr>
                                 <tr class="mdc-data-table__row">
                                     <td class="mdc-data-table__cell">Start time</td>
-                                    <td class="mdc-data-table__cell"><?php echo $op['start_time']; ?></td>
+                                    <td class="mdc-data-table__cell" data-ts="<?php echo $op['start_time']; ?>"><?php echo $op['start_time']; ?></td>
                                 </tr>
                                 <?php // TODO: in game time / timestamps ?>
                                 <tr class="mdc-data-table__row">

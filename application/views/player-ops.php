@@ -129,7 +129,7 @@ $sides = $this->config->item('sides');
                                     <td class="mdc-data-table__cell mdc-data-table__cell--numeric">
                                         <a href="<?php echo base_url($year_prefix . 'op/') . $i['operation_id']; ?>" title="<?php echo html_escape($op_id_title); ?>"><?php echo $i['operation_id']; ?></a>
                                     </td>
-                                    <td class="mdc-data-table__cell"><span title="<?php echo $i['start_time']; ?>"><?php echo html_escape($i['date']); ?></span></td>
+                                    <td class="mdc-data-table__cell"><span title="<?php echo $i['start_time']; ?>" data-ts="<?php echo $i['start_time']; ?>" data-ts-title="true"><?php echo html_escape($i['date']); ?></span></td>
                                     <td class="mdc-data-table__cell"><span title="<?php echo html_escape($i['tag']); ?>"><?php echo $event_types[$i['event']]; ?></span></td>
                                     <td class="mdc-data-table__cell">
                                         <span title="<?php echo implode(', ', [html_escape($i['world_name']), $duration_min . ' minutes', $i['players_total'] . ' players']); ?>">
