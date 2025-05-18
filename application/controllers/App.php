@@ -209,8 +209,10 @@ class App extends CI_Controller
             'commanded_ops' => []
         ];
         $year_prefix = $year !== false ? $year . '/' : '';
+        $active = 'players';
 
         if (filter_var($id, FILTER_VALIDATE_INT)) {
+            $active = 'player/' . $id . '/' . $tab;
             $player = $this->players->get_by_id($id, $year);
 
             if ($player) {
@@ -320,7 +322,7 @@ class App extends CI_Controller
             }
         }
 
-        $this->_foot('players', $year);
+        $this->_foot($active, $year);
     }
 
     public function op($id, $tab = 'entities', $year = false)
