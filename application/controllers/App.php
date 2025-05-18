@@ -212,7 +212,8 @@ class App extends CI_Controller
         $path = 'players';
 
         if (filter_var($id, FILTER_VALIDATE_INT)) {
-            $path = 'player/' . $id . '/' . $tab;
+            $path = 'player/' . $id;
+            if ($tab !== 'ops') $path .= '/' . $tab;
             $player = $this->players->get_by_id($id, $year);
 
             if ($player) {

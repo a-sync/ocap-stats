@@ -18,7 +18,7 @@ if ($year !== false) {
                         </span>
                         <span class="mdc-tab__ripple"></span>
                     </a>
-                    <a href="<?php echo base_url($year_prefix); ?>" class="mdc-tab<?php if ($active === 'ops') echo ' mdc-tab--active';  ?>" role="tab" aria-selected="true" tabindex="2">
+                    <a href="<?php echo base_url(rtrim($year_prefix, '/')); ?>" class="mdc-tab<?php if ($active === 'ops') echo ' mdc-tab--active';  ?>" role="tab" aria-selected="true" tabindex="2">
                         <span class="mdc-tab__content">
                             <span class="mdc-tab__icon material-icons" aria-hidden="true">calendar_month</span>
                             <span class="mdc-tab__text-label">Ops</span>

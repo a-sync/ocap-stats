@@ -38,7 +38,7 @@ if ($year !== false) {
         }
         echo '</a> &nbsp;&bull;&nbsp; ';
         foreach ($years as $y) {
-            echo '<a href="' . base_url($y . '/' . $path) . '">';
+            echo '<a href="' . base_url(rtrim($y . '/' . $path, '/')) . '">';
             if ($year === $y) {
                 echo '<b>' . $y . '</b>';
             } else {
