@@ -76,20 +76,24 @@ if ($year !== false) {
     document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('[data-ts]').forEach((el) => {
             const ts = el.getAttribute('data-ts');
-            const date = new Date(ts);
-            if (!isNaN(date)) {
+            const [datePart, timePart] = ts.split(' ');
+            const [year, month, day] = datePart.split('-').map(Number);
+            const [hour, minute, second] = timePart.split(':').map(Number);
+            const utcMilliseconds = Date.UTC(year, month - 1, day, hour, minute, second);
+            const date = new Date(utcMilliseconds);
+            if (!isNaN(date.getTime())) {
                 const options = {
                     year: 'numeric', month: 'numeric', day: 'numeric',
                     hour: 'numeric', minute: 'numeric', second: 'numeric',
                     timeZoneName: 'short',
                     hour12: false
                 };
-                const local = new Intl.DateTimeFormat(undefined, options).format(date);
+                const localized = new Intl.DateTimeFormat(undefined, options).format(date);
                 const title = el.getAttribute('data-ts-title');
                 if (title) {
-                    el.title = local;
+                    el.title = localized;
                 } else {
-                    el.textContent = local;
+                    el.textContent = localized;
                 }
             }
         });
