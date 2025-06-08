@@ -73,7 +73,9 @@ class App extends CI_Controller
         $this->load->helper('cache');
 
         $cache_expiration = 0;
-        if (ENVIRONMENT === 'production') {
+        if (isset($_SERVER['CACHE_EXPIRATION'])) {
+            $cache_expiration = intval($_SERVER['CACHE_EXPIRATION']);
+        } elseif (ENVIRONMENT === 'production') {
             $cache_expiration = 60 * 24 * 7;
         }
 

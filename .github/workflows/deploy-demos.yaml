@@ -117,6 +117,14 @@ jobs:
           find: "SetEnv CI_ENV development"
           replace: "SetEnv CI_ENV production"
 
+      # - name: ✏️ Replace CACHE_EXPIRATION
+      #   uses: jacobtomlinson/gha-find-replace@v3
+      #   with:
+      #     include: ".htaccess"
+      #     regex: false
+      #     find: "SetEnv CACHE_EXPIRATION 0"
+      #     replace: "SetEnv CACHE_EXPIRATION 604800"
+
       - name: 📂 Sync files
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:

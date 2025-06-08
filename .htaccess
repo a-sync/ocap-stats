@@ -23,4 +23,5 @@
 </IfModule>
 <IfModule mod_env.c>
     SetEnv CI_ENV development
+    SetEnv CACHE_EXPIRATION 0
 </IfModule>
