@@ -509,7 +509,7 @@ class CI_Pagination {
 				$this->uri_segment = count($this->CI->uri->segment_array());
 			}
 
-			$this->cur_page = $this->CI->uri->segment($this->uri_segment);
+			$this->cur_page = $this->CI->uri->segment($this->uri_segment, '');
 
 			// Remove any specified prefix/suffix from the segment.
 			if ($this->prefix !== '' OR $this->suffix !== '')
@@ -523,7 +523,7 @@ class CI_Pagination {
 		}
 
 		// If something isn't quite right, back to the default base page.
-		if ( ! ctype_digit($this->cur_page) OR ($this->use_page_numbers && (int) $this->cur_page === 0))
+		if ( ! ctype_digit((string) $this->cur_page) OR ($this->use_page_numbers && (int) $this->cur_page === 0))
 		{
 			$this->cur_page = $base_page;
 		}

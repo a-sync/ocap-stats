@@ -278,12 +278,12 @@ if ( ! function_exists('create_captcha'))
 		{
 			$theta += $thetac;
 			$rad = $radius * ($i / $points);
-			$x = ($rad * cos($theta)) + $x_axis;
-			$y = ($rad * sin($theta)) + $y_axis;
+			$x = round(($rad * cos($theta)) + $x_axis);
+			$y = round(($rad * sin($theta)) + $y_axis);
 			$theta += $thetac;
 			$rad1 = $radius * (($i + 1) / $points);
-			$x1 = ($rad1 * cos($theta)) + $x_axis;
-			$y1 = ($rad1 * sin($theta)) + $y_axis;
+			$x1 = round(($rad1 * cos($theta)) + $x_axis);
+			$y1 = round(($rad1 * sin($theta)) + $y_axis);
 			imageline($im, $x, $y, $x1, $y1, $colors['grid']);
 			$theta -= $thetac;
 		}
@@ -346,7 +346,9 @@ if ( ! function_exists('create_captcha'))
 		}
 
 		$img = '<img '.($img_id === '' ? '' : 'id="'.$img_id.'"').' src="'.$img_url.$img_filename.'" style="width: '.$img_width.'px; height: '.$img_height .'px; border: 0;" alt=" " />';
-		ImageDestroy($im);
+		if (PHP_VERSION_ID < 80500) {
+			ImageDestroy($im);
+		}
 
 		return array('word' => $word, 'time' => $now, 'image' => $img, 'filename' => $img_filename);
 	}

@@ -1,5 +1,5 @@
 # Setup
-Built with Ye Olde CodeIgniter 3.1 (required PHP version >= 7.0).  
+Built with Ye Olde CodeIgniter 3.1 (required PHP version >= 7.4).  
 Copy all files to the host and configure the [`base_url`](application/config/config.php#L30) and the [DB settings](application/config/database.php#L76).  
 
 If the site is running under a path the [.htaccess](.htaccess#L9) file `RewriteBase /` line needs to be updated to reflect that path.  
