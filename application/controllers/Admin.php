@@ -91,23 +91,23 @@ class Admin extends CI_Controller
             log_message('error', 'EVENT --> [' . $this->adminUser['name'] . '] updated operations.json');
             if (!download_file(OPERATIONS_JSON_URL, JSONPATH . 'operations.json.tmp')) {
                 log_message('error', 'operations.json download failed.');
-            }
-
-            if (defined('OPERATIONS_JSON_URL_CONTENT_REGEX')) {
-                $matches = [];
-                if (preg_match(OPERATIONS_JSON_URL_CONTENT_REGEX, file_get_contents(JSONPATH . 'operations.json.tmp'), $matches)) {
-                    if (!file_put_contents(JSONPATH . 'operations.json.tmp', $matches[1], LOCK_EX)) {
-                        log_message('error', 'operations.json.tmp write failed.');
+            } else {
+                if (defined('OPERATIONS_JSON_URL_CONTENT_REGEX')) {
+                    $matches = [];
+                    if (preg_match(OPERATIONS_JSON_URL_CONTENT_REGEX, file_get_contents(JSONPATH . 'operations.json.tmp'), $matches)) {
+                        if (!file_put_contents(JSONPATH . 'operations.json.tmp', $matches[1], LOCK_EX)) {
+                            log_message('error', 'operations.json.tmp write failed.');
+                            unlink(JSONPATH . 'operations.json.tmp');
+                        }
+                    } else {
+                        log_message('error', 'operations.json.tmp regex failed.');
                         unlink(JSONPATH . 'operations.json.tmp');
                     }
-                } else {
-                    log_message('error', 'operations.json.tmp regex failed.');
-                    unlink(JSONPATH . 'operations.json.tmp');
                 }
-            }
 
-            if (file_exists(JSONPATH . 'operations.json.tmp')) {
-                rename(JSONPATH . 'operations.json.tmp', JSONPATH . 'operations.json');
+                if (file_exists(JSONPATH . 'operations.json.tmp')) {
+                    rename(JSONPATH . 'operations.json.tmp', JSONPATH . 'operations.json');
+                }
             }
         }
 
@@ -353,9 +353,8 @@ class Admin extends CI_Controller
 
         if (!download_file(OPERATION_DATA_JSON_URL_PATH . rawurlencode($operation['filename']), JSONPATH . $operation['filename'])) {
             $errors[] = 'Operation (' . $operation['id'] . ') data JSON download failed.';
-        }
-
-        if (file_exists(JSONPATH . $operation['filename']) && filesize(JSONPATH . $operation['filename']) === 0) {
+            $this->_json_del($operation);
+        } elseif (file_exists(JSONPATH . $operation['filename']) && filesize(JSONPATH . $operation['filename']) === 0) {
             $errors[] = 'The downloaded operation (' . $operation['id'] . ') data JSON was empty.';
             $this->_json_del($operation);
         }
